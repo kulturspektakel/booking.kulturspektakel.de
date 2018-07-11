@@ -1,0 +1,67 @@
+.Sidebar h3 {
+  margin-top: 20px;
+  margin-bottom: 0;
+}
+
+.Sidebar h4 {
+  margin-bottom: 0;
+}
+
+.Sidebar .Rater {
+  text-align: center;
+  border: 1px solid #e8e8e8;
+  border-radius: 4px;
+  margin-bottom: 20px;
+  margin-top: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding-bottom: 6px;
+}
+
+.Sidebar .ant-rate {
+  flex-grow: 1;
+}
+
+.Sidebar .avg {
+  border-left: 1px solid #e8e8e8;
+  flex-grow: 1;
+  color: #e8e8e8;
+  line-height: 30px;
+  padding-bottom: 0px;
+  margin-top: 6px;
+}
+
+.Sidebar table {
+  max-width: 100%;
+  margin-bottom: 20px;
+}
+
+.Sidebar th {
+  font-weight: bold;
+  padding-right: 10px;
+  white-space: nowrap;
+  text-align: left;
+}
+
+.Sidebar td {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  display: block;
+}
+
+.ant-drawer .ant-drawer-body {
+  padding-top: 0;
+}
+
+.Sidebar .ant-tabs {
+  overflow: visible;
+}
+
+.Sidebar .ant-tabs-bar {
+  margin-left: -24px;
+  margin-right: -24px;
+  padding-left: 24px;
+  padding-top: 6px;
+}

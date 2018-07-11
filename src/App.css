@@ -1,0 +1,30 @@
+@import '~antd/dist/antd.css';
+
+.App {
+  text-align: center;
+}
+
+.loginButton {
+  margin-top: 45vh;
+  display: inline-block;
+}
+
+h1 {
+  color: white;
+  font-weight: 300;
+  font-size: 24px;
+  margin: 0;
+}
+
+.ant-layout-header {
+  text-align: left;
+  padding-left: 10px;
+  padding-right: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.profilePic {
+  border-radius: 4px;
+}

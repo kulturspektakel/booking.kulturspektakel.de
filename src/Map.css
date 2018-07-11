@@ -1,0 +1,10 @@
+.Map {
+  width: 100%;
+  height: 280px;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.Map.loading {
+  border: 1px solid #e8e8e8;
+}

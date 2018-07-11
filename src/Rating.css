@@ -1,0 +1,12 @@
+.Rating {
+  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 24px;
+  font-weight: 300;
+  display: block;
+  text-align: center;
+  color: #d8d8d8;
+}
+
+.Rating.rated {
+  color: #4a98f4;
+}

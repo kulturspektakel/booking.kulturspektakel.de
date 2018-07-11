@@ -1,0 +1,33 @@
+{
+  "name": "booking",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "antd": "^3.9.3",
+    "flow-bin": "^0.81.0",
+    "moment": "^2.18.1",
+    "query-string": "^5.0.0",
+    "react": "^16.5.2",
+    "react-dom": "^16.5.2",
+    "react-google-maps": "^9.4.5",
+    "react-player": "^0.20.0",
+    "react-scripts": "^2.0.4",
+    "recompose": "^0.30.0",
+    "youtube-url": "^0.5.0"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test --env=jsdom",
+    "eject": "react-scripts eject"
+  },
+  "devDependencies": {
+    "prettier": "1.14.3"
+  },
+  "browserslist": [
+    ">0.2%",
+    "not dead",
+    "not ie <= 11",
+    "not op_mini all"
+  ]
+}

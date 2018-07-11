@@ -1,0 +1,32 @@
+.badge {
+  position: relative;
+  opacity: 0.25;
+  filter: grayscale();
+  margin-bottom: -3px;
+}
+
+.badge.has-comments {
+  opacity: 1;
+  color: #108ee9;
+  filter: none;
+}
+
+.badge span {
+  position: absolute;
+  display: block;
+  text-align: center;
+  top: 2px;
+  left: 0;
+  width: 24px;
+  pointer-events: none;
+}
+
+.comment-button {
+  display: block;
+  width: 100%;
+}
+
+.message {
+  margin-bottom: 12px;
+  width: 300px;
+}
