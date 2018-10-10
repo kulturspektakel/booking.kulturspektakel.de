@@ -11,7 +11,6 @@ import Player from './Player';
 import Comments from './Comments';
 import ShowMore from './ShowMore';
 import Rating from './Rating';
-import Map from './Map';
 import './Sidebar.css';
 
 const TabPane = Tabs.TabPane;
@@ -25,12 +24,6 @@ type State = {};
 
 export default class Sidebar extends Component<Props, State> {
   render() {
-    const myRating =
-      this.props.tableRow &&
-      this.props.tableRow.rating &&
-      this.props.tableRow.myRating
-        ? this.props.tableRow.rating.toFixed(1)
-        : null;
     return (
       <div className={`Sidebar ${this.props.tableRow ? 'visible' : ''}`}>
         {this.props.tableRow && (
