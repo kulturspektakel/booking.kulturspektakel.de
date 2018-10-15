@@ -306,7 +306,7 @@ class Core extends Component<*, State> {
         reaction.count += 1;
         reaction.users.push(user);
       } else {
-        (slackData.reactions || []).push({
+        slackData.reactions = (slackData.reactions || []).concat({
           count: 1,
           name: emoji,
           users: [user],
