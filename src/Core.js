@@ -129,6 +129,8 @@ type State = {
   myUserId: ?string,
 };
 
+export const Context = React.createContext({slackUsers: null});
+
 class Core extends Component<*, State> {
   state = {
     selectedRow: null,
@@ -376,25 +378,29 @@ class Core extends Component<*, State> {
                 </Dropdown>
               )}
             </Header>
-            <Table
-              data={data}
-              onSelect={(tableRow: TableRow) =>
-                this.setState({selectedRow: tableRow})
-              }
-            />
-            <Drawer
-              title={this.state.selectedRow && this.state.selectedRow.bandname}
-              placement="right"
-              destroyOnClose={true}
-              onClose={() => this.setState({selectedRow: null})}
-              visible={Boolean(this.state.selectedRow)}
-              width={500}
-            >
-              <Sidebar
-                tableRow={this.state.selectedRow}
-                myUser={this.state.slackUsers.get(this.state.myUserId)}
+            <Context.Provider value={{slackUsers: this.state.slackUsers}}>
+              <Table
+                data={data}
+                onSelect={(tableRow: TableRow) =>
+                  this.setState({selectedRow: tableRow})
+                }
               />
-            </Drawer>
+              <Drawer
+                title={
+                  this.state.selectedRow && this.state.selectedRow.bandname
+                }
+                placement="right"
+                destroyOnClose={true}
+                onClose={() => this.setState({selectedRow: null})}
+                visible={Boolean(this.state.selectedRow)}
+                width={500}
+              >
+                <Sidebar
+                  tableRow={this.state.selectedRow}
+                  myUser={this.state.slackUsers.get(this.state.myUserId)}
+                />
+              </Drawer>
+            </Context.Provider>
           </Layout>
         )}
       </div>
