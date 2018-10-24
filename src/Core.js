@@ -255,18 +255,25 @@ class Core extends Component<*, State> {
     users: Array<SlackUser>,
   ) => {
     return (tableRow: TableRow) => {
-      tableRow.slackData = slackDatas.find(
-        slack =>
+      tableRow.slackData = slackDatas.find(slack => {
+        const slackBandName = slack.text
+          .split('\n')[0]
+          .trim()
+          .toLowerCase()
+          .replace(/^\*/, '')
+          .replace(/\*$/, '')
+          .replace('&amp;', '&');
+
+        const bandname = tableRow.bandname.toLowerCase();
+
+        return (
           slack.bot_id &&
           slack.bot_id === config.slackBotID &&
-          slack.text
-            .split('\n')[0]
-            .trim()
-            .toLowerCase()
-            .replace(/^\*/, '')
-            .replace(/\*$/, '')
-            .replace('&amp;', '&') === tableRow.bandname.toLowerCase(),
-      );
+          (slackBandName === bandname ||
+            // if band name is a URL, Slack will auto encode it
+            slackBandName === `<http://${bandname}|${bandname}>`)
+        );
+      });
       const {slackData} = tableRow;
       if (slackData) {
         // adding comments
