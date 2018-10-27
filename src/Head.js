@@ -44,7 +44,7 @@ export default class Head extends Component<Props, State> {
           {this.props.data && (
             <span className="stats">
               {this.props.data.reduce(
-                (acc, cv) => (cv.rating ? acc + 1 : acc),
+                (acc, cv) => (cv.myRating ? acc + 1 : acc),
                 0,
               )}
               /{(this.props.data || []).length} bewertet
