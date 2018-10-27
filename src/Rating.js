@@ -40,13 +40,13 @@ export default class Rating extends Component<Props> {
                             });
                             return acc;
                           }, [])
-                          .map(a => <div>{a}</div>)
+                          .map(a => <div key={a}>{a}</div>)
                       : null}
                   </Fragment>
                 }
                 placement="left"
               >
-                {this.props.record.rating.toFixed(1)}
+                {(this.props.record.rating || 0).toFixed(1)}
               </Tooltip>
             )}
           </Context.Consumer>

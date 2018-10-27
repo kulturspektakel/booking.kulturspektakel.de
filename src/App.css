@@ -28,3 +28,14 @@ h1 {
 .profilePic {
   border-radius: 4px;
 }
+
+.stats {
+  color: white;
+  opacity: 0.4;
+  margin-right: 20px;
+  font-size: 16px;
+}
+
+.menuRight:hover .stats {
+  opacity: 0.7;
+}

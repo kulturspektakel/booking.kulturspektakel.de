@@ -2,14 +2,12 @@
 import React, {Component} from 'react';
 import Sidebar from './Sidebar';
 import Table from './Table';
+import Head from './Head';
 import Spin from 'antd/lib/spin';
 import Drawer from 'antd/lib/drawer';
-import Menu from 'antd/lib/menu';
-import Dropdown from 'antd/lib/dropdown';
-import Avatar from 'antd/lib/avatar';
+
 import Layout from 'antd/lib/layout';
 import config from './config';
-const {Header} = Layout;
 
 export type SlackUser = {
   color: string,
@@ -349,11 +347,6 @@ class Core extends Component<*, State> {
     this.setState({data: this.state.data});
   };
 
-  logout = () => {
-    window.localStorage.clear();
-    window.location.reload();
-  };
-
   render() {
     const {data} = this.state;
     return (
@@ -365,26 +358,11 @@ class Core extends Component<*, State> {
           />
         ) : (
           <Layout>
-            <Header>
-              <h1>Kulturspektakel Booking 2019</h1>
-              {this.state.myUserId && (
-                <Dropdown
-                  overlay={
-                    <Menu>
-                      <Menu.Item onClick={this.logout}>Ausloggen</Menu.Item>
-                    </Menu>
-                  }
-                >
-                  <Avatar
-                    src={
-                      this.state.slackUsers.get(this.state.myUserId).profile
-                        .image_72
-                    }
-                    size={36}
-                  />
-                </Dropdown>
-              )}
-            </Header>
+            <Head
+              data={this.state.data}
+              slackUsers={this.state.slackUsers}
+              myUserId={this.state.myUserId}
+            />
             <Context.Provider value={{slackUsers: this.state.slackUsers}}>
               <Table
                 data={data}

@@ -29,6 +29,7 @@ class ShowMore extends Component<Props, State> {
     ) : (
       <div>
         {this.props.children.substr(0, this.props.limit)}
+        {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
         ... <a onClick={() => this.setState({more: true})}>→&nbsp;mehr</a>
       </div>
     );
