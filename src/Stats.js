@@ -6,13 +6,15 @@ import {
   Area,
   ResponsiveContainer,
   XAxis,
-  YAxis,
   Tooltip,
   PieChart,
   Pie,
   Cell,
   Legend,
+  BarChart,
+  Bar,
 } from 'recharts';
+import config from './config';
 
 import './Stats.css';
 
@@ -21,7 +23,7 @@ import type {TableRow, SlackUser} from './Core';
 type Props = {|
   visible: boolean,
   onHide: () => void,
-  data: ?Array<TableRow>,
+  data: Array<TableRow>,
   slackUsers: Map<string, SlackUser>,
   myUserId: ?string,
 |};
@@ -30,6 +32,7 @@ type State = {|
   visible: boolean,
   perDay: Array<{key: string, value: string}>,
   perGenre: Array<{key: string, value: string}>,
+  myRatings: Array<{key: string, value: number}>,
 |};
 
 const COLORS = [
@@ -42,19 +45,20 @@ const COLORS = [
 ];
 
 export default class Stats extends Component<Props, State> {
-  state = {visible: false, perDay: [], perGenre: []};
+  static defaultProps = {
+    data: [],
+  };
+  state = {visible: false, perDay: [], perGenre: [], myRatings: []};
 
   componentDidMount() {
     this.setState({
       perDay: this.getPerDay(),
       perGenre: this.getPerGenre(),
+      myRatings: this.getMyRatings(),
     });
   }
 
   getPerDay() {
-    if (!this.props.data) {
-      return;
-    }
     const d = this.props.data
       .map((t: TableRow) =>
         t.timestamp
@@ -99,10 +103,34 @@ export default class Stats extends Component<Props, State> {
     return Object.keys(a).map(key => ({key, value: a[key]}));
   }
 
-  render() {
-    const {perDay, perGenre} = this.state;
+  getMyRatings() {
+    const reverseLookup = Object.keys(config.ratings).reduce((acc, cv) => {
+      acc[config.ratings[cv]] = cv;
+      return acc;
+    }, {});
 
-    console.log(perGenre);
+    const a = this.props.data.reduce(
+      (acc, cv) => {
+        acc[cv.myRating ? reverseLookup[cv.myRating] : 'unbewertet'] += 1;
+        return acc;
+      },
+      Object.keys(config.ratings).reduce(
+        (acc, cv) => {
+          acc[String(cv)] = 0;
+          return acc;
+        },
+        {unbewertet: 0},
+      ),
+    );
+
+    return Object.keys(a).map(key => ({
+      key: config.stars[config.ratings[key]] || 'unbewertet',
+      value: a[key],
+    }));
+  }
+
+  render() {
+    const {perDay, perGenre, myRatings} = this.state;
 
     return (
       <Modal
@@ -153,12 +181,22 @@ export default class Stats extends Component<Props, State> {
               }
               innerRaduis={80}
             >
-              {perGenre.map((entry, index) => (
-                <Cell fill={COLORS[index % COLORS.length]} />
+              {perGenre.map((entry, i) => (
+                <Cell fill={COLORS[i % COLORS.length]} key={i} />
               ))}
             </Pie>
-            <Legend />
+            <Tooltip />
+            <Legend iconType="circle" />
           </PieChart>
+        </ResponsiveContainer>
+
+        <h4>Meine Bewertungen</h4>
+        <ResponsiveContainer width="100%" height={250}>
+          <BarChart height={250} data={myRatings}>
+            <XAxis dataKey="key" />
+            <Bar dataKey="value" fill="#5996F0" />
+            <Tooltip cursor={false} />
+          </BarChart>
         </ResponsiveContainer>
       </Modal>
     );

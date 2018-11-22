@@ -25,6 +25,7 @@ export default {
     three: 3,
     four: 4,
   },
+  stars: ['', '★☆☆☆', '★★☆☆', '★★★☆', '★★★★'],
   colMapping: ([
     'timestamp',
     'email',

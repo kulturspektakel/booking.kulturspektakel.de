@@ -12,8 +12,6 @@ type Props = {
   record: TableRow,
 };
 
-const STAR = ['', '★☆☆☆', '★★☆☆', '★★★☆', '★★★★'];
-
 export default class Rating extends Component<Props> {
   render() {
     return (
@@ -33,7 +31,7 @@ export default class Rating extends Component<Props> {
                           .reduce((acc, cv) => {
                             cv.users.forEach(u => {
                               acc.push(
-                                `${STAR[cv.rating]} ${
+                                `${config.stars[cv.rating]} ${
                                   context.slackUsers.get(u).real_name
                                 }`,
                               );
