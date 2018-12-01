@@ -6,6 +6,7 @@ import Table from 'antd/lib/table';
 import Rate from 'antd/lib/rate';
 import Tooltip from 'antd/lib/tooltip';
 import Rating from './Rating.js';
+import Facepile from './Facepile.js';
 import config from './config.js';
 import './Table.css';
 
@@ -146,6 +147,12 @@ const COLUMNS = [
     onFilter: (value, record) =>
       record.rating >= value && record.rating < value + 1,
     sorter: (a, b) => a.rating - b.rating,
+    width: 120,
+  },
+  {
+    title: 'Bewertet',
+    dataIndex: '',
+    render: (rating, record) => <Facepile record={record} />,
     width: 120,
   },
 ];

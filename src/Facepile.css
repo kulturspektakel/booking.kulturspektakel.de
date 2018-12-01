@@ -1,0 +1,11 @@
+.Facepile {
+  white-space: nowrap;
+  overflow: hidden;
+}
+.Facepile .ant-avatar {
+  border: 1px solid #f0f2f5;
+}
+
+.Facepile .ant-avatar + .ant-avatar {
+  margin-left: -6px;
+}
