@@ -1,6 +1,6 @@
 // @flow
 
-import React, {Fragment, Component} from 'react';
+import React, {Component} from 'react';
 import Tooltip from 'antd/lib/tooltip';
 import Avatar from 'antd/lib/avatar';
 import config from './config';
@@ -37,6 +37,7 @@ export default class Facepile extends Component<Props> {
                   .sort()
                   .map(user => (
                     <Tooltip
+                      key={user}
                       title={context.slackUsers.get(user).profile.real_name}
                     >
                       <Avatar

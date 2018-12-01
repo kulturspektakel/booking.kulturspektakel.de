@@ -6,6 +6,7 @@ import {
   Area,
   ResponsiveContainer,
   XAxis,
+  YAxis,
   Tooltip,
   PieChart,
   Pie,
@@ -14,6 +15,7 @@ import {
   BarChart,
   Bar,
 } from 'recharts';
+import {Context} from './Core';
 import config from './config';
 
 import './Stats.css';
@@ -33,6 +35,7 @@ type State = {|
   perDay: Array<{key: string, value: string}>,
   perGenre: Array<{key: string, value: string}>,
   myRatings: Array<{key: string, value: number}>,
+  topUsers: Array<{key: string, value: number}>,
 |};
 
 const COLORS = [
@@ -55,6 +58,7 @@ export default class Stats extends Component<Props, State> {
       perDay: this.getPerDay(),
       perGenre: this.getPerGenre(),
       myRatings: this.getMyRatings(),
+      topUsers: this.getTopUsers(),
     });
   }
 
@@ -129,8 +133,29 @@ export default class Stats extends Component<Props, State> {
     }));
   }
 
+  getTopUsers() {
+    const validReaction = (reaction: {name: string}) =>
+      reaction.name in config.ratings;
+
+    const a = this.props.data.reduce((acc, cv) => {
+      if (cv.slackData && cv.slackData.reactions) {
+        cv.slackData.reactions.filter(validReaction).forEach(r => {
+          r.users.forEach(u => {
+            acc[u] = (acc[u] || 0) + 1;
+          });
+        });
+      }
+
+      return acc;
+    }, {});
+
+    console.log(Object.keys(a).map(key => ({key, value: a[key]})));
+
+    return Object.keys(a).map(key => ({key, value: a[key]}));
+  }
+
   render() {
-    const {perDay, perGenre, myRatings} = this.state;
+    const {perDay, perGenre, myRatings, topUsers} = this.state;
 
     return (
       <Modal
@@ -189,6 +214,27 @@ export default class Stats extends Component<Props, State> {
             <Legend iconType="circle" />
           </PieChart>
         </ResponsiveContainer>
+
+        <h4>Meiste Bewertungen</h4>
+        <Context.Consumer>
+          {context => (
+            <ResponsiveContainer width="100%" height={250}>
+              <BarChart
+                layout="vertical"
+                height={250}
+                data={topUsers.map(({key, value}) => ({
+                  key: context.slackUsers.get(key).profile.real_name,
+                  value,
+                }))}
+              >
+                <YAxis dataKey="key" type="category" />
+                <XAxis type="number" />
+                <Bar dataKey="value" fill="#5996F0" />
+                <Tooltip cursor={false} />
+              </BarChart>
+            </ResponsiveContainer>
+          )}
+        </Context.Consumer>
 
         <h4>Meine Bewertungen</h4>
         <ResponsiveContainer width="100%" height={250}>

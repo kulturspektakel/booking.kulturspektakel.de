@@ -351,19 +351,19 @@ class Core extends Component<*, State> {
     const {data} = this.state;
     return (
       <div className="App">
-        {!data ? (
-          <Spin
-            size="large"
-            style={{marginTop: '45vh', display: 'inline-block'}}
-          />
-        ) : (
-          <Layout>
-            <Head
-              data={this.state.data}
-              slackUsers={this.state.slackUsers}
-              myUserId={this.state.myUserId}
+        <Context.Provider value={{slackUsers: this.state.slackUsers}}>
+          {!data ? (
+            <Spin
+              size="large"
+              style={{marginTop: '45vh', display: 'inline-block'}}
             />
-            <Context.Provider value={{slackUsers: this.state.slackUsers}}>
+          ) : (
+            <Layout>
+              <Head
+                data={this.state.data}
+                slackUsers={this.state.slackUsers}
+                myUserId={this.state.myUserId}
+              />
               <Table
                 data={data}
                 onSelect={(tableRow: TableRow) =>
@@ -385,9 +385,9 @@ class Core extends Component<*, State> {
                   myUser={this.state.slackUsers.get(this.state.myUserId)}
                 />
               </Drawer>
-            </Context.Provider>
-          </Layout>
-        )}
+            </Layout>
+          )}
+        </Context.Provider>
       </div>
     );
   }
