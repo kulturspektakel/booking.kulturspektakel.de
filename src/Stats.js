@@ -149,8 +149,6 @@ export default class Stats extends Component<Props, State> {
       return acc;
     }, {});
 
-    console.log(Object.keys(a).map(key => ({key, value: a[key]})));
-
     return Object.keys(a).map(key => ({key, value: a[key]}));
   }
 

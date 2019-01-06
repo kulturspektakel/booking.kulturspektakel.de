@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "antd": "^3.9.3",
+    "antd": "^3.11.6",
     "flow-bin": "^0.81.0",
     "moment": "^2.18.1",
     "query-string": "^5.0.0",

@@ -116,6 +116,7 @@ export type TableRow = {
   slackData?: ?SlackMessage,
   rating?: ?number,
   onRate?: number => mixed,
+  onToggleContacted?: () => mixed,
   myRating?: ?number,
   onUpdate?: () => void,
 };
@@ -285,6 +286,7 @@ class Core extends Component<*, State> {
         tableRow.rating = this._getAverageRating(slackData.reactions || []);
         tableRow.myRating = this._getMyRating(slackData.reactions || []);
         tableRow.onRate = this._onRate(tableRow);
+        tableRow.onToggleContacted = this._onToggleContacted(tableRow);
 
         tableRow.onUpdate = this._onUpdateItem();
       }
@@ -343,33 +345,67 @@ class Core extends Component<*, State> {
     }
   };
 
+  _onToggleContacted = (tableRow: TableRow) => async (): Promise<boolean> => {
+    const {slackData} = tableRow;
+    const token = JSON.parse(window.localStorage.getItem('login')).access_token;
+
+    if (slackData) {
+      const contacted = (slackData.reactions || []).findIndex(
+        reaction => reaction.name === config.contactedEmoji,
+      );
+
+      if (contacted > -1) {
+        (slackData.reactions || []).splice(contacted, 1);
+      } else {
+        if (!slackData.reactions) {
+          slackData.reactions = [];
+        }
+        const user = JSON.parse(window.localStorage.getItem('login')).user_id;
+
+        (slackData.reactions || []).push({
+          name: config.contactedEmoji,
+          count: 1,
+          users: [user],
+        });
+      }
+
+      this.setState({data: this.state.data});
+      return fetch(
+        `https://slack.com/api/reactions.${
+          contacted > -1 ? 'remove' : 'add'
+        }?token=${token}&name=${config.contactedEmoji}&channel=${
+          config.slackChannel
+        }&timestamp=${slackData.ts}`,
+      ).then(() => true);
+    } else {
+      return Promise.reject();
+    }
+  };
+
   _onUpdateItem = () => {
     this.setState({data: this.state.data});
   };
+
+  _onSelect = (tableRow: TableRow) => this.setState({selectedRow: tableRow});
 
   render() {
     const {data} = this.state;
     return (
       <div className="App">
-        <Context.Provider value={{slackUsers: this.state.slackUsers}}>
-          {!data ? (
-            <Spin
-              size="large"
-              style={{marginTop: '45vh', display: 'inline-block'}}
-            />
-          ) : (
+        {!data ? (
+          <Spin
+            size="large"
+            style={{marginTop: '45vh', display: 'inline-block'}}
+          />
+        ) : (
+          <Context.Provider value={{slackUsers: this.state.slackUsers}}>
             <Layout>
               <Head
                 data={this.state.data}
                 slackUsers={this.state.slackUsers}
                 myUserId={this.state.myUserId}
               />
-              <Table
-                data={data}
-                onSelect={(tableRow: TableRow) =>
-                  this.setState({selectedRow: tableRow})
-                }
-              />
+              <Table data={data} onSelect={this._onSelect} />
               <Drawer
                 title={
                   this.state.selectedRow && this.state.selectedRow.bandname
@@ -386,8 +422,8 @@ class Core extends Component<*, State> {
                 />
               </Drawer>
             </Layout>
-          )}
-        </Context.Provider>
+          </Context.Provider>
+        )}
       </div>
     );
   }

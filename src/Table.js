@@ -1,12 +1,13 @@
 // @flow
 import type {TableRow} from './Core.js';
 
-import React, {Component} from 'react';
+import React, {PureComponent} from 'react';
 import Table from 'antd/lib/table';
 import Rate from 'antd/lib/rate';
 import Tooltip from 'antd/lib/tooltip';
 import Rating from './Rating.js';
 import Facepile from './Facepile.js';
+import Contacted from './Contacted.js';
 import config from './config.js';
 import './Table.css';
 
@@ -119,7 +120,7 @@ const COLUMNS = [
       value = value === '0' ? undefined : parseInt(value, 10);
       return record.myRating === value;
     },
-    sorter: (a, b) => a.myRating || 0 - b.myRating || 0,
+    sorter: (a, b) => (a.myRating || 0) - (b.myRating || 0),
     width: 140,
   },
   {
@@ -152,8 +153,14 @@ const COLUMNS = [
   {
     title: 'Bewertet',
     dataIndex: '',
-    render: (rating, record) => <Facepile record={record} />,
+    render: (_, record) => <Facepile record={record} />,
     width: 120,
+  },
+  {
+    title: 'Kontakt',
+    dataIndex: '',
+    render: (_, record) => <Contacted record={record} />,
+    width: 75,
   },
 ];
 
@@ -162,9 +169,17 @@ type Props = {
   onSelect: (t: TableRow) => void,
 };
 
-type State = {};
+class TableComponent extends PureComponent<Props> {
+  _onRow = (t: TableRow) => ({
+    onClick: e => {
+      if (e.target.nodeName === 'path' || e.target.nodeName === 'INPUT') {
+        e.stopPropagation();
+        return;
+      }
+      this.props.onSelect(t);
+    },
+  });
 
-class TableComponent extends Component<Props, State> {
   render() {
     return (
       <Table
@@ -174,15 +189,7 @@ class TableComponent extends Component<Props, State> {
         size="small"
         columns={COLUMNS}
         rowKey={record => `${record.name}${record.timestamp}`}
-        onRow={(t: TableRow) => ({
-          onClick: e => {
-            if (e.target.nodeName === 'path') {
-              e.stopPropagation();
-              return;
-            }
-            this.props.onSelect(t);
-          },
-        })}
+        onRow={this._onRow}
       />
     );
   }

@@ -6,12 +6,14 @@ import React, {Fragment, Component} from 'react';
 import Icon from 'antd/lib/icon';
 import Rate from 'antd/lib/rate';
 import Badge from 'antd/lib/badge';
+import Popconfirm from 'antd/lib/popconfirm';
 import Tabs from 'antd/lib/tabs';
 import Player from './Player';
 import Comments from './Comments';
 import ShowMore from './ShowMore';
 import Rating from './Rating';
 import './Sidebar.css';
+import config from './config';
 
 const TabPane = Tabs.TabPane;
 
@@ -20,9 +22,42 @@ type Props = {
   myUser: ?SlackUser,
 };
 
-type State = {};
+type State = {
+  showPopconfirm: boolean,
+};
 
 export default class Sidebar extends Component<Props, State> {
+  state = {
+    showPopconfirm: false,
+  };
+
+  componentDidMount() {
+    document.addEventListener('copy', this.onCopy);
+  }
+
+  componentWillUnmount() {
+    document.removeEventListener('copy', this.onCopy);
+  }
+
+  onCopy = (e: ClipboardEvent) => {
+    const email = window.getSelection().toString();
+    if (email.includes('@')) {
+      this.markAsContacted();
+    }
+  };
+
+  markAsContacted = () => {
+    if (
+      this.props.tableRow &&
+      this.props.tableRow.slackData &&
+      (this.props.tableRow.slackData.reactions || []).findIndex(
+        r => r.name === config.contactedEmoji,
+      ) === -1
+    ) {
+      this.setState({showPopconfirm: true});
+    }
+  };
+
   render() {
     return (
       <div className={`Sidebar ${this.props.tableRow ? 'visible' : ''}`}>
@@ -109,15 +144,38 @@ export default class Sidebar extends Component<Props, State> {
                   <br />
                   {this.props.tableRow.handy}
                   <br />
-                  <a
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    href={`https://mail.google.com/mail/u/booking@kulturspektakel.de?view=cm&fs=1&to=${
-                      this.props.tableRow.email
-                    }`}
+                  <Popconfirm
+                    title="Soll die Band als kontaktiert markiert werden?"
+                    okText="Ja"
+                    cancelText="Nein"
+                    onConfirm={() => {
+                      if (
+                        this.props.tableRow &&
+                        this.props.tableRow.onToggleContacted
+                      ) {
+                        this.props.tableRow.onToggleContacted();
+                      }
+                      this.setState({showPopconfirm: false});
+                    }}
+                    onCancel={() => this.setState({showPopconfirm: false})}
+                    visible={this.state.showPopconfirm}
                   >
-                    {this.props.tableRow.email}
-                  </a>
+                    <a
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      href="#"
+                      onMouseUp={() => {
+                        window.open(
+                          `https://mail.google.com/mail/u/booking@kulturspektakel.de?view=cm&fs=1&to=${
+                            this.props.tableRow.email
+                          }`,
+                        );
+                        this.markAsContacted();
+                      }}
+                    >
+                      {this.props.tableRow.email}
+                    </a>
+                  </Popconfirm>
                 </p>
 
                 {/* <Map googleMapURL="https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=geometry,drawing,places" /> */}
