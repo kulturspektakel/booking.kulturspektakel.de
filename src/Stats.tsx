@@ -1,4 +1,4 @@
-// @flow
+/* eslint-disable */
 import React, {Component} from 'react';
 import {Modal} from 'antd';
 import {
@@ -20,23 +20,23 @@ import config from './config';
 
 import './Stats.css';
 
-import type {TableRow, SlackUser} from './Core';
+import {TableRow, SlackUser} from './Core';
 
-type Props = {|
-  visible: boolean,
-  onHide: () => void,
-  data: Array<TableRow>,
-  slackUsers: Map<string, SlackUser>,
-  myUserId: ?string,
-|};
+type Props = {
+  visible: boolean;
+  onHide: () => void;
+  data: Array<TableRow>;
+  slackUsers: Map<string, SlackUser>;
+  myUserId: string | null;
+};
 
-type State = {|
-  visible: boolean,
-  perDay: Array<{key: string, value: string}>,
-  perGenre: Array<{key: string, value: string}>,
-  myRatings: Array<{key: string, value: number}>,
-  topUsers: Array<{key: string, value: number}>,
-|};
+type State = {
+  visible: boolean;
+  perDay: Array<{key: string; value: string}>;
+  perGenre: Array<{key: string; value: string}>;
+  myRatings: Array<{key: string; value: number}>;
+  topUsers: Array<{key: string; value: number}>;
+};
 
 const COLORS = [
   '#0088FE',
@@ -51,8 +51,15 @@ export default class Stats extends Component<Props, State> {
   static defaultProps = {
     data: [],
   };
-  state = {visible: false, perDay: [], perGenre: [], myRatings: []};
+  state: State = {
+    visible: false,
+    perDay: [],
+    perGenre: [],
+    myRatings: [],
+    topUsers: [],
+  };
 
+  /*
   componentDidMount() {
     this.setState({
       perDay: this.getPerDay(),
@@ -202,7 +209,6 @@ export default class Stats extends Component<Props, State> {
               label={({value}) =>
                 `${Math.floor((value / (this.props.data || []).length) * 100)}%`
               }
-              innerRaduis={80}
             >
               {perGenre.map((entry, i) => (
                 <Cell fill={COLORS[i % COLORS.length]} key={i} />
@@ -221,7 +227,7 @@ export default class Stats extends Component<Props, State> {
                 layout="vertical"
                 height={250}
                 data={topUsers.map(({key, value}) => ({
-                  key: context.slackUsers.get(key).profile.real_name,
+                  key: context.slackUsers.get(key)!.profile.real_name,
                   value,
                 }))}
               >
@@ -244,5 +250,8 @@ export default class Stats extends Component<Props, State> {
         </ResponsiveContainer>
       </Modal>
     );
+  }*/
+  render() {
+    return null;
   }
 }

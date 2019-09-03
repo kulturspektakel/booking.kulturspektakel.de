@@ -1,5 +1,3 @@
-// @flow
-
 import React from 'react';
 import Checkbox from 'antd/lib/checkbox';
 import Tooltip from 'antd/lib/tooltip';
@@ -7,10 +5,10 @@ import config from './config';
 import {Context} from './Core';
 import './Rating.css';
 
-import type {TableRow} from './Core';
+import {TableRow} from './Core';
 
 type Props = {
-  record: TableRow,
+  record: TableRow;
 };
 
 export default function({record}: Props) {
@@ -21,9 +19,9 @@ export default function({record}: Props) {
     : -1;
 
   const checked = contacted > -1;
-
-  const user = checked ? record.slackData.reactions[contacted].users[0] : null;
-
+  const user = checked
+    ? record.slackData!.reactions![contacted].users[0]
+    : null;
   const checkbox = (
     <Checkbox checked={checked} onChange={record.onToggleContacted} />
   );
@@ -32,10 +30,10 @@ export default function({record}: Props) {
     <div style={{textAlign: 'center'}}>
       <Context.Consumer>
         {context =>
-          checked ? (
+          checked && user ? (
             <Tooltip
               placement="left"
-              title={context.slackUsers.get(user).real_name}
+              title={context.slackUsers.get(user)!.real_name}
             >
               {checkbox}
             </Tooltip>

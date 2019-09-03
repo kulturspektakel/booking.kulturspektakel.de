@@ -1,14 +1,12 @@
-// @flow
-import type {TableRow} from './Core.js';
-
+import {TableRow} from './Core';
 import React, {PureComponent} from 'react';
 import Table from 'antd/lib/table';
 import Rate from 'antd/lib/rate';
 import Tooltip from 'antd/lib/tooltip';
-import Rating from './Rating.js';
-import Facepile from './Facepile.js';
-import Contacted from './Contacted.js';
-import config from './config.js';
+import Rating from './Rating';
+import Facepile from './Facepile';
+import Contacted from './Contacted';
+import config from './config';
 import './Table.css';
 
 const COLUMNS = [
@@ -16,8 +14,9 @@ const COLUMNS = [
     title: '',
     dataIndex: 'musikrichtung',
     filters: Object.keys(config.genres).map(g => ({text: g, value: g})),
-    onFilter: (value, record) => record.musikrichtung === value,
-    render: (musikrichtung, record) => (
+    onFilter: (value: string, TableRow: TableRow) =>
+      TableRow.musikrichtung === value,
+    render: (musikrichtung: keyof typeof config.genres, _record: TableRow) => (
       <Tooltip title={musikrichtung} placement="right">
         <img src={config.genres[musikrichtung]} alt={musikrichtung} />
       </Tooltip>
@@ -27,25 +26,25 @@ const COLUMNS = [
   {
     title: 'Name',
     dataIndex: 'bandname',
-    sorter: (a, b) =>
+    sorter: (a: TableRow, b: TableRow) =>
       a.bandname.toLowerCase() > b.bandname.toLowerCase()
         ? -1
         : a.bandname.toLowerCase() < b.bandname.toLowerCase()
           ? 1
           : 0,
-    render: (title, record) => (
+    render: (title: string, TableRow: any) => (
       <div>
         <strong>{title}</strong>
         <br />
-        {record.genre || <span>&nbsp;</span>}
+        {TableRow.genre || <span>&nbsp;</span>}
       </div>
     ),
   },
   {
     title: 'Likes',
     dataIndex: 'likes',
-    // defaultSortOrder: 'descend',
-    sorter: (a, b) => a.likes - b.likes,
+    sorter: (a: TableRow, b: TableRow) =>
+      parseInt(a.likes, 10) - parseInt(b.likes, 10),
     width: 100,
   },
   {
@@ -73,12 +72,13 @@ const COLUMNS = [
         value: 'aus dem Ausland',
       },
     ],
-    onFilter: (value, record) => record.anreise === value,
-    sorter: (a, b) => parseInt(a.entfernung, 10) - parseInt(b.entfernung, 10),
-    render: (_, record) => (
+    onFilter: (value: string, TableRow: any) => TableRow.anreise === value,
+    sorter: (a: TableRow, b: TableRow) =>
+      parseInt(a.entfernung, 10) - parseInt(b.entfernung, 10),
+    render: (_: any, TableRow: any) => (
       <span>
-        {record.wohnort}
-        {record.entfernung && ` (${record.entfernung}km)`}
+        {TableRow.wohnort}
+        {TableRow.entfernung && ` (${TableRow.entfernung}km)`}
       </span>
     ),
     width: 300,
@@ -86,93 +86,99 @@ const COLUMNS = [
   {
     title: 'Bewertung',
     dataIndex: 'myRating',
-    render: (myRating, record) => (
+    render: (myRating: number | undefined, TableRow: any) => (
       <Rate
         value={myRating}
         count={4}
-        onChange={record.onRate}
+        onChange={TableRow.onRate}
         style={{color: '#4795F7'}}
       />
     ),
     filters: [
       {
         text: '4 Sterne',
-        value: 4,
+        value: '4',
       },
       {
         text: '3 Sterne',
-        value: 3,
+        value: '3',
       },
       {
         text: '2 Sterne',
-        value: 2,
+        value: '2',
       },
       {
         text: '1 Stern',
-        value: 1,
+        value: '1',
       },
       {
         text: 'nicht bewertet',
-        value: 0,
+        value: '0',
       },
     ],
-    onFilter: (value, record) => {
-      value = value === '0' ? undefined : parseInt(value, 10);
-      return record.myRating === value;
+    onFilter: (value: string, TableRow: TableRow) => {
+      const v = value === '0' ? undefined : parseInt(value, 10);
+      return TableRow.myRating === v;
     },
-    sorter: (a, b) => (a.myRating || 0) - (b.myRating || 0),
+    sorter: (a: TableRow, b: TableRow) => (a.myRating || 0) - (b.myRating || 0),
     width: 140,
   },
   {
     title: 'Schnitt',
     dataIndex: 'rating',
-    render: (rating, record) => <Rating record={record} />,
+    render: (_rating: number, record: TableRow) => <Rating record={record} />,
     filters: [
       {
         text: '4 Sterne',
-        value: 4,
+        value: '4',
       },
       {
         text: '3 Sterne',
-        value: 3,
+        value: '3',
       },
       {
         text: '2 Sterne',
-        value: 2,
+        value: '2',
       },
       {
         text: '1 Stern',
-        value: 1,
+        value: '1',
       },
     ],
-    onFilter: (value, record) =>
-      record.rating >= value && record.rating < value + 1,
-    sorter: (a, b) => a.rating - b.rating,
+    onFilter: (value: string, record: TableRow) => {
+      const v = parseInt(value, 10);
+      const rating = record.rating || -1;
+      return rating >= v && rating < v + 1;
+    },
+    sorter: (a: TableRow, b: TableRow) => (a.rating || -1) - (b.rating || -1),
     width: 120,
   },
   {
     title: 'Bewertet',
     dataIndex: '',
-    render: (_, record) => <Facepile record={record} />,
+    render: (_: string, record: TableRow) => <Facepile record={record} />,
     width: 120,
   },
   {
     title: 'Kontakt',
     dataIndex: '',
-    render: (_, record) => <Contacted record={record} />,
+    render: (_: string, record: TableRow) => <Contacted record={record} />,
     width: 75,
   },
 ];
 
 type Props = {
-  data: Array<TableRow>,
-  onSelect: (t: TableRow) => void,
+  data: Array<TableRow>;
+  onSelect: (t: TableRow) => void;
 };
 
 class TableComponent extends PureComponent<Props> {
   _onRow = (t: TableRow) => ({
-    onClick: e => {
-      if (e.target.nodeName === 'path' || e.target.nodeName === 'INPUT') {
+    onClick: (e: React.SyntheticEvent<Element, Event>) => {
+      if (
+        (e.target as HTMLElement).nodeName === 'path' ||
+        (e.target as HTMLElement).nodeName === 'INPUT'
+      ) {
         e.stopPropagation();
         return;
       }
@@ -188,7 +194,7 @@ class TableComponent extends PureComponent<Props> {
         pagination={false}
         size="small"
         columns={COLUMNS}
-        rowKey={record => `${record.name}${record.timestamp}`}
+        rowKey={TableRow => `${TableRow.name}${TableRow.timestamp}`}
         onRow={this._onRow}
       />
     );

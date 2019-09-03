@@ -1,13 +1,12 @@
-// @flow
 import React, {Component} from 'react';
 
 type Props = {
-  children: string,
-  limit: number,
+  children: string;
+  limit: number;
 };
 
 type State = {
-  more: boolean,
+  more: boolean;
 };
 
 class ShowMore extends Component<Props, State> {

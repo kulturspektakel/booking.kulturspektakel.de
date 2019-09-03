@@ -1,20 +1,19 @@
-// @flow
 import React, {Component} from 'react';
 import Input from 'antd/lib/input';
 import './Comments.css';
 import config from './config';
 
-import type {TableRow} from './Core';
-import type {SlackUser} from './Core.js';
+import {TableRow} from './Core';
+import {SlackUser} from './Core.js';
 
 type Props = {
-  record: TableRow,
-  myUser: SlackUser,
+  record: TableRow;
+  myUser: SlackUser;
 };
 
 type State = {
-  message: string,
-  loading: boolean,
+  message: string;
+  loading: boolean;
 };
 
 class Comments extends Component<Props, State> {
@@ -23,7 +22,7 @@ class Comments extends Component<Props, State> {
     loading: false,
   };
 
-  _onComment = (e: Event) => {
+  _onComment = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     e.preventDefault();
     e.stopPropagation();
     const comment = this.state.message;
@@ -51,18 +50,18 @@ class Comments extends Component<Props, State> {
           'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8',
         },
         body: `token=${
-          JSON.parse(window.localStorage.getItem('login')).access_token
+          JSON.parse(window.localStorage.getItem('login') || '').access_token
         }&channel=${
           config.slackChannel
         }&as_user=true&text=${comment}&thread_ts=${slackData.ts}`,
       })
         .then(res => res.json())
-        .then(data => {
+        .then(_ =>
           this.setState({
             message: '',
             loading: false,
-          });
-        });
+          }),
+        );
     }
   };
 

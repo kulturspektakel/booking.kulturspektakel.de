@@ -1,22 +1,21 @@
-// @flow
 import React, {Component} from 'react';
 import qs from 'query-string';
 import Core from './Core';
-import config from './config.js';
+import config from './config';
 import './App.css';
 
 export type OAuthSuccess = {
-  ok: true,
-  access_token: string,
-  scope: string,
+  ok: true;
+  access_token: string;
+  scope: string;
   user: {
-    name: string,
-    id: string,
-  },
-  team: {id: string},
+    name: string;
+    id: string;
+  };
+  team: {id: string};
 };
 
-class App extends Component<*> {
+class App extends Component<{}> {
   componentDidMount() {
     const {code} = qs.parse(window.location.search);
     if (code) {
@@ -42,7 +41,7 @@ class App extends Component<*> {
 
   render() {
     const loginString = window.localStorage.getItem('login');
-    let data: ?OAuthSuccess;
+    let data: OAuthSuccess | undefined;
     if (loginString) {
       data = JSON.parse(loginString);
     }

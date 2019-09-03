@@ -1,24 +1,21 @@
-// @flow
 import React, {Component} from 'react';
-
 import Stats from './Stats';
 import Menu from 'antd/lib/menu';
 import Dropdown from 'antd/lib/dropdown';
 import Avatar from 'antd/lib/avatar';
 import Layout from 'antd/lib/layout';
-
-import type {TableRow, SlackUser} from './Core';
+import {TableRow, SlackUser} from './Core';
 const {Header} = Layout;
 
-type Props = {|
-  data: ?Array<TableRow>,
-  slackUsers: Map<string, SlackUser>,
-  myUserId: ?string,
-|};
+type Props = {
+  data: TableRow[] | null;
+  slackUsers: Map<string, SlackUser>;
+  myUserId: string | null;
+};
 
-type State = {|
-  statsVisible: boolean,
-|};
+type State = {
+  statsVisible: boolean;
+};
 
 export default class Head extends Component<Props, State> {
   state = {
@@ -30,16 +27,21 @@ export default class Head extends Component<Props, State> {
   };
 
   render() {
+    const {data} = this.props;
     return (
       <Header>
-        <Stats
-          visible={this.state.statsVisible}
-          onHide={() => this.setState({statsVisible: !this.state.statsVisible})}
-          data={this.props.data}
-          slackUsers={this.props.slackUsers}
-          myUserId={this.props.myUserId}
-        />
-        <h1>Kulturspektakel Booking 2019</h1>
+        {data && (
+          <Stats
+            visible={this.state.statsVisible}
+            onHide={() =>
+              this.setState({statsVisible: !this.state.statsVisible})
+            }
+            data={data}
+            slackUsers={this.props.slackUsers}
+            myUserId={this.props.myUserId}
+          />
+        )}
+        <h1>Kulturspektakel Booking 2020</h1>
         <div className="menuRight">
           {this.props.data && (
             <span className="stats">
@@ -65,7 +67,7 @@ export default class Head extends Component<Props, State> {
             >
               <Avatar
                 src={
-                  this.props.slackUsers.get(this.props.myUserId).profile
+                  this.props.slackUsers.get(this.props.myUserId)!.profile
                     .image_72
                 }
                 size={36}
