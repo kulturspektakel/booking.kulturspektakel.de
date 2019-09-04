@@ -3,15 +3,10 @@ import Checkbox from 'antd/lib/checkbox';
 import Tooltip from 'antd/lib/tooltip';
 import config from './config';
 import {Context} from './Core';
+import {TableRow} from './Table';
 import './Rating.css';
 
-import {TableRow} from './Core';
-
-type Props = {
-  record: TableRow;
-};
-
-export default function({record}: Props) {
+export default function({record}: {record: TableRow}) {
   const contacted = record.slackData
     ? (record.slackData.reactions || []).findIndex(
         r => r.name === config.contactedEmoji,

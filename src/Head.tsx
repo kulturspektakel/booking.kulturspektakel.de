@@ -4,7 +4,8 @@ import Menu from 'antd/lib/menu';
 import Dropdown from 'antd/lib/dropdown';
 import Avatar from 'antd/lib/avatar';
 import Layout from 'antd/lib/layout';
-import {TableRow, SlackUser} from './Core';
+import {TableRow} from './Table';
+import {SlackUser} from './api';
 const {Header} = Layout;
 
 type Props = {

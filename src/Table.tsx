@@ -1,5 +1,4 @@
-import {TableRow} from './Core';
-import React, {PureComponent} from 'react';
+import React from 'react';
 import Table from 'antd/lib/table';
 import Rate from 'antd/lib/rate';
 import Tooltip from 'antd/lib/tooltip';
@@ -7,7 +6,34 @@ import Rating from './Rating';
 import Facepile from './Facepile';
 import Contacted from './Contacted';
 import config from './config';
+import {SlackMessage} from './api';
 import './Table.css';
+
+export type TableRow = {
+  timestamp: string;
+  email: string;
+  bandname: string;
+  musikrichtung: string;
+  genre: string;
+  wohnort: string;
+  facebook: string;
+  demo: string;
+  website: string;
+  beschreibung: string;
+  name: string;
+  handy: string;
+  woher: string;
+  aufmerksam: string;
+  anreise: string;
+  entfernung: string;
+  likes: string;
+  slackData?: SlackMessage | undefined;
+  rating?: number | null;
+  onRate?: (rating: number) => any;
+  onToggleContacted?: () => any;
+  myRating?: number | undefined;
+  onUpdate?: () => void;
+};
 
 const COLUMNS = [
   {
@@ -160,45 +186,37 @@ const COLUMNS = [
     width: 120,
   },
   {
-    title: 'Kontakt',
+    title: 'Anfrage',
     dataIndex: '',
     render: (_: string, record: TableRow) => <Contacted record={record} />,
     width: 75,
   },
 ];
 
-type Props = {
+export default function(props: {
   data: Array<TableRow>;
   onSelect: (t: TableRow) => void;
-};
-
-class TableComponent extends PureComponent<Props> {
-  _onRow = (t: TableRow) => ({
-    onClick: (e: React.SyntheticEvent<Element, Event>) => {
-      if (
-        (e.target as HTMLElement).nodeName === 'path' ||
-        (e.target as HTMLElement).nodeName === 'INPUT'
-      ) {
-        e.stopPropagation();
-        return;
-      }
-      this.props.onSelect(t);
-    },
-  });
-
-  render() {
-    return (
-      <Table
-        bordered
-        dataSource={this.props.data}
-        pagination={false}
-        size="small"
-        columns={COLUMNS}
-        rowKey={TableRow => `${TableRow.name}${TableRow.timestamp}`}
-        onRow={this._onRow}
-      />
-    );
-  }
+}) {
+  return (
+    <Table
+      bordered
+      dataSource={props.data}
+      pagination={false}
+      size="small"
+      columns={COLUMNS}
+      rowKey={record => `${record.name}${record.timestamp}`}
+      onRow={(t: TableRow) => ({
+        onClick: (e: React.SyntheticEvent<Element, Event>) => {
+          if (
+            (e.target as HTMLElement).nodeName === 'path' ||
+            (e.target as HTMLElement).nodeName === 'INPUT'
+          ) {
+            e.stopPropagation();
+            return;
+          }
+          props.onSelect(t);
+        },
+      })}
+    />
+  );
 }
-
-export default TableComponent;

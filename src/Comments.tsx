@@ -2,9 +2,8 @@ import React, {Component} from 'react';
 import Input from 'antd/lib/input';
 import './Comments.css';
 import config from './config';
-
-import {TableRow} from './Core';
-import {SlackUser} from './Core.js';
+import {TableRow} from './Table';
+import {SlackUser} from './api';
 
 type Props = {
   record: TableRow;

@@ -1,16 +1,42 @@
 import React, {Fragment} from 'react';
 import Tooltip from 'antd/lib/tooltip';
 import config from './config';
-import {Context, SlackReaction} from './Core';
+import {Context} from './Core';
 import './Rating.css';
+import {SlackReaction} from './api';
+import {TableRow} from './Table';
 
-import {TableRow} from './Core';
+export function _getAverageRating(
+  reactions: Array<SlackReaction> = [],
+): number | null {
+  const validReaction = (reaction: {name: string}) =>
+    reaction.name in config.ratings;
+  reactions = reactions.filter(validReaction);
+  if (reactions.length === 0) {
+    return null;
+  }
+  return (
+    reactions.reduce(
+      (acc, cv) =>
+        acc + cv.count * config.ratings[cv.name as keyof typeof config.ratings],
+      0,
+    ) / reactions.reduce((acc, cv) => acc + cv.count, 0)
+  );
+}
 
-type Props = {
-  record: TableRow;
-};
+export function _getMyRating(
+  reactions: Array<SlackReaction> = [],
+): number | undefined {
+  const myUser = JSON.parse(window.localStorage.getItem('login')!).user_id;
+  const reaction = reactions.filter(
+    reaction => reaction.users.findIndex(user => user === myUser) > -1,
+  );
+  if (reaction.length > 0) {
+    return config.ratings[reaction[0].name as keyof typeof config.ratings];
+  }
+}
 
-export default function(props: Props) {
+export default function(props: {record: TableRow}) {
   return (
     <div className={`Rating ${props.record.myRating ? 'rated' : ''}`}>
       {!props.record.myRating ? (

@@ -1,5 +1,3 @@
-import {TableRow} from './Core.js';
-import {SlackUser} from './Core.js';
 import React, {Fragment, Component} from 'react';
 import Icon from 'antd/lib/icon';
 import Rate from 'antd/lib/rate';
@@ -10,8 +8,10 @@ import Player from './Player';
 import Comments from './Comments';
 import ShowMore from './ShowMore';
 import Rating from './Rating';
-import './Sidebar.css';
 import config from './config';
+import {TableRow} from './Table';
+import {SlackUser} from './api';
+import './Sidebar.css';
 
 const TabPane = Tabs.TabPane;
 
@@ -190,7 +190,7 @@ export default class Sidebar extends Component<Props, State> {
                     <span>
                       Kommentare{' '}
                       <Badge
-                        style={{top: 5, backgroundColor: '#4A98F4'}}
+                        style={{backgroundColor: '#4A98F4'}}
                         count={
                           tableRow.slackData &&
                           (tableRow.slackData.replies || []).length

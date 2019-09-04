@@ -4,14 +4,9 @@ import Avatar from 'antd/lib/avatar';
 import config from './config';
 import {Context} from './Core';
 import './Facepile.css';
+import {TableRow} from './Table';
 
-import {TableRow} from './Core';
-
-type Props = {
-  record: TableRow;
-};
-
-export default function(props: Props) {
+export default function(props: {record: TableRow}) {
   return (
     <Context.Consumer>
       {context => {

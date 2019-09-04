@@ -1,4 +1,3 @@
-/* eslint-disable */
 import React, {Component} from 'react';
 import {Modal} from 'antd';
 import {
@@ -17,10 +16,9 @@ import {
 } from 'recharts';
 import {Context} from './Core';
 import config from './config';
-
 import './Stats.css';
-
-import {TableRow, SlackUser} from './Core';
+import {SlackUser} from './api';
+import {TableRow} from './Table';
 
 type Props = {
   visible: boolean;
@@ -32,19 +30,22 @@ type Props = {
 
 type State = {
   visible: boolean;
-  perDay: Array<{key: string; value: string}>;
-  perGenre: Array<{key: string; value: string}>;
+  perDay: Array<{key: string; value: number}>;
+  perGenre: Array<{key: string; value: number}>;
   myRatings: Array<{key: string; value: number}>;
   topUsers: Array<{key: string; value: number}>;
 };
 
 const COLORS = [
+  '#1F2F65',
+  '#7087FE',
   '#0088FE',
   '#00C49F',
   '#FFBB28',
   '#FF8042',
   '#CC5147',
-  '#383E4B',
+  '#FE5BA5',
+  '#B877CF',
 ];
 
 export default class Stats extends Component<Props, State> {
@@ -53,21 +54,11 @@ export default class Stats extends Component<Props, State> {
   };
   state: State = {
     visible: false,
-    perDay: [],
-    perGenre: [],
-    myRatings: [],
-    topUsers: [],
+    perDay: this.getPerDay(),
+    perGenre: this.getPerGenre(),
+    myRatings: this.getMyRatings(),
+    topUsers: this.getTopUsers(),
   };
-
-  /*
-  componentDidMount() {
-    this.setState({
-      perDay: this.getPerDay(),
-      perGenre: this.getPerGenre(),
-      myRatings: this.getMyRatings(),
-      topUsers: this.getTopUsers(),
-    });
-  }
 
   getPerDay() {
     const d = this.props.data
@@ -81,8 +72,13 @@ export default class Stats extends Component<Props, State> {
       .sort();
 
     const numDays =
-      Math.ceil((new Date(d[d.length - 1]) - new Date(d[0])) / 86400000) + 1;
-    const days = {};
+      Math.ceil(
+        (new Date(d[d.length - 1]).getTime() - new Date(d[0]).getTime()) /
+          86400000,
+      ) + 1;
+    const days: {
+      [key: string]: number;
+    } = {};
     for (let i = 0; i < numDays; i++) {
       days[
         new Date(new Date(d[0]).getTime() + 86400000 * i)
@@ -90,7 +86,7 @@ export default class Stats extends Component<Props, State> {
           .split('T')[0]
       ] = 0;
     }
-    const dates = d.reduce((acc, cv) => {
+    const dates = d.reduce<{[key: string]: number}>((acc, cv) => {
       acc[cv] += 1;
       return acc;
     }, days);
@@ -102,7 +98,7 @@ export default class Stats extends Component<Props, State> {
   }
 
   getPerGenre() {
-    const a = this.props.data.reduce((acc, cv) => {
+    const a = this.props.data.reduce<{[key: string]: number}>((acc, cv) => {
       if (!acc[cv.musikrichtung]) {
         acc[cv.musikrichtung] = 1;
       } else {
@@ -115,18 +111,22 @@ export default class Stats extends Component<Props, State> {
   }
 
   getMyRatings() {
-    const reverseLookup = Object.keys(config.ratings).reduce((acc, cv) => {
+    const reverseLookup = (Object.keys(config.ratings) as Array<
+      keyof typeof config.ratings
+    >).reduce<{
+      [key: string]: string;
+    }>((acc, cv) => {
       acc[config.ratings[cv]] = cv;
       return acc;
     }, {});
 
     const a = this.props.data.reduce(
-      (acc, cv) => {
+      (acc: any, cv) => {
         acc[cv.myRating ? reverseLookup[cv.myRating] : 'unbewertet'] += 1;
         return acc;
       },
       Object.keys(config.ratings).reduce(
-        (acc, cv) => {
+        (acc: any, cv) => {
           acc[String(cv)] = 0;
           return acc;
         },
@@ -135,7 +135,7 @@ export default class Stats extends Component<Props, State> {
     );
 
     return Object.keys(a).map(key => ({
-      key: config.stars[config.ratings[key]] || 'unbewertet',
+      key: config.stars[(config.ratings as any)[key]] || 'unbewertet',
       value: a[key],
     }));
   }
@@ -144,7 +144,7 @@ export default class Stats extends Component<Props, State> {
     const validReaction = (reaction: {name: string}) =>
       reaction.name in config.ratings;
 
-    const a = this.props.data.reduce((acc, cv) => {
+    const a = this.props.data.reduce((acc: any, cv) => {
       if (cv.slackData && cv.slackData.reactions) {
         cv.slackData.reactions.filter(validReaction).forEach(r => {
           r.users.forEach(u => {
@@ -185,7 +185,7 @@ export default class Stats extends Component<Props, State> {
               fill="url(#colorUv)"
             />
             <Tooltip
-              labelFormatter={i => (
+              labelFormatter={(i: any) => (
                 <div>
                   {perDay[i].key
                     .split('-')
@@ -210,7 +210,7 @@ export default class Stats extends Component<Props, State> {
                 `${Math.floor((value / (this.props.data || []).length) * 100)}%`
               }
             >
-              {perGenre.map((entry, i) => (
+              {perGenre.map((_entry, i) => (
                 <Cell fill={COLORS[i % COLORS.length]} key={i} />
               ))}
             </Pie>
@@ -250,8 +250,5 @@ export default class Stats extends Component<Props, State> {
         </ResponsiveContainer>
       </Modal>
     );
-  }*/
-  render() {
-    return null;
   }
 }
