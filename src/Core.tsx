@@ -46,7 +46,15 @@ class Core extends Component<{}, State> {
         .user_id;
 
       const data = googleData.map(this._findCorrespondingBand(slackMessages));
-      this.setState({data, slackUsers, myUserId});
+      let selectedRow: TableRow | null = null;
+      if (window.location.hash.length > 1) {
+        selectedRow =
+          data.find(
+            row =>
+              '#' + row.timestamp.replace(/\D/g, '') === window.location.hash,
+          ) || null;
+      }
+      this.setState({data, slackUsers, myUserId, selectedRow});
     });
   }
 
