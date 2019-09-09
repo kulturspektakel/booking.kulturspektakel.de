@@ -200,7 +200,15 @@ class Core extends Component<{}, State> {
     this.setState({data: this.state.data});
   };
 
-  _onSelect = (tableRow: TableRow) => this.setState({selectedRow: tableRow});
+  _onSelect = (tableRow: TableRow) => {
+    window.location.hash = tableRow.timestamp.replace(/\D/g, '');
+    this.setState({selectedRow: tableRow});
+  };
+
+  _onClose = () => {
+    window.history.replaceState(null, '', window.location.pathname);
+    this.setState({selectedRow: null});
+  };
 
   render() {
     const {data, myUserId} = this.state;
@@ -226,7 +234,7 @@ class Core extends Component<{}, State> {
                 }
                 placement="right"
                 destroyOnClose={true}
-                onClose={() => this.setState({selectedRow: null})}
+                onClose={this._onClose}
                 visible={Boolean(this.state.selectedRow)}
                 width={500}
               >
