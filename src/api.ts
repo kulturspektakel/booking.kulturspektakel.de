@@ -139,18 +139,19 @@ export async function _loadSlackUsers(): Promise<Map<string, SlackUser>> {
 export async function _loadGoogleData(): Promise<TableRow[]> {
   try {
     const res = await fetch(
-      `https://sheets.googleapis.com/v4/spreadsheets/${
-        config.googleSheet
-      }/values/A1:Z10000?key=${config.googleAPIKey}`,
+      `https://sheets.googleapis.com/v4/spreadsheets/${config.googleSheet}/values/A1:Z10000?key=${config.googleAPIKey}`,
     );
     const {values}: GoogleResponse = await res.json();
-    return values.filter((_, i) => i !== 0).map(
-      row =>
-        row.reduce((acc: any, cv, i) => {
-          acc[config.colMapping[i]] = cv;
-          return acc;
-        }, {}) as TableRow,
-    );
+    return values
+      .filter((_, i) => i !== 0)
+      .map(
+        (row, j) =>
+          row.reduce((acc: any, cv, i) => {
+            acc[config.colMapping[i]] = cv;
+            acc.index = j + 1;
+            return acc;
+          }, {}) as TableRow,
+      );
   } catch (e) {
     return [];
   }
