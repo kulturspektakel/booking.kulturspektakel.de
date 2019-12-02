@@ -33,9 +33,16 @@ export type TableRow = {
   onToggleContacted?: () => any;
   myRating?: number | undefined;
   onUpdate?: () => void;
+  index?: number;
 };
 
 const COLUMNS = [
+  {
+    title: '',
+    dataIndex: 'index',
+    align: 'center' as const,
+    width: 50,
+  },
   {
     title: '',
     dataIndex: 'musikrichtung',
@@ -56,8 +63,8 @@ const COLUMNS = [
       a.bandname.toLowerCase() > b.bandname.toLowerCase()
         ? -1
         : a.bandname.toLowerCase() < b.bandname.toLowerCase()
-          ? 1
-          : 0,
+        ? 1
+        : 0,
     render: (title: string, TableRow: any) => (
       <div>
         <strong>{title}</strong>
@@ -71,7 +78,8 @@ const COLUMNS = [
     dataIndex: 'likes',
     sorter: (a: TableRow, b: TableRow) =>
       parseInt(a.likes, 10) - parseInt(b.likes, 10),
-    width: 100,
+    width: 80,
+    align: 'right' as const,
   },
   {
     title: 'Ort',
@@ -107,7 +115,7 @@ const COLUMNS = [
         {TableRow.entfernung && ` (${TableRow.entfernung}km)`}
       </span>
     ),
-    width: 300,
+    width: 280,
   },
   {
     title: 'Bewertung',
