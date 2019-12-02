@@ -74,7 +74,7 @@ class Core extends Component<{}, State> {
       const id = tableRow.timestamp.replace(/\D/g, '');
 
       tableRow.slackData = slackDatas.find(slack => {
-        if (!slack.blocks) {
+        if (!slack.blocks || typeof slack.blocks[0].text === 'string') {
           return false;
         }
         const match = slack.blocks[0].text.text.match(

@@ -78,7 +78,7 @@ export type SlackMessage = {
     block_id: string;
     text: {
       text: string;
-    };
+    } | string;
     type: string;
   }>;
   user: string | SlackUser;
