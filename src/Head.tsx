@@ -6,6 +6,7 @@ import Avatar from 'antd/lib/avatar';
 import Layout from 'antd/lib/layout';
 import {TableRow} from './Table';
 import {SlackUser} from './api';
+import config from './config';
 const {Header} = Layout;
 
 type Props = {
@@ -57,6 +58,15 @@ export default class Head extends Component<Props, State> {
             <Dropdown
               overlay={
                 <Menu>
+                  <Menu.Item
+                    onClick={() =>
+                      window.open(
+                        `https://docs.google.com/spreadsheets/d/${config.googleSheet}`,
+                      )
+                    }
+                  >
+                    Google Sheet
+                  </Menu.Item>
                   <Menu.Item
                     onClick={() => this.setState({statsVisible: true})}
                   >
