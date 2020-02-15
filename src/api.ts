@@ -76,7 +76,7 @@ export type SlackMessage = {
   type: 'message';
   blocks?: Array<{
     block_id: string;
-    text: {
+    text?: {
       text: string;
     };
     type: string;
