@@ -20,12 +20,12 @@ export default function Page({
   loading?: boolean;
 }) {
   return (
-    <Container maxW="container.md" pt="10" pb="20">
+    <Container maxW="container.lg" pt="10" pb="20">
       <Head>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </Head>
       <HStack mb="5">
-        <Heading size="lg">Tischreservierung</Heading>
+        <Heading size="lg">Bands</Heading>
         <Spacer />
         <Link href="/">
           <Box w={[20, 32, 40]} cursor="pointer">
