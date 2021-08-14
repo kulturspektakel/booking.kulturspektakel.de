@@ -74,6 +74,7 @@ export type BandApplication = {
   contactPhone: Scalars['String'];
   email: Scalars['String'];
   city: Scalars['String'];
+  demo?: Maybe<Scalars['String']>;
 };
 
 export type Billable = {
@@ -89,6 +90,25 @@ export type Config = {
   __typename?: 'Config';
   reservationStart: Scalars['DateTime'];
   tokenValue: Scalars['Int'];
+};
+
+export type CreateBandApplicationInput = {
+  email: Scalars['String'];
+  bandname: Scalars['String'];
+  genreCategory: GenreCategory;
+  genre: Scalars['String'];
+  city: Scalars['String'];
+  facebook?: Maybe<Scalars['String']>;
+  instagram?: Maybe<Scalars['String']>;
+  website?: Maybe<Scalars['String']>;
+  demo: Scalars['String'];
+  description: Scalars['String'];
+  numberOfArtists: Scalars['Int'];
+  numberOfNonMaleArtists: Scalars['Int'];
+  contactName: Scalars['String'];
+  contactPhone: Scalars['String'];
+  knowsKultFrom?: Maybe<Scalars['String']>;
+  heardAboutBookingFrom?: Maybe<HeardAboutBookingFrom>;
 };
 
 export type Device = Billable & {
@@ -108,7 +128,7 @@ export enum GenreCategory {
   Rock = 'Rock',
   Pop = 'Pop',
   Indie = 'Indie',
-  ReaggaeSka = 'Reaggae_Ska',
+  ReggaeSka = 'Reggae_Ska',
   BluesFunkJazzSoul = 'Blues_Funk_Jazz_Soul',
   FolkSingerSongwriterCountry = 'Folk_SingerSongwriter_Country',
   ElektroHipHop = 'Elektro_HipHop',
@@ -221,21 +241,7 @@ export type MutationSwapReservationsArgs = {
 };
 
 export type MutationCreateBandApplicationArgs = {
-  email: Scalars['String'];
-  bandname: Scalars['String'];
-  genreCategory: GenreCategory;
-  genre: Scalars['String'];
-  city: Scalars['String'];
-  facebook: Scalars['String'];
-  website: Scalars['String'];
-  demo: Scalars['String'];
-  description: Scalars['String'];
-  numberOfArtists: Scalars['Int'];
-  numberOfNonMaleArtists: Scalars['Int'];
-  contactName: Scalars['String'];
-  contactPhone: Scalars['String'];
-  knowsKultFrom?: Maybe<Scalars['String']>;
-  heardAboutBookingFrom?: Maybe<HeardAboutBookingFrom>;
+  data: CreateBandApplicationInput;
 };
 
 export type Node = {
@@ -337,6 +343,7 @@ export type Query = {
   devices: Array<Device>;
   productList?: Maybe<ProductList>;
   bandApplications: Array<BandApplication>;
+  distanceToKult?: Maybe<Scalars['Float']>;
 };
 
 export type QueryReservationForTokenArgs = {
@@ -357,6 +364,10 @@ export type QueryProductListArgs = {
 
 export type QueryBandApplicationsArgs = {
   eventYear: Scalars['Int'];
+};
+
+export type QueryDistanceToKultArgs = {
+  origin: Scalars['String'];
 };
 
 export type Reservation = {
@@ -447,259 +458,122 @@ export type Viewer = {
   profilePicture?: Maybe<Scalars['String']>;
 };
 
-export type BandApplicationsQueryVariables = Exact<{[key: string]: never}>;
-
-export type BandApplicationsQuery = {
-  __typename?: 'Query';
-  bandApplications: Array<{
-    __typename?: 'BandApplication';
-    id: string;
-    bandname: string;
-    city: string;
-    facebookLikes?: Maybe<number>;
-    description?: Maybe<string>;
-    genre?: Maybe<string>;
-    genreCategory: GenreCategory;
-  }>;
-};
-
-export type ReservationQueryVariables = Exact<{
-  token: Scalars['String'];
+export type DistanceQueryVariables = Exact<{
+  origin: Scalars['String'];
 }>;
 
-export type ReservationQuery = {
+export type DistanceQuery = {
   __typename?: 'Query';
-  reservationForToken?: Maybe<{
-    __typename?: 'Reservation';
-    id: number;
-    token: string;
-    startTime: Date;
-    endTime: Date;
-    status: ReservationStatus;
-    primaryPerson: string;
-    otherPersons: Array<string>;
-    table: {
-      __typename?: 'Table';
-      maxCapacity: number;
-      area: {__typename?: 'Area'; displayName: string};
-    };
-    reservationsFromSamePerson: Array<{
-      __typename?: 'Reservation';
-      id: number;
-      token: string;
-      startTime: Date;
-    }>;
-  }>;
+  distanceToKult?: Maybe<number>;
 };
 
-export type ConfimReservationMutationVariables = Exact<{
-  token: Scalars['String'];
+export type CreateBandApplicationMutationVariables = Exact<{
+  data: CreateBandApplicationInput;
 }>;
 
-export type ConfimReservationMutation = {
+export type CreateBandApplicationMutation = {
   __typename?: 'Mutation';
-  confirmReservation?: Maybe<{
-    __typename?: 'Reservation';
-    id: number;
-    status: ReservationStatus;
-    reservationsFromSamePerson: Array<{
-      __typename?: 'Reservation';
-      id: number;
-      token: string;
-      startTime: Date;
-    }>;
-  }>;
+  createBandApplication?: Maybe<{__typename?: 'BandApplication'; id: string}>;
 };
 
-export const BandApplicationsDocument = gql`
-  query BandApplications {
-    bandApplications(eventYear: 2020) {
-      id
-      bandname
-      city
-      facebookLikes
-      description
-      genre
-      genreCategory
-    }
+export const DistanceDocument = gql`
+  query Distance($origin: String!) {
+    distanceToKult(origin: $origin)
   }
 `;
 
 /**
- * __useBandApplicationsQuery__
+ * __useDistanceQuery__
  *
- * To run a query within a React component, call `useBandApplicationsQuery` and pass it any options that fit your needs.
- * When your component renders, `useBandApplicationsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * To run a query within a React component, call `useDistanceQuery` and pass it any options that fit your needs.
+ * When your component renders, `useDistanceQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
  * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
  *
  * @example
- * const { data, loading, error } = useBandApplicationsQuery({
+ * const { data, loading, error } = useDistanceQuery({
  *   variables: {
+ *      origin: // value for 'origin'
  *   },
  * });
  */
-export function useBandApplicationsQuery(
-  baseOptions?: Apollo.QueryHookOptions<
-    BandApplicationsQuery,
-    BandApplicationsQueryVariables
-  >,
+export function useDistanceQuery(
+  baseOptions: Apollo.QueryHookOptions<DistanceQuery, DistanceQueryVariables>,
 ) {
   const options = {...defaultOptions, ...baseOptions};
-  return Apollo.useQuery<BandApplicationsQuery, BandApplicationsQueryVariables>(
-    BandApplicationsDocument,
+  return Apollo.useQuery<DistanceQuery, DistanceQueryVariables>(
+    DistanceDocument,
     options,
   );
 }
-export function useBandApplicationsLazyQuery(
+export function useDistanceLazyQuery(
   baseOptions?: Apollo.LazyQueryHookOptions<
-    BandApplicationsQuery,
-    BandApplicationsQueryVariables
+    DistanceQuery,
+    DistanceQueryVariables
   >,
 ) {
   const options = {...defaultOptions, ...baseOptions};
-  return Apollo.useLazyQuery<
-    BandApplicationsQuery,
-    BandApplicationsQueryVariables
-  >(BandApplicationsDocument, options);
+  return Apollo.useLazyQuery<DistanceQuery, DistanceQueryVariables>(
+    DistanceDocument,
+    options,
+  );
 }
-export type BandApplicationsQueryHookResult = ReturnType<
-  typeof useBandApplicationsQuery
+export type DistanceQueryHookResult = ReturnType<typeof useDistanceQuery>;
+export type DistanceLazyQueryHookResult = ReturnType<
+  typeof useDistanceLazyQuery
 >;
-export type BandApplicationsLazyQueryHookResult = ReturnType<
-  typeof useBandApplicationsLazyQuery
+export type DistanceQueryResult = Apollo.QueryResult<
+  DistanceQuery,
+  DistanceQueryVariables
 >;
-export type BandApplicationsQueryResult = Apollo.QueryResult<
-  BandApplicationsQuery,
-  BandApplicationsQueryVariables
->;
-export const ReservationDocument = gql`
-  query Reservation($token: String!) {
-    reservationForToken(token: $token) {
+export const CreateBandApplicationDocument = gql`
+  mutation CreateBandApplication($data: CreateBandApplicationInput!) {
+    createBandApplication(data: $data) {
       id
-      token
-      startTime
-      endTime
-      table {
-        maxCapacity
-        area {
-          displayName
-        }
-      }
-      status
-      primaryPerson
-      otherPersons
-      reservationsFromSamePerson {
-        id
-        token
-        startTime
-      }
     }
   }
 `;
-
-/**
- * __useReservationQuery__
- *
- * To run a query within a React component, call `useReservationQuery` and pass it any options that fit your needs.
- * When your component renders, `useReservationQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useReservationQuery({
- *   variables: {
- *      token: // value for 'token'
- *   },
- * });
- */
-export function useReservationQuery(
-  baseOptions: Apollo.QueryHookOptions<
-    ReservationQuery,
-    ReservationQueryVariables
-  >,
-) {
-  const options = {...defaultOptions, ...baseOptions};
-  return Apollo.useQuery<ReservationQuery, ReservationQueryVariables>(
-    ReservationDocument,
-    options,
-  );
-}
-export function useReservationLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    ReservationQuery,
-    ReservationQueryVariables
-  >,
-) {
-  const options = {...defaultOptions, ...baseOptions};
-  return Apollo.useLazyQuery<ReservationQuery, ReservationQueryVariables>(
-    ReservationDocument,
-    options,
-  );
-}
-export type ReservationQueryHookResult = ReturnType<typeof useReservationQuery>;
-export type ReservationLazyQueryHookResult = ReturnType<
-  typeof useReservationLazyQuery
->;
-export type ReservationQueryResult = Apollo.QueryResult<
-  ReservationQuery,
-  ReservationQueryVariables
->;
-export const ConfimReservationDocument = gql`
-  mutation ConfimReservation($token: String!) {
-    confirmReservation(token: $token) {
-      id
-      status
-      reservationsFromSamePerson {
-        id
-        token
-        startTime
-      }
-    }
-  }
-`;
-export type ConfimReservationMutationFn = Apollo.MutationFunction<
-  ConfimReservationMutation,
-  ConfimReservationMutationVariables
+export type CreateBandApplicationMutationFn = Apollo.MutationFunction<
+  CreateBandApplicationMutation,
+  CreateBandApplicationMutationVariables
 >;
 
 /**
- * __useConfimReservationMutation__
+ * __useCreateBandApplicationMutation__
  *
- * To run a mutation, you first call `useConfimReservationMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useConfimReservationMutation` returns a tuple that includes:
+ * To run a mutation, you first call `useCreateBandApplicationMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateBandApplicationMutation` returns a tuple that includes:
  * - A mutate function that you can call at any time to execute the mutation
  * - An object with fields that represent the current status of the mutation's execution
  *
  * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
  *
  * @example
- * const [confimReservationMutation, { data, loading, error }] = useConfimReservationMutation({
+ * const [createBandApplicationMutation, { data, loading, error }] = useCreateBandApplicationMutation({
  *   variables: {
- *      token: // value for 'token'
+ *      data: // value for 'data'
  *   },
  * });
  */
-export function useConfimReservationMutation(
+export function useCreateBandApplicationMutation(
   baseOptions?: Apollo.MutationHookOptions<
-    ConfimReservationMutation,
-    ConfimReservationMutationVariables
+    CreateBandApplicationMutation,
+    CreateBandApplicationMutationVariables
   >,
 ) {
   const options = {...defaultOptions, ...baseOptions};
   return Apollo.useMutation<
-    ConfimReservationMutation,
-    ConfimReservationMutationVariables
-  >(ConfimReservationDocument, options);
+    CreateBandApplicationMutation,
+    CreateBandApplicationMutationVariables
+  >(CreateBandApplicationDocument, options);
 }
-export type ConfimReservationMutationHookResult = ReturnType<
-  typeof useConfimReservationMutation
+export type CreateBandApplicationMutationHookResult = ReturnType<
+  typeof useCreateBandApplicationMutation
 >;
-export type ConfimReservationMutationResult =
-  Apollo.MutationResult<ConfimReservationMutation>;
-export type ConfimReservationMutationOptions = Apollo.BaseMutationOptions<
-  ConfimReservationMutation,
-  ConfimReservationMutationVariables
+export type CreateBandApplicationMutationResult =
+  Apollo.MutationResult<CreateBandApplicationMutation>;
+export type CreateBandApplicationMutationOptions = Apollo.BaseMutationOptions<
+  CreateBandApplicationMutation,
+  CreateBandApplicationMutationVariables
 >;
