@@ -96,7 +96,7 @@ export type CreateBandApplicationInput = {
   email: Scalars['String'];
   bandname: Scalars['String'];
   genreCategory: GenreCategory;
-  genre: Scalars['String'];
+  genre?: Maybe<Scalars['String']>;
   city: Scalars['String'];
   facebook?: Maybe<Scalars['String']>;
   instagram?: Maybe<Scalars['String']>;

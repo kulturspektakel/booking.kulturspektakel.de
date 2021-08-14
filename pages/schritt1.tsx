@@ -2,26 +2,21 @@ import {
   FormControl,
   FormHelperText,
   FormLabel,
-  Input,
   Text,
   Textarea,
   HStack,
-  NumberDecrementStepper,
-  NumberIncrementStepper,
-  NumberInput,
-  NumberInputField,
-  NumberInputStepper,
   Link,
   Select,
 } from '@chakra-ui/react';
 import React, {useState} from 'react';
 import Page from '../components/Page';
 import {GenreCategory} from '../types/graphql';
-import {Formik, Form, Field} from 'formik';
+import {Formik} from 'formik';
 import Step from '../components/Step';
 import {AppContextT, useAppContext} from '../components/useAppContext';
 import DistanceWarning from '../components/DistanceWarning';
 import {useRouter} from 'next/dist/client/router';
+import Field from '../components/Field';
 
 const GENRE_CATEGORIES: Map<GenreCategory, string> = new Map([
   [GenreCategory.Pop, 'Pop'],
@@ -38,7 +33,7 @@ const GENRE_CATEGORIES: Map<GenreCategory, string> = new Map([
   [GenreCategory.Other, 'andere Musikrichtung'],
 ]);
 
-export default function Home() {
+export default function Step1() {
   const [context, updateContext] = useAppContext();
   const [city, setCity] = useState(context.city);
   const router = useRouter();
@@ -46,52 +41,36 @@ export default function Home() {
   return (
     <Page>
       <Formik
-        initialValues={
-          context as Pick<
-            AppContextT,
-            | 'bandname'
-            | 'genreCategory'
-            | 'genre'
-            | 'description'
-            | 'city'
-            | 'numberOfArtists'
-            | 'numberOfNonMaleArtists'
-          >
-        }
-        validate={(v) => ({
-          bandname: v.bandname ? null : 'asd',
-          description: v.description ? null : 'asd',
-          city: v.city ? null : 'asd',
-          numberOfArtists: v.numberOfArtists ? null : 'asd',
-          numberOfNonMaleArtists: v.numberOfNonMaleArtists ? null : 'asd',
-        })}
+        initialValues={context}
         onSubmit={(values) => {
-          console.log('onSubmit');
           updateContext(values);
           router.push('/schritt2');
         }}
+        validate={(v) => {
+          const errors: {[key in keyof AppContextT]: string} = {};
+          if (
+            v.numberOfNonMaleArtists &&
+            v.numberOfArtists &&
+            v.numberOfNonMaleArtists > v.numberOfArtists
+          ) {
+            errors.numberOfNonMaleArtists =
+              'Anzahl der nicht männlichen Künstler*innen kann nicht größer als Anzahl der männlichen Künster sein.';
+          }
+          return errors;
+        }}
       >
-        {({errors, touched, values, getFieldProps}) => {
+        {({values}) => {
           return (
             <Step>
-              <FormControl
-                id="bandname"
-                isRequired
-                isInvalid={touched.bandname && Boolean(errors.bandname)}
-              >
+              <FormControl id="bandname" isRequired>
                 <FormLabel>Bandname</FormLabel>
-                <Field as={Input} type="text" bg="white" name="bandname" />
+                <Field />
               </FormControl>
 
               <HStack w="100%">
                 <FormControl id="genreCategory" isRequired>
                   <FormLabel>Musikrichtung</FormLabel>
-                  <Field
-                    as={Select}
-                    placeholder="bitte auswählen…"
-                    bg="white"
-                    name="genreCategory"
-                  >
+                  <Field as={Select} placeholder="bitte auswählen…">
                     {Array.from(GENRE_CATEGORIES.entries()).map(([k, v]) => (
                       <option value={k} key={k}>
                         {v}
@@ -100,45 +79,22 @@ export default function Home() {
                   </Field>
                 </FormControl>
                 <FormControl id="genre">
-                  <Field
-                    as={Input}
-                    placeholder="genaues Genre (optional)"
-                    bg="white"
-                    name="genre"
-                    mt="8"
-                  />
+                  <Field placeholder="genaues Genre (optional)" mt="8" />
                 </FormControl>
               </HStack>
 
-              <FormControl
-                isRequired
-                id="description"
-                isInvalid={touched.description && Boolean(errors.description)}
-              >
+              <FormControl isRequired id="description">
                 <FormLabel>Bandbeschreibung</FormLabel>
                 <FormHelperText mt="-2" mb="2">
                   Erzählt uns etwas über eure Band! Was macht ihr für Musik? Was
                   ist eure Bandgeschichte?
                 </FormHelperText>
-                <Field
-                  as={Textarea}
-                  name="description"
-                  type="text"
-                  bg="white"
-                />
+                <Field as={Textarea} />
               </FormControl>
 
-              <FormControl
-                id="city"
-                isRequired
-                isInvalid={touched.city && Boolean(errors.city)}
-              >
+              <FormControl id="city" isRequired>
                 <FormLabel>Wohnort</FormLabel>
                 <Field
-                  as={Input}
-                  name="city"
-                  type="text"
-                  bg="white"
                   onBlur={(e: React.BaseSyntheticEvent) =>
                     setCity(e.target.value)
                   }
@@ -147,38 +103,21 @@ export default function Home() {
 
               <DistanceWarning origin={city} />
 
-              <HStack w="100%">
+              <HStack w="100%" mt="5">
                 <FormControl id="numberOfArtists" isRequired>
                   <FormLabel>Anzahl Bandmitglieder</FormLabel>
-                  <NumberInput size="md" min={1}>
-                    <NumberInputField
-                      bg="white"
-                      {...getFieldProps('numberOfArtists')}
-                    />
-                    <NumberInputStepper>
-                      <NumberIncrementStepper />
-                      <NumberDecrementStepper />
-                    </NumberInputStepper>
-                  </NumberInput>
+                  <Field type="number" min={1} />
                 </FormControl>
                 <FormControl id="numberOfNonMaleArtists" isRequired>
                   <FormLabel>
                     davon <strong>nicht</strong> männlich
                   </FormLabel>
-                  <NumberInput size="md" min={1} max={values.numberOfArtists}>
-                    <NumberInputField
-                      bg="white"
-                      {...getFieldProps('numberOfNonMaleArtists')}
-                    />
-                    <NumberInputStepper>
-                      <NumberIncrementStepper />
-                      <NumberDecrementStepper />
-                    </NumberInputStepper>
-                  </NumberInput>
+                  <Field type="number" min={1} max={values.numberOfArtists} />
                 </FormControl>
               </HStack>
               <Text fontSize="sm" color="gray.500">
-                Die Festival-Branche hat eine geringe Geschlechter-Diversität (
+                Die Festival-Branche hat eine geringe
+                Geschlechter&shy;diversität (
                 <Link
                   textDecoration="underline"
                   rel="noreferrer"
@@ -187,10 +126,10 @@ export default function Home() {
                 >
                   mehr Informationen
                 </Link>
-                ). Wir wählen die Bands nicht nach Geschlechterverteilung aus,
-                trotzdem wollen wir einen besseren Überblick über die Situation
-                bekommen und ermutigen speziell unterrepräsentierte Gruppen sich
-                bei uns zu bewerben.
+                ). Wir wählen die Bands nicht nach Geschlechter&shy;verteilung
+                aus, trotzdem wollen wir einen besseren Überblick über die
+                Situation bekommen und ermutigen speziell
+                unter&shy;repräsentierte Gruppen sich bei uns zu bewerben.
               </Text>
             </Step>
           );

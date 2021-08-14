@@ -1,4 +1,5 @@
 import React, {Dispatch, SetStateAction, useContext} from 'react';
+import {useCallback} from 'react';
 import {CreateBandApplicationInput} from '../types/graphql';
 
 export type AppContextT = Partial<CreateBandApplicationInput>;
@@ -13,5 +14,13 @@ export function useAppContext(): [
   (newValues: AppContextT) => void,
 ] {
   const [context, setContext] = useContext(AppContext);
-  return [context, (newValues) => setContext({...context, newValues})];
+
+  const updateContext = useCallback(
+    (newValues: AppContextT) => {
+      const newContext = {...context, ...newValues};
+      setContext(newContext);
+    },
+    [context, setContext],
+  );
+  return [context, updateContext];
 }
