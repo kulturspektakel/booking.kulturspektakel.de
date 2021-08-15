@@ -35,6 +35,17 @@ export default function Home() {
     return null;
   }
 
+  let errorMessage: string | null = null;
+  if (!event.bandApplicationStart || !event.bandApplicationEnd) {
+    errorMessage = 'Aktuell läuft die Bewerbungsphase nicht.';
+  } else if (event.bandApplicationStart > new Date()) {
+    errorMessage = `Die Bewerbungsphase beginnt am ${event.bandApplicationStart.toLocaleDateString(
+      'de',
+    )}`;
+  } else if (event.bandApplicationEnd < new Date()) {
+    errorMessage = `Die Bewerbungsphase ist beendet.`;
+  }
+
   return (
     <Page>
       <VStack spacing="5">
@@ -55,10 +66,16 @@ export default function Home() {
           <ChakraLink href="mailto:info@kulturspektakel.de" color="red.500">
             info@kulturspektakel.de
           </ChakraLink>
-          . Bewerbungsschluss ist der{' '}
-          {event.bandApplicationEnd?.toLocaleDateString('de')}, trotzdem möchten
-          wir euch dazu aufrufen eure Bewerbung so früh wie möglich
-          einzureichen.
+          .
+          {event.bandApplicationEnd && (
+            <>
+              {' '}
+              Bewerbungsschluss ist der{' '}
+              {event.bandApplicationEnd?.toLocaleDateString('de')}, trotzdem
+              möchten wir euch dazu aufrufen eure Bewerbung so früh wie möglich
+              einzureichen.
+            </>
+          )}
         </Text>
         <Text>
           Nach dem Absenden des Formulars wird sich unser Booking-Team per
@@ -66,23 +83,17 @@ export default function Home() {
           der Bewerbungsfrist.
         </Text>
         <Center>
-          {event.bandApplicationStart &&
-          event.bandApplicationStart < new Date() ? (
-            <Link href="/schritt1">
-              <Button colorScheme="blue">Jetzt Bewerben</Button>
-            </Link>
-          ) : (
+          {errorMessage ? (
             <Alert status="warning" borderRadius="md">
               <AlertIcon />
               <AlertDescription color="yellow.900">
-                Die Bewerbungsphase hat noch nicht begonnen
-                {event.bandApplicationStart
-                  ? ` und wird am ${event.bandApplicationStart.toLocaleDateString(
-                      'de',
-                    )} starten.`
-                  : '.'}
+                {errorMessage}
               </AlertDescription>
             </Alert>
+          ) : (
+            <Link href="/schritt1">
+              <Button colorScheme="blue">Jetzt Bewerben</Button>
+            </Link>
           )}
         </Center>
       </VStack>

@@ -1,6 +1,7 @@
 import {gql} from '@apollo/client';
 import {VStack, Heading, Text, Img} from '@chakra-ui/react';
-import React from 'react';
+import React, {useState} from 'react';
+import {useEffect} from 'react';
 import Page from '../components/Page';
 import {useAppContext} from '../components/useAppContext';
 import {GenreCategory, useThanksQuery} from '../types/graphql';
@@ -29,16 +30,19 @@ const GENRE_ICONS: Map<GenreCategory, string> = new Map([
 
 export default function Thanks() {
   const {data} = useThanksQuery();
-  const [context] = useAppContext();
+  const [context, _, resetContext] = useAppContext();
+  const [genre, setGenre] = useState<GenreCategory>(GenreCategory.Rock);
+  useEffect(() => {
+    if (context.genreCategory) {
+      setGenre(context.genreCategory);
+    }
+    resetContext();
+  }, [context.genreCategory, resetContext]);
+
   return (
     <Page>
       <VStack spacing="5" textAlign="center">
-        <Img
-          src={`/genre/${GENRE_ICONS.get(
-            context.genreCategory ?? GenreCategory.Rock,
-          )}`}
-          width="16"
-        />
+        <Img src={`/genre/${GENRE_ICONS.get(genre)}`} width="16" />
         <Heading size="lg">Danke für eure Bewerbung!</Heading>
         <Text>
           Wir haben dir soeben eine E-Mail zur Bestätigung geschickt. Wir

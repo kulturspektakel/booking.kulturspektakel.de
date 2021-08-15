@@ -52,11 +52,12 @@ export default function Step3() {
               variables: {
                 data,
               },
+              errorPolicy: 'all',
             });
+            router.push('/danke');
           } catch (e) {
             alert(e);
           }
-          router.push('/danke');
         }}
       >
         <Step>

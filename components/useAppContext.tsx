@@ -12,6 +12,7 @@ export const AppContext = React.createContext<
 export function useAppContext(): [
   AppContextT,
   (newValues: AppContextT) => void,
+  () => void,
 ] {
   const [context, setContext] = useContext(AppContext);
 
@@ -22,5 +23,9 @@ export function useAppContext(): [
     },
     [context, setContext],
   );
-  return [context, updateContext];
+
+  const resetContext = useCallback(() => {
+    setContext({});
+  }, [setContext]);
+  return [context, updateContext, resetContext];
 }

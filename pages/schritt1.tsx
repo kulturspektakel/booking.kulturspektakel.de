@@ -112,7 +112,7 @@ export default function Step1() {
                   <FormLabel>
                     davon <strong>nicht</strong> männlich
                   </FormLabel>
-                  <Field type="number" min={1} max={values.numberOfArtists} />
+                  <Field type="number" min={0} max={values.numberOfArtists} />
                 </FormControl>
               </HStack>
               <Text fontSize="sm" color="gray.500">
