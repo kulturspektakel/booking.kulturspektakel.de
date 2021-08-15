@@ -36,7 +36,7 @@ const HEARD_ABOUT: Map<HeardAboutBookingFrom, string> = new Map([
 ]);
 
 export default function Step3() {
-  const [context, updateContext] = useAppContext();
+  const [context, updateContext, resetContext] = useAppContext();
   const router = useRouter();
   const [create] = useCreateBandApplicationMutation();
 
@@ -54,6 +54,7 @@ export default function Step3() {
               },
               errorPolicy: 'all',
             });
+            resetContext();
             router.push('/danke');
           } catch (e) {
             alert(e);

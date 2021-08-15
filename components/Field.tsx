@@ -14,7 +14,9 @@ export default function Field({
   const value = v ?? '';
 
   const isInvalid =
-    isRequired && touched[id] && (Boolean(errors[id]) || !value);
+    isRequired &&
+    touched[id] &&
+    (Boolean(errors[id]) || value === '' || value == null);
 
   const inputProps: InputProps = {
     name: id,
