@@ -61,7 +61,7 @@ export type Band = {
   description?: Maybe<Scalars['String']>;
 };
 
-export type BandApplication = {
+export type BandApplication = Node & {
   __typename?: 'BandApplication';
   id: Scalars['ID'];
   bandname: Scalars['String'];
@@ -90,6 +90,7 @@ export type Config = {
   __typename?: 'Config';
   reservationStart: Scalars['DateTime'];
   tokenValue: Scalars['Int'];
+  bandApplicationDeadline: Scalars['DateTime'];
 };
 
 export type CreateBandApplicationInput = {
@@ -122,6 +123,18 @@ export type Device = Billable & {
 export type DeviceSalesNumbersArgs = {
   after: Scalars['DateTime'];
   before: Scalars['DateTime'];
+};
+
+export type Event = Node & {
+  __typename?: 'Event';
+  /** Unique identifier for the resource */
+  id: Scalars['ID'];
+  name: Scalars['String'];
+  start: Scalars['DateTime'];
+  end: Scalars['DateTime'];
+  bandApplicationStart?: Maybe<Scalars['DateTime']>;
+  bandApplicationEnd?: Maybe<Scalars['DateTime']>;
+  bandApplication: Array<BandApplication>;
 };
 
 export enum GenreCategory {
@@ -342,8 +355,8 @@ export type Query = {
   reservationsByPerson: Array<ReservationByPerson>;
   devices: Array<Device>;
   productList?: Maybe<ProductList>;
-  bandApplications: Array<BandApplication>;
   distanceToKult?: Maybe<Scalars['Float']>;
+  events: Array<Event>;
 };
 
 export type QueryReservationForTokenArgs = {
@@ -360,10 +373,6 @@ export type QueryAvailableCapacityArgs = {
 
 export type QueryProductListArgs = {
   id: Scalars['Int'];
-};
-
-export type QueryBandApplicationsArgs = {
-  eventYear: Scalars['Int'];
 };
 
 export type QueryDistanceToKultArgs = {
@@ -467,6 +476,36 @@ export type DistanceQuery = {
   distanceToKult?: Maybe<number>;
 };
 
+export type ThanksQueryVariables = Exact<{[key: string]: never}>;
+
+export type ThanksQuery = {
+  __typename?: 'Query';
+  node?: Maybe<
+    | {__typename?: 'Area'}
+    | {__typename?: 'BandApplication'}
+    | {__typename?: 'Event'; bandApplicationEnd?: Maybe<Date>}
+    | {__typename?: 'Table'}
+  >;
+};
+
+export type EventQueryVariables = Exact<{[key: string]: never}>;
+
+export type EventQuery = {
+  __typename?: 'Query';
+  node?: Maybe<
+    | {__typename?: 'Area'}
+    | {__typename?: 'BandApplication'}
+    | {
+        __typename?: 'Event';
+        start: Date;
+        end: Date;
+        bandApplicationStart?: Maybe<Date>;
+        bandApplicationEnd?: Maybe<Date>;
+      }
+    | {__typename?: 'Table'}
+  >;
+};
+
 export type CreateBandApplicationMutationVariables = Exact<{
   data: CreateBandApplicationInput;
 }>;
@@ -526,6 +565,107 @@ export type DistanceLazyQueryHookResult = ReturnType<
 export type DistanceQueryResult = Apollo.QueryResult<
   DistanceQuery,
   DistanceQueryVariables
+>;
+export const ThanksDocument = gql`
+  query Thanks {
+    node(id: "Event:kult2022") {
+      ... on Event {
+        bandApplicationEnd
+      }
+    }
+  }
+`;
+
+/**
+ * __useThanksQuery__
+ *
+ * To run a query within a React component, call `useThanksQuery` and pass it any options that fit your needs.
+ * When your component renders, `useThanksQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useThanksQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useThanksQuery(
+  baseOptions?: Apollo.QueryHookOptions<ThanksQuery, ThanksQueryVariables>,
+) {
+  const options = {...defaultOptions, ...baseOptions};
+  return Apollo.useQuery<ThanksQuery, ThanksQueryVariables>(
+    ThanksDocument,
+    options,
+  );
+}
+export function useThanksLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<ThanksQuery, ThanksQueryVariables>,
+) {
+  const options = {...defaultOptions, ...baseOptions};
+  return Apollo.useLazyQuery<ThanksQuery, ThanksQueryVariables>(
+    ThanksDocument,
+    options,
+  );
+}
+export type ThanksQueryHookResult = ReturnType<typeof useThanksQuery>;
+export type ThanksLazyQueryHookResult = ReturnType<typeof useThanksLazyQuery>;
+export type ThanksQueryResult = Apollo.QueryResult<
+  ThanksQuery,
+  ThanksQueryVariables
+>;
+export const EventDocument = gql`
+  query Event {
+    node(id: "Event:kult2022") {
+      ... on Event {
+        start
+        end
+        bandApplicationStart
+        bandApplicationEnd
+      }
+    }
+  }
+`;
+
+/**
+ * __useEventQuery__
+ *
+ * To run a query within a React component, call `useEventQuery` and pass it any options that fit your needs.
+ * When your component renders, `useEventQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useEventQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useEventQuery(
+  baseOptions?: Apollo.QueryHookOptions<EventQuery, EventQueryVariables>,
+) {
+  const options = {...defaultOptions, ...baseOptions};
+  return Apollo.useQuery<EventQuery, EventQueryVariables>(
+    EventDocument,
+    options,
+  );
+}
+export function useEventLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<EventQuery, EventQueryVariables>,
+) {
+  const options = {...defaultOptions, ...baseOptions};
+  return Apollo.useLazyQuery<EventQuery, EventQueryVariables>(
+    EventDocument,
+    options,
+  );
+}
+export type EventQueryHookResult = ReturnType<typeof useEventQuery>;
+export type EventLazyQueryHookResult = ReturnType<typeof useEventLazyQuery>;
+export type EventQueryResult = Apollo.QueryResult<
+  EventQuery,
+  EventQueryVariables
 >;
 export const CreateBandApplicationDocument = gql`
   mutation CreateBandApplication($data: CreateBandApplicationInput!) {

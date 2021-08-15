@@ -15,6 +15,7 @@ import Field from '../components/Field';
 import {gql} from '@apollo/client';
 import {
   CreateBandApplicationInput,
+  HeardAboutBookingFrom,
   useCreateBandApplicationMutation,
 } from '../types/graphql';
 
@@ -25,6 +26,14 @@ gql`
     }
   }
 `;
+
+const HEARD_ABOUT: Map<HeardAboutBookingFrom, string> = new Map([
+  [HeardAboutBookingFrom.BYon, 'BY-on'],
+  [HeardAboutBookingFrom.Facebook, 'Facebook'],
+  [HeardAboutBookingFrom.Friends, 'Freunde / Bekannte'],
+  [HeardAboutBookingFrom.Newspaper, 'Zeitung'],
+  [HeardAboutBookingFrom.Website, 'Webseite'],
+]);
 
 export default function Step3() {
   const [context, updateContext] = useAppContext();
@@ -81,9 +90,11 @@ export default function Step3() {
               Wie seid ihr auf unser Booking aufmerksam geworden?
             </FormLabel>
             <Field as={Select} placeholder="bitte auswählen…">
-              <option value="option1">Option 1</option>
-              <option value="option2">Option 2</option>
-              <option value="option3">Option 3</option>
+              {Array.from(HEARD_ABOUT.entries()).map(([k, v]) => (
+                <option key={k} value={k}>
+                  {v}
+                </option>
+              ))}
             </Field>
           </FormControl>
         </Step>
