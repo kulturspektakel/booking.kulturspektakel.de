@@ -71,9 +71,13 @@ export default function Home() {
             <>
               {' '}
               Bewerbungsschluss ist der{' '}
-              {event.bandApplicationEnd?.toLocaleDateString('de')}, trotzdem
-              möchten wir euch dazu aufrufen eure Bewerbung so früh wie möglich
-              einzureichen.
+              {event.bandApplicationEnd?.toLocaleDateString('de', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+              })}
+              , trotzdem möchten wir euch dazu aufrufen eure Bewerbung so früh
+              wie möglich einzureichen.
             </>
           )}
         </Text>
