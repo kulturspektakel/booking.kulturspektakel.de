@@ -75,6 +75,7 @@ export default function Home() {
                 day: '2-digit',
                 month: '2-digit',
                 year: 'numeric',
+                timeZone: 'Europe/Berlin',
               })}
               , trotzdem möchten wir euch dazu aufrufen eure Bewerbung so früh
               wie möglich einzureichen.

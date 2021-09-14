@@ -128,8 +128,9 @@ export default function Step1() {
                 </Link>
                 ). Wir wählen die Bands nicht nach Geschlechter&shy;verteilung
                 aus, trotzdem wollen wir einen besseren Überblick über die
-                Situation bekommen und ermutigen speziell
-                unter&shy;repräsentierte Gruppen sich bei uns zu bewerben.
+                Situation bekommen. Personen und Gruppen die auf
+                Festival&shy;bühnen unter&shy;repräsentiert sind möchten wir
+                explizit ermutigen sich bei uns zu bewerben.
               </Text>
             </Step>
           );

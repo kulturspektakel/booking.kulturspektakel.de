@@ -27,7 +27,12 @@ export default function Thanks() {
           beantworten jede Bewerbung allerdings kann es bis nach dem
           Bewerbungsschluss am{' '}
           {data?.node?.__typename === 'Event' &&
-            data.node.bandApplicationEnd?.toLocaleDateString('de')}{' '}
+            data.node.bandApplicationEnd?.toLocaleDateString('de', {
+              day: '2-digit',
+              month: '2-digit',
+              year: 'numeric',
+              timeZone: 'Europe/Berlin',
+            })}{' '}
           dauern, bis wir uns bei euch melden.
         </Text>
       </VStack>
