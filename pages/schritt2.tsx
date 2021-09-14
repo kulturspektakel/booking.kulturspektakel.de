@@ -37,7 +37,7 @@ export default function Step2() {
               egal wo. Hauptsache wir können uns etwas von euch anhören.
             </FormHelperText>
             <Field
-              type="url"
+              type="text"
               placeholder="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
             />
           </FormControl>
@@ -55,7 +55,7 @@ export default function Step2() {
           <FormControl id="facebook">
             <FormLabel>Facebook</FormLabel>
             <Field
-              type="url"
+              type="text"
               placeholder="https://facebook.com/kulturspektakel"
             />
             <FormErrorMessage>tes</FormErrorMessage>
@@ -63,7 +63,7 @@ export default function Step2() {
 
           <FormControl id="website">
             <FormLabel>Webseite</FormLabel>
-            <Field type="url" placeholder="https://kulturspektakel.de" />
+            <Field type="text" placeholder="https://kulturspektakel.de" />
           </FormControl>
         </Step>
       </Formik>

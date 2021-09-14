@@ -75,6 +75,20 @@ export type BandApplication = Node & {
   email: Scalars['String'];
   city: Scalars['String'];
   demo?: Maybe<Scalars['String']>;
+  instagram?: Maybe<Scalars['String']>;
+  instagramFollower?: Maybe<Scalars['Int']>;
+  distance?: Maybe<Scalars['Float']>;
+  heardAboutBookingFrom?: Maybe<HeardAboutBookingFrom>;
+  knowsKultFrom?: Maybe<Scalars['String']>;
+  contactedByViewer?: Maybe<Viewer>;
+  bandApplicationRating: Array<BandApplicationRating>;
+  rating?: Maybe<Scalars['Float']>;
+};
+
+export type BandApplicationRating = {
+  __typename?: 'BandApplicationRating';
+  viewer: Viewer;
+  rating: Scalars['Int'];
 };
 
 export type Billable = {
@@ -182,6 +196,8 @@ export type Mutation = {
   upsertProductList?: Maybe<ProductList>;
   swapReservations?: Maybe<Scalars['Boolean']>;
   createBandApplication?: Maybe<BandApplication>;
+  markBandApplicationContacted?: Maybe<BandApplication>;
+  rateBandApplication?: Maybe<BandApplication>;
 };
 
 export type MutationUpdateReservationOtherPersonsArgs = {
@@ -255,6 +271,16 @@ export type MutationSwapReservationsArgs = {
 
 export type MutationCreateBandApplicationArgs = {
   data: CreateBandApplicationInput;
+};
+
+export type MutationMarkBandApplicationContactedArgs = {
+  bandApplicationId: Scalars['ID'];
+  contacted: Scalars['Boolean'];
+};
+
+export type MutationRateBandApplicationArgs = {
+  bandApplicationId: Scalars['ID'];
+  rating?: Maybe<Scalars['Int']>;
 };
 
 export type Node = {
@@ -462,6 +488,7 @@ export type TimeSeries = {
 
 export type Viewer = {
   __typename?: 'Viewer';
+  id: Scalars['ID'];
   displayName: Scalars['String'];
   email: Scalars['String'];
   profilePicture?: Maybe<Scalars['String']>;
