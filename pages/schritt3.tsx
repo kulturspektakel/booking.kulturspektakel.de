@@ -30,6 +30,7 @@ gql`
 const HEARD_ABOUT: Map<HeardAboutBookingFrom, string> = new Map([
   [HeardAboutBookingFrom.BYon, 'BY-on'],
   [HeardAboutBookingFrom.Facebook, 'Facebook'],
+  [HeardAboutBookingFrom.Instagram, 'Instagram'],
   [HeardAboutBookingFrom.Friends, 'Freunde / Bekannte'],
   [HeardAboutBookingFrom.Newspaper, 'Zeitung'],
   [HeardAboutBookingFrom.Website, 'Webseite'],

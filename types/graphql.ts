@@ -141,7 +141,6 @@ export type DeviceSalesNumbersArgs = {
 
 export type Event = Node & {
   __typename?: 'Event';
-  /** Unique identifier for the resource */
   id: Scalars['ID'];
   name: Scalars['String'];
   start: Scalars['DateTime'];
@@ -169,6 +168,7 @@ export enum HeardAboutBookingFrom {
   Friends = 'Friends',
   Website = 'Website',
   Facebook = 'Facebook',
+  Instagram = 'Instagram',
 }
 
 export type HistoricalProduct = Billable & {
@@ -486,7 +486,7 @@ export type TimeSeries = {
   value: Scalars['Int'];
 };
 
-export type Viewer = {
+export type Viewer = Node & {
   __typename?: 'Viewer';
   id: Scalars['ID'];
   displayName: Scalars['String'];
@@ -512,6 +512,7 @@ export type ThanksQuery = {
     | {__typename?: 'BandApplication'}
     | {__typename?: 'Event'; bandApplicationEnd?: Maybe<Date>}
     | {__typename?: 'Table'}
+    | {__typename?: 'Viewer'}
   >;
 };
 
@@ -530,6 +531,7 @@ export type EventQuery = {
         bandApplicationEnd?: Maybe<Date>;
       }
     | {__typename?: 'Table'}
+    | {__typename?: 'Viewer'}
   >;
 };
 
