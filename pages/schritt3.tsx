@@ -36,6 +36,12 @@ const HEARD_ABOUT: Map<HeardAboutBookingFrom, string> = new Map([
   [HeardAboutBookingFrom.Website, 'Webseite'],
 ]);
 
+const PLAYED_PREVIOUSLY: Map<PreviouslyPlayed, string> = new Map([
+  [PreviouslyPlayed.Yes, 'Ja'],
+  [PreviouslyPlayed.OtherFormation, 'Mit einer anderen Band'],
+  [PreviouslyPlayed.No, 'Nein'],
+]);
+
 export default function Step3() {
   const [context, updateContext, resetContext] = useAppContext();
   const router = useRouter();
@@ -86,6 +92,17 @@ export default function Step3() {
               immer mal erzählen?
             </FormHelperText>
             <Field as={Textarea} />
+          </FormControl>
+
+          <FormControl id="hasPreviouslyPlayed">
+            <FormLabel>Habt ihr schonmal bei uns gespielt?</FormLabel>
+            <Field as={Select} placeholder="bitte auswählen…">
+              {Array.from(PLAYED_PREVIOUSLY.entries()).map(([k, v]) => (
+                <option key={k} value={k}>
+                  {v}
+                </option>
+              ))}
+            </Field>
           </FormControl>
 
           <FormControl id="heardAboutBookingFrom">

@@ -490,6 +490,22 @@
             "deprecationReason": null
           },
           {
+            "name": "numberOfArtists",
+            "description": null,
+            "args": [],
+            "type": {"kind": "SCALAR", "name": "Int", "ofType": null},
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "numberOfNonMaleArtists",
+            "description": null,
+            "args": [],
+            "type": {"kind": "SCALAR", "name": "Int", "ofType": null},
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "contactedByViewer",
             "description": null,
             "args": [],
@@ -868,6 +884,18 @@
             "type": {
               "kind": "ENUM",
               "name": "HeardAboutBookingFrom",
+              "ofType": null
+            },
+            "defaultValue": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "hasPreviouslyPlayed",
+            "description": null,
+            "type": {
+              "kind": "ENUM",
+              "name": "PreviouslyPlayed",
               "ofType": null
             },
             "defaultValue": null,
@@ -2367,6 +2395,35 @@
           },
           {
             "name": "FREE_BAND",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "possibleTypes": null
+      },
+      {
+        "kind": "ENUM",
+        "name": "PreviouslyPlayed",
+        "description": null,
+        "fields": null,
+        "inputFields": null,
+        "interfaces": null,
+        "enumValues": [
+          {
+            "name": "Yes",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "OtherFormation",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "No",
             "description": null,
             "isDeprecated": false,
             "deprecationReason": null

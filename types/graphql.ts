@@ -80,6 +80,8 @@ export type BandApplication = Node & {
   distance?: Maybe<Scalars['Float']>;
   heardAboutBookingFrom?: Maybe<HeardAboutBookingFrom>;
   knowsKultFrom?: Maybe<Scalars['String']>;
+  numberOfArtists?: Maybe<Scalars['Int']>;
+  numberOfNonMaleArtists?: Maybe<Scalars['Int']>;
   contactedByViewer?: Maybe<Viewer>;
   bandApplicationRating: Array<BandApplicationRating>;
   rating?: Maybe<Scalars['Float']>;
@@ -124,6 +126,7 @@ export type CreateBandApplicationInput = {
   contactPhone: Scalars['String'];
   knowsKultFrom?: Maybe<Scalars['String']>;
   heardAboutBookingFrom?: Maybe<HeardAboutBookingFrom>;
+  hasPreviouslyPlayed?: Maybe<PreviouslyPlayed>;
 };
 
 export type Device = Billable & {
@@ -331,6 +334,12 @@ export enum OrderPayment {
   Voucher = 'VOUCHER',
   FreeCrew = 'FREE_CREW',
   FreeBand = 'FREE_BAND',
+}
+
+export enum PreviouslyPlayed {
+  Yes = 'Yes',
+  OtherFormation = 'OtherFormation',
+  No = 'No',
 }
 
 export type Product = Billable & {
