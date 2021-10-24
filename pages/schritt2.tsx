@@ -29,7 +29,7 @@ export default function Step2() {
           router.push('/schritt3');
         }}
       >
-        <Step>
+        <Step step={2}>
           <FormControl id="demo" isRequired>
             <FormLabel>Demomaterial: YouTube, Soundcloud, etc.</FormLabel>
             <FormHelperText mt="-2" mb="2">

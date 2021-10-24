@@ -61,7 +61,7 @@ export default function Step1() {
       >
         {({values}) => {
           return (
-            <Step>
+            <Step step={1}>
               <FormControl id="bandname" isRequired>
                 <FormLabel>Bandname</FormLabel>
                 <Field />

@@ -15,12 +15,16 @@ import introspectionResult from '../types/graphql.schema.json';
 import {buildClientSchema, IntrospectionQuery} from 'graphql';
 import {GraphQLDateTime, GraphQLDate} from 'graphql-scalars';
 import {AppContext, AppContextT} from '../components/useAppContext';
+import {StepsStyleConfig as Steps} from 'chakra-ui-steps';
 
 const App = ({Component, pageProps}: AppProps) => {
   const client = useMemo(() => initializeApollo(), []);
   const context = useState<AppContextT>({});
 
   const theme = extendTheme({
+    components: {
+      Steps,
+    },
     styles: {
       global: {
         body: {

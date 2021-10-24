@@ -17,7 +17,7 @@ import {
   CreateBandApplicationInput,
   HeardAboutBookingFrom,
   useCreateBandApplicationMutation,
-  PreviouslyPlayed
+  PreviouslyPlayed,
 } from '../types/graphql';
 
 gql`
@@ -69,7 +69,7 @@ export default function Step3() {
           }
         }}
       >
-        <Step>
+        <Step nextButtonLabel="Bewerbung absenden" step={3}>
           <FormControl id="contactName" isRequired>
             <FormLabel>Ansprechpartner*in</FormLabel>
             <Field />
