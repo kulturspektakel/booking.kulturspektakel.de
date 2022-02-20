@@ -4,6 +4,12 @@ import {
   FormLabel,
   Textarea,
   Select,
+  Alert,
+  AlertDescription,
+  AlertIcon,
+  AlertTitle,
+  Box,
+  Code,
 } from '@chakra-ui/react';
 import React from 'react';
 import Page from '../components/Page';
@@ -46,7 +52,7 @@ const PLAYED_PREVIOUSLY: Map<PreviouslyPlayed, string> = new Map([
 export default function Step3() {
   const [context, updateContext, resetContext] = useAppContext();
   const router = useRouter();
-  const [create] = useCreateBandApplicationMutation();
+  const [create, {error, loading}] = useCreateBandApplicationMutation();
 
   return (
     <Page>
@@ -55,17 +61,15 @@ export default function Step3() {
         onSubmit={async (values) => {
           updateContext(values);
           const data = {...context, ...values} as CreateBandApplicationInput;
-          try {
-            await create({
-              variables: {
-                data,
-              },
-              errorPolicy: 'all',
-            });
+          const {data: res} = await create({
+            variables: {
+              data,
+            },
+            errorPolicy: 'all',
+          });
+          if (res?.createBandApplication?.id) {
             resetContext();
             router.push('/danke');
-          } catch (e) {
-            alert(e);
           }
         }}
       >
@@ -118,6 +122,26 @@ export default function Step3() {
               ))}
             </Field>
           </FormControl>
+          {!loading && error && (
+            <Alert status="error" borderRadius="md">
+              <AlertIcon />
+              <Box flex="1">
+                <AlertTitle mr={2}>
+                  Die Bewerbung konnte nicht abgeschickt werden.
+                </AlertTitle>
+                <AlertDescription>
+                  <p>
+                    Bitte versuche es nochmals, falls es immer noch nicht
+                    klappt, schreibe bitte eine Mail an{' '}
+                    <strong>booking@kulturspektakel.de</strong>.
+                  </p>
+                  <Code borderRadius="md">
+                    {error.name}: {error.message}
+                  </Code>
+                </AlertDescription>
+              </Box>
+            </Alert>
+          )}
         </Step>
       </Formik>
     </Page>
