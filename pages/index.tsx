@@ -17,7 +17,7 @@ import {useEventQuery} from '../types/graphql';
 
 gql`
   query Event {
-    node(id: "Event:kult2022") {
+    node(id: "Event:kult2023") {
       ... on Event {
         start
         end

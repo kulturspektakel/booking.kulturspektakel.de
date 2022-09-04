@@ -1,6 +1,7 @@
 import {gql} from '@apollo/client';
 import * as Apollo from '@apollo/client';
 export type Maybe<T> = T | null;
+export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends {[key: string]: unknown}> = {[K in keyof T]: T[K]};
 export type MakeOptional<T, K extends keyof T> = Omit<T, K> & {
   [SubKey in K]?: Maybe<T[SubKey]>;
@@ -8,7 +9,7 @@ export type MakeOptional<T, K extends keyof T> = Omit<T, K> & {
 export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & {
   [SubKey in K]: Maybe<T[SubKey]>;
 };
-const defaultOptions = {};
+const defaultOptions = {} as const;
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
   ID: string;
@@ -16,33 +17,17 @@ export type Scalars = {
   Boolean: boolean;
   Int: number;
   Float: number;
-  /** A date string, such as 2007-12-03, compliant with the `full-date` format outlined in section 5.6 of the RFC 3339 profile of the ISO 8601 standard for representation of dates and times using the Gregorian calendar. */
   Date: Date;
-  /** A date-time string at UTC, such as 2007-12-03T10:15:30Z, compliant with the `date-time` format outlined in section 5.6 of the RFC 3339 profile of the ISO 8601 standard for representation of dates and times using the Gregorian calendar. */
   DateTime: Date;
-  /** The `JSONObject` scalar type represents JSON objects as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf). */
-  JSONObject: any;
 };
 
 export type Area = Node & {
   __typename?: 'Area';
-  availability: Array<TableAvailability>;
-  availableTables: Scalars['Int'];
-  bandsPlaying: Array<Band>;
+  bandsPlaying: Array<BandPlaying>;
   displayName: Scalars['String'];
   id: Scalars['ID'];
   openingHour: Array<OpeningHour>;
-  table: Array<Table>;
   themeColor: Scalars['String'];
-};
-
-export type AreaAvailabilityArgs = {
-  day: Scalars['Date'];
-  partySize: Scalars['Int'];
-};
-
-export type AreaAvailableTablesArgs = {
-  time?: Maybe<Scalars['DateTime']>;
 };
 
 export type AreaBandsPlayingArgs = {
@@ -50,17 +35,7 @@ export type AreaBandsPlayingArgs = {
 };
 
 export type AreaOpeningHourArgs = {
-  day?: Maybe<Scalars['Date']>;
-};
-
-export type Band = {
-  __typename?: 'Band';
-  description?: Maybe<Scalars['String']>;
-  endTime: Scalars['DateTime'];
-  genre?: Maybe<Scalars['String']>;
-  id: Scalars['ID'];
-  name: Scalars['String'];
-  startTime: Scalars['DateTime'];
+  day?: InputMaybe<Scalars['Date']>;
 };
 
 export type BandApplication = Node & {
@@ -88,6 +63,7 @@ export type BandApplication = Node & {
   numberOfArtists?: Maybe<Scalars['Int']>;
   numberOfNonMaleArtists?: Maybe<Scalars['Int']>;
   rating?: Maybe<Scalars['Float']>;
+  website?: Maybe<Scalars['String']>;
 };
 
 export type BandApplicationRating = {
@@ -96,8 +72,18 @@ export type BandApplicationRating = {
   viewer: Viewer;
 };
 
+export type BandPlaying = Node & {
+  __typename?: 'BandPlaying';
+  description?: Maybe<Scalars['String']>;
+  endTime: Scalars['DateTime'];
+  genre?: Maybe<Scalars['String']>;
+  id: Scalars['ID'];
+  name: Scalars['String'];
+  startTime: Scalars['DateTime'];
+};
+
 export type Billable = {
-  salesNumbers: SalesNumber;
+  salesNumbers: Array<SalesNumber>;
 };
 
 export type BillableSalesNumbersArgs = {
@@ -105,11 +91,75 @@ export type BillableSalesNumbersArgs = {
   before: Scalars['DateTime'];
 };
 
+export type Board = {
+  __typename?: 'Board';
+  chair: Scalars['String'];
+  deputy: Scalars['String'];
+  deputy2: Scalars['String'];
+  observer: Scalars['String'];
+  observer2: Scalars['String'];
+  secretary: Scalars['String'];
+  treasurer: Scalars['String'];
+};
+
+export type Card = Node &
+  Transactionable & {
+    __typename?: 'Card';
+    id: Scalars['ID'];
+    transactions: CardTransactionConnection;
+  };
+
+export type CardTransactionsArgs = {
+  after?: InputMaybe<Scalars['DateTime']>;
+  before?: InputMaybe<Scalars['DateTime']>;
+  limit?: InputMaybe<Scalars['Int']>;
+  type?: InputMaybe<CardTransactionType>;
+};
+
+export type CardStatus = {
+  __typename?: 'CardStatus';
+  balance: Scalars['Int'];
+  cardId: Scalars['ID'];
+  deposit: Scalars['Int'];
+  hasNewerTransactions?: Maybe<Scalars['Boolean']>;
+  recentTransactions?: Maybe<Array<Transaction>>;
+};
+
+export type CardTransaction = Transaction & {
+  __typename?: 'CardTransaction';
+  Order: Array<Order>;
+  balanceAfter: Scalars['Int'];
+  balanceBefore: Scalars['Int'];
+  cardId: Scalars['String'];
+  clientId: Scalars['String'];
+  createdAt: Scalars['DateTime'];
+  depositAfter: Scalars['Int'];
+  depositBefore: Scalars['Int'];
+  deviceTime: Scalars['DateTime'];
+  transactionType: CardTransactionType;
+};
+
+export type CardTransactionConnection = {
+  __typename?: 'CardTransactionConnection';
+  /** This includes money made from deposit */
+  balanceTotal: Scalars['Int'];
+  data: Array<CardTransaction>;
+  depositIn: Scalars['Int'];
+  depositOut: Scalars['Int'];
+  totalCount: Scalars['Int'];
+  uniqueCards: Scalars['Int'];
+};
+
+export enum CardTransactionType {
+  Cashout = 'Cashout',
+  Charge = 'Charge',
+  TopUp = 'TopUp',
+}
+
 export type Config = {
   __typename?: 'Config';
-  bandApplicationDeadline: Scalars['DateTime'];
-  reservationStart: Scalars['DateTime'];
-  tokenValue: Scalars['Int'];
+  board: Board;
+  depositValue: Scalars['Int'];
 };
 
 export type CreateBandApplicationInput = {
@@ -120,36 +170,53 @@ export type CreateBandApplicationInput = {
   demo: Scalars['String'];
   description: Scalars['String'];
   email: Scalars['String'];
-  facebook?: Maybe<Scalars['String']>;
-  genre?: Maybe<Scalars['String']>;
+  facebook?: InputMaybe<Scalars['String']>;
+  genre?: InputMaybe<Scalars['String']>;
   genreCategory: GenreCategory;
-  hasPreviouslyPlayed?: Maybe<PreviouslyPlayed>;
-  heardAboutBookingFrom?: Maybe<HeardAboutBookingFrom>;
-  instagram?: Maybe<Scalars['String']>;
-  knowsKultFrom?: Maybe<Scalars['String']>;
+  hasPreviouslyPlayed?: InputMaybe<PreviouslyPlayed>;
+  heardAboutBookingFrom?: InputMaybe<HeardAboutBookingFrom>;
+  instagram?: InputMaybe<Scalars['String']>;
+  knowsKultFrom?: InputMaybe<Scalars['String']>;
   numberOfArtists: Scalars['Int'];
   numberOfNonMaleArtists: Scalars['Int'];
-  website?: Maybe<Scalars['String']>;
+  website?: InputMaybe<Scalars['String']>;
 };
 
-export type Device = Billable & {
-  __typename?: 'Device';
-  id: Scalars['ID'];
-  lastSeen?: Maybe<Scalars['DateTime']>;
-  productList?: Maybe<ProductList>;
-  salesNumbers: SalesNumber;
-};
+export type Device = Billable &
+  Node &
+  Transactionable & {
+    __typename?: 'Device';
+    id: Scalars['ID'];
+    lastSeen?: Maybe<Scalars['DateTime']>;
+    productList?: Maybe<ProductList>;
+    salesNumbers: Array<SalesNumber>;
+    softwareVersion?: Maybe<Scalars['String']>;
+    transactions: CardTransactionConnection;
+  };
 
 export type DeviceSalesNumbersArgs = {
   after: Scalars['DateTime'];
   before: Scalars['DateTime'];
 };
 
+export type DeviceTransactionsArgs = {
+  after?: InputMaybe<Scalars['DateTime']>;
+  before?: InputMaybe<Scalars['DateTime']>;
+  limit?: InputMaybe<Scalars['Int']>;
+  type?: InputMaybe<CardTransactionType>;
+};
+
+export enum DeviceType {
+  ContactlessTerminal = 'CONTACTLESS_TERMINAL',
+  Ipad = 'IPAD',
+}
+
 export type Event = Node & {
   __typename?: 'Event';
   bandApplication: Array<BandApplication>;
   bandApplicationEnd?: Maybe<Scalars['DateTime']>;
   bandApplicationStart?: Maybe<Scalars['DateTime']>;
+  bandsPlaying: Array<BandPlaying>;
   end: Scalars['DateTime'];
   id: Scalars['ID'];
   name: Scalars['String'];
@@ -180,8 +247,8 @@ export enum HeardAboutBookingFrom {
 export type HistoricalProduct = Billable & {
   __typename?: 'HistoricalProduct';
   name: Scalars['String'];
-  productListId: Scalars['Int'];
-  salesNumbers: SalesNumber;
+  productListId: Scalars['ID'];
+  salesNumbers: Array<SalesNumber>;
 };
 
 export type HistoricalProductSalesNumbersArgs = {
@@ -189,34 +256,23 @@ export type HistoricalProductSalesNumbersArgs = {
   before: Scalars['DateTime'];
 };
 
+export type MissingTransaction = Transaction & {
+  __typename?: 'MissingTransaction';
+  balanceAfter: Scalars['Int'];
+  balanceBefore: Scalars['Int'];
+  depositAfter: Scalars['Int'];
+  depositBefore: Scalars['Int'];
+  numberOfMissingTransactions: Scalars['Int'];
+};
+
 export type Mutation = {
   __typename?: 'Mutation';
-  cancelReservation?: Maybe<Scalars['Boolean']>;
-  checkInReservation?: Maybe<Reservation>;
-  confirmReservation?: Maybe<Reservation>;
-  createBandApplication?: Maybe<BandApplication>;
-  createOrder?: Maybe<Order>;
-  createReservation?: Maybe<Reservation>;
-  markBandApplicationContacted?: Maybe<BandApplication>;
-  rateBandApplication?: Maybe<BandApplication>;
-  requestReservation: Scalars['Boolean'];
-  swapReservations?: Maybe<Scalars['Boolean']>;
-  updateReservation?: Maybe<Reservation>;
-  updateReservationOtherPersons?: Maybe<Reservation>;
-  upsertProductList?: Maybe<ProductList>;
-};
-
-export type MutationCancelReservationArgs = {
-  token: Scalars['String'];
-};
-
-export type MutationCheckInReservationArgs = {
-  checkedInPersons: Scalars['Int'];
-  id: Scalars['Int'];
-};
-
-export type MutationConfirmReservationArgs = {
-  token: Scalars['String'];
+  createBandApplication: BandApplication;
+  createOrder: Order;
+  markBandApplicationContacted: BandApplication;
+  rateBandApplication: BandApplication;
+  updateDeviceProductList: Device;
+  upsertProductList: ProductList;
 };
 
 export type MutationCreateBandApplicationArgs = {
@@ -230,16 +286,6 @@ export type MutationCreateOrderArgs = {
   products: Array<OrderItemInput>;
 };
 
-export type MutationCreateReservationArgs = {
-  endTime: Scalars['DateTime'];
-  note?: Maybe<Scalars['String']>;
-  otherPersons: Array<Scalars['String']>;
-  primaryEmail: Scalars['String'];
-  primaryPerson: Scalars['String'];
-  startTime: Scalars['DateTime'];
-  tableId: Scalars['ID'];
-};
-
 export type MutationMarkBandApplicationContactedArgs = {
   bandApplicationId: Scalars['ID'];
   contacted: Scalars['Boolean'];
@@ -247,50 +293,47 @@ export type MutationMarkBandApplicationContactedArgs = {
 
 export type MutationRateBandApplicationArgs = {
   bandApplicationId: Scalars['ID'];
-  rating?: Maybe<Scalars['Int']>;
+  rating?: InputMaybe<Scalars['Int']>;
 };
 
-export type MutationRequestReservationArgs = {
-  areaId: Scalars['ID'];
-  endTime: Scalars['DateTime'];
-  otherPersons: Array<Scalars['String']>;
-  primaryEmail: Scalars['String'];
-  primaryPerson: Scalars['String'];
-  startTime: Scalars['DateTime'];
-  tableType?: Maybe<TableType>;
-};
-
-export type MutationSwapReservationsArgs = {
-  a: Scalars['Int'];
-  b: Scalars['Int'];
-};
-
-export type MutationUpdateReservationArgs = {
-  checkedInPersons?: Maybe<Scalars['Int']>;
-  endTime?: Maybe<Scalars['DateTime']>;
-  id: Scalars['Int'];
-  note?: Maybe<Scalars['String']>;
-  primaryPerson?: Maybe<Scalars['String']>;
-  startTime?: Maybe<Scalars['DateTime']>;
-  tableId?: Maybe<Scalars['ID']>;
-};
-
-export type MutationUpdateReservationOtherPersonsArgs = {
-  otherPersons: Array<Scalars['String']>;
-  token: Scalars['String'];
+export type MutationUpdateDeviceProductListArgs = {
+  deviceId: Scalars['ID'];
+  productListId: Scalars['ID'];
 };
 
 export type MutationUpsertProductListArgs = {
-  active?: Maybe<Scalars['Boolean']>;
-  emoji?: Maybe<Scalars['String']>;
-  id?: Maybe<Scalars['Int']>;
-  name?: Maybe<Scalars['String']>;
-  products?: Maybe<Array<ProductInput>>;
+  active?: InputMaybe<Scalars['Boolean']>;
+  emoji?: InputMaybe<Scalars['String']>;
+  id?: InputMaybe<Scalars['ID']>;
+  name?: InputMaybe<Scalars['String']>;
+  products?: InputMaybe<Array<ProductInput>>;
 };
 
 export type Node = {
-  /** Unique identifier for the resource */
   id: Scalars['ID'];
+};
+
+export type NuclinoPage = Node & {
+  __typename?: 'NuclinoPage';
+  content: Scalars['String'];
+  id: Scalars['ID'];
+  lastUpdatedAt: Scalars['DateTime'];
+  lastUpdatedUser: NuclinoUser;
+  title: Scalars['String'];
+};
+
+export type NuclinoSearchResult = {
+  __typename?: 'NuclinoSearchResult';
+  highlight: Scalars['String'];
+  page: NuclinoPage;
+};
+
+export type NuclinoUser = {
+  __typename?: 'NuclinoUser';
+  email: Scalars['String'];
+  firstName: Scalars['String'];
+  id: Scalars['ID'];
+  lastName: Scalars['String'];
 };
 
 export type OpeningHour = {
@@ -303,17 +346,17 @@ export type Order = {
   __typename?: 'Order';
   createdAt: Scalars['DateTime'];
   deposit: Scalars['Int'];
-  deviceId?: Maybe<Scalars['String']>;
+  deviceId?: Maybe<Scalars['ID']>;
   id: Scalars['Int'];
   items: Array<OrderItem>;
   payment: OrderPayment;
-  total?: Maybe<Scalars['Int']>;
+  total: Scalars['Int'];
 };
 
 export type OrderItem = {
   __typename?: 'OrderItem';
   amount: Scalars['Int'];
-  id: Scalars['Int'];
+  id: Scalars['ID'];
   name: Scalars['String'];
   note?: Maybe<Scalars['String']>;
   perUnitPrice: Scalars['Int'];
@@ -323,9 +366,9 @@ export type OrderItem = {
 export type OrderItemInput = {
   amount: Scalars['Int'];
   name: Scalars['String'];
-  note?: Maybe<Scalars['String']>;
+  note?: InputMaybe<Scalars['String']>;
   perUnitPrice: Scalars['Int'];
-  productListId?: Maybe<Scalars['Int']>;
+  productListId?: InputMaybe<Scalars['Int']>;
 };
 
 export enum OrderPayment {
@@ -344,15 +387,16 @@ export enum PreviouslyPlayed {
   Yes = 'Yes',
 }
 
-export type Product = Billable & {
-  __typename?: 'Product';
-  id: Scalars['Int'];
-  name: Scalars['String'];
-  price: Scalars['Int'];
-  productListId: Scalars['Int'];
-  requiresDeposit: Scalars['Boolean'];
-  salesNumbers: SalesNumber;
-};
+export type Product = Billable &
+  Node & {
+    __typename?: 'Product';
+    id: Scalars['ID'];
+    name: Scalars['String'];
+    price: Scalars['Int'];
+    productListId: Scalars['ID'];
+    requiresDeposit: Scalars['Boolean'];
+    salesNumbers: Array<SalesNumber>;
+  };
 
 export type ProductSalesNumbersArgs = {
   after: Scalars['DateTime'];
@@ -362,18 +406,20 @@ export type ProductSalesNumbersArgs = {
 export type ProductInput = {
   name: Scalars['String'];
   price: Scalars['Int'];
-  requiresDeposit?: Maybe<Scalars['Boolean']>;
+  requiresDeposit?: InputMaybe<Scalars['Boolean']>;
 };
 
-export type ProductList = Billable & {
-  __typename?: 'ProductList';
-  emoji?: Maybe<Scalars['String']>;
-  historicalProducts: Array<HistoricalProduct>;
-  id: Scalars['Int'];
-  name: Scalars['String'];
-  product: Array<Product>;
-  salesNumbers: SalesNumber;
-};
+export type ProductList = Billable &
+  Node & {
+    __typename?: 'ProductList';
+    active: Scalars['Boolean'];
+    emoji?: Maybe<Scalars['String']>;
+    historicalProducts: Array<HistoricalProduct>;
+    id: Scalars['ID'];
+    name: Scalars['String'];
+    product: Array<Product>;
+    salesNumbers: Array<SalesNumber>;
+  };
 
 export type ProductListSalesNumbersArgs = {
   after: Scalars['DateTime'];
@@ -383,21 +429,25 @@ export type ProductListSalesNumbersArgs = {
 export type Query = {
   __typename?: 'Query';
   areas: Array<Area>;
-  availableCapacity: Scalars['Int'];
-  config?: Maybe<Config>;
+  cardStatus: CardStatus;
+  config: Config;
   devices: Array<Device>;
   distanceToKult?: Maybe<Scalars['Float']>;
   events: Array<Event>;
   node?: Maybe<Node>;
-  productList?: Maybe<ProductList>;
+  nodes: Array<Maybe<Node>>;
+  nuclinoPages: Array<NuclinoSearchResult>;
   productLists: Array<ProductList>;
-  reservationForToken?: Maybe<Reservation>;
-  reservationsByPerson: Array<ReservationByPerson>;
+  transactions: Transactions;
   viewer?: Maybe<Viewer>;
 };
 
-export type QueryAvailableCapacityArgs = {
-  time?: Maybe<Scalars['DateTime']>;
+export type QueryCardStatusArgs = {
+  payload: Scalars['String'];
+};
+
+export type QueryDevicesArgs = {
+  type?: InputMaybe<DeviceType>;
 };
 
 export type QueryDistanceToKultArgs = {
@@ -408,83 +458,25 @@ export type QueryNodeArgs = {
   id: Scalars['ID'];
 };
 
-export type QueryProductListArgs = {
-  id: Scalars['Int'];
+export type QueryNodesArgs = {
+  ids: Array<Scalars['ID']>;
 };
 
-export type QueryReservationForTokenArgs = {
-  token: Scalars['String'];
+export type QueryNuclinoPagesArgs = {
+  query: Scalars['String'];
 };
-
-export type Reservation = {
-  __typename?: 'Reservation';
-  alternativeTables: Array<Maybe<Table>>;
-  availableToCheckIn: Scalars['Int'];
-  checkInTime?: Maybe<Scalars['DateTime']>;
-  checkedInPersons: Scalars['Int'];
-  endTime: Scalars['DateTime'];
-  id: Scalars['Int'];
-  note?: Maybe<Scalars['String']>;
-  otherPersons: Array<Scalars['String']>;
-  primaryEmail: Scalars['String'];
-  primaryPerson: Scalars['String'];
-  reservationsFromSamePerson: Array<Reservation>;
-  startTime: Scalars['DateTime'];
-  status: ReservationStatus;
-  swappableWith: Array<Maybe<Reservation>>;
-  table: Table;
-  tableId: Scalars['String'];
-  token: Scalars['String'];
-};
-
-export type ReservationByPerson = {
-  __typename?: 'ReservationByPerson';
-  email: Scalars['String'];
-  reservations: Array<Reservation>;
-};
-
-export enum ReservationStatus {
-  CheckedIn = 'CheckedIn',
-  Confirmed = 'Confirmed',
-  Pending = 'Pending',
-}
 
 export type SalesNumber = {
   __typename?: 'SalesNumber';
   count: Scalars['Int'];
+  payment: OrderPayment;
   timeSeries: Array<TimeSeries>;
   total: Scalars['Float'];
 };
 
 export type SalesNumberTimeSeriesArgs = {
-  grouping?: Maybe<TimeGrouping>;
+  grouping?: InputMaybe<TimeGrouping>;
 };
-
-export type Table = Node & {
-  __typename?: 'Table';
-  area: Area;
-  displayName: Scalars['String'];
-  id: Scalars['ID'];
-  maxCapacity: Scalars['Int'];
-  reservations: Array<Reservation>;
-  type: TableType;
-};
-
-export type TableReservationsArgs = {
-  day?: Maybe<Scalars['Date']>;
-};
-
-export type TableAvailability = {
-  __typename?: 'TableAvailability';
-  endTime: Scalars['DateTime'];
-  startTime: Scalars['DateTime'];
-  tableType: TableType;
-};
-
-export enum TableType {
-  Island = 'ISLAND',
-  Table = 'TABLE',
-}
 
 export enum TimeGrouping {
   Day = 'Day',
@@ -495,6 +487,36 @@ export type TimeSeries = {
   __typename?: 'TimeSeries';
   time: Scalars['DateTime'];
   value: Scalars['Int'];
+};
+
+export type Transaction = {
+  balanceAfter: Scalars['Int'];
+  balanceBefore: Scalars['Int'];
+  depositAfter: Scalars['Int'];
+  depositBefore: Scalars['Int'];
+};
+
+export type Transactionable = {
+  transactions: CardTransactionConnection;
+};
+
+export type TransactionableTransactionsArgs = {
+  after?: InputMaybe<Scalars['DateTime']>;
+  before?: InputMaybe<Scalars['DateTime']>;
+  limit?: InputMaybe<Scalars['Int']>;
+  type?: InputMaybe<CardTransactionType>;
+};
+
+export type Transactions = Transactionable & {
+  __typename?: 'Transactions';
+  transactions: CardTransactionConnection;
+};
+
+export type TransactionsTransactionsArgs = {
+  after?: InputMaybe<Scalars['DateTime']>;
+  before?: InputMaybe<Scalars['DateTime']>;
+  limit?: InputMaybe<Scalars['Int']>;
+  type?: InputMaybe<CardTransactionType>;
 };
 
 export type Viewer = Node & {
@@ -511,7 +533,7 @@ export type DistanceQueryVariables = Exact<{
 
 export type DistanceQuery = {
   __typename?: 'Query';
-  distanceToKult?: number | null | undefined;
+  distanceToKult?: number | null;
 };
 
 export type ThanksQueryVariables = Exact<{[key: string]: never}>;
@@ -521,11 +543,15 @@ export type ThanksQuery = {
   node?:
     | {__typename?: 'Area'}
     | {__typename?: 'BandApplication'}
-    | {__typename?: 'Event'; bandApplicationEnd?: Date | null | undefined}
-    | {__typename?: 'Table'}
+    | {__typename?: 'BandPlaying'}
+    | {__typename?: 'Card'}
+    | {__typename?: 'Device'}
+    | {__typename?: 'Event'; bandApplicationEnd?: Date | null}
+    | {__typename?: 'NuclinoPage'}
+    | {__typename?: 'Product'}
+    | {__typename?: 'ProductList'}
     | {__typename?: 'Viewer'}
-    | null
-    | undefined;
+    | null;
 };
 
 export type EventQueryVariables = Exact<{[key: string]: never}>;
@@ -535,17 +561,21 @@ export type EventQuery = {
   node?:
     | {__typename?: 'Area'}
     | {__typename?: 'BandApplication'}
+    | {__typename?: 'BandPlaying'}
+    | {__typename?: 'Card'}
+    | {__typename?: 'Device'}
     | {
         __typename?: 'Event';
         start: Date;
         end: Date;
-        bandApplicationStart?: Date | null | undefined;
-        bandApplicationEnd?: Date | null | undefined;
+        bandApplicationStart?: Date | null;
+        bandApplicationEnd?: Date | null;
       }
-    | {__typename?: 'Table'}
+    | {__typename?: 'NuclinoPage'}
+    | {__typename?: 'Product'}
+    | {__typename?: 'ProductList'}
     | {__typename?: 'Viewer'}
-    | null
-    | undefined;
+    | null;
 };
 
 export type CreateBandApplicationMutationVariables = Exact<{
@@ -554,10 +584,7 @@ export type CreateBandApplicationMutationVariables = Exact<{
 
 export type CreateBandApplicationMutation = {
   __typename?: 'Mutation';
-  createBandApplication?:
-    | {__typename?: 'BandApplication'; id: string}
-    | null
-    | undefined;
+  createBandApplication: {__typename?: 'BandApplication'; id: string};
 };
 
 export const DistanceDocument = gql`
@@ -662,7 +689,7 @@ export type ThanksQueryResult = Apollo.QueryResult<
 >;
 export const EventDocument = gql`
   query Event {
-    node(id: "Event:kult2022") {
+    node(id: "Event:kult2023") {
       ... on Event {
         start
         end
