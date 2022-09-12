@@ -31,7 +31,7 @@ export default function Step2() {
       >
         <Step step={2}>
           <FormControl id="demo" isRequired>
-            <FormLabel>Demomaterial: YouTube, Soundcloud, etc.</FormLabel>
+            <FormLabel>Demomaterial: YouTube, Spotify, etc.</FormLabel>
             <FormHelperText mt="-2" mb="2">
               Bitte gebt uns einen direkten Link zu Demomaterial eurer Band,
               egal wo. Hauptsache wir können uns etwas von euch anhören.
