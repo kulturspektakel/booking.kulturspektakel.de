@@ -536,7 +536,9 @@ export type DistanceQuery = {
   distanceToKult?: number | null;
 };
 
-export type ThanksQueryVariables = Exact<{[key: string]: never}>;
+export type ThanksQueryVariables = Exact<{
+  id: Scalars['ID'];
+}>;
 
 export type ThanksQuery = {
   __typename?: 'Query';
@@ -554,7 +556,9 @@ export type ThanksQuery = {
     | null;
 };
 
-export type EventQueryVariables = Exact<{[key: string]: never}>;
+export type EventQueryVariables = Exact<{
+  id: Scalars['ID'];
+}>;
 
 export type EventQuery = {
   __typename?: 'Query';
@@ -639,8 +643,8 @@ export type DistanceQueryResult = Apollo.QueryResult<
   DistanceQueryVariables
 >;
 export const ThanksDocument = gql`
-  query Thanks {
-    node(id: "Event:kult2022") {
+  query Thanks($id: ID!) {
+    node(id: $id) {
       ... on Event {
         bandApplicationEnd
       }
@@ -660,11 +664,12 @@ export const ThanksDocument = gql`
  * @example
  * const { data, loading, error } = useThanksQuery({
  *   variables: {
+ *      id: // value for 'id'
  *   },
  * });
  */
 export function useThanksQuery(
-  baseOptions?: Apollo.QueryHookOptions<ThanksQuery, ThanksQueryVariables>,
+  baseOptions: Apollo.QueryHookOptions<ThanksQuery, ThanksQueryVariables>,
 ) {
   const options = {...defaultOptions, ...baseOptions};
   return Apollo.useQuery<ThanksQuery, ThanksQueryVariables>(
@@ -688,8 +693,8 @@ export type ThanksQueryResult = Apollo.QueryResult<
   ThanksQueryVariables
 >;
 export const EventDocument = gql`
-  query Event {
-    node(id: "Event:kult2023") {
+  query Event($id: ID!) {
+    node(id: $id) {
       ... on Event {
         start
         end
@@ -712,11 +717,12 @@ export const EventDocument = gql`
  * @example
  * const { data, loading, error } = useEventQuery({
  *   variables: {
+ *      id: // value for 'id'
  *   },
  * });
  */
 export function useEventQuery(
-  baseOptions?: Apollo.QueryHookOptions<EventQuery, EventQueryVariables>,
+  baseOptions: Apollo.QueryHookOptions<EventQuery, EventQueryVariables>,
 ) {
   const options = {...defaultOptions, ...baseOptions};
   return Apollo.useQuery<EventQuery, EventQueryVariables>(

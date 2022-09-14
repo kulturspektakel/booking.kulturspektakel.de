@@ -15,9 +15,11 @@ import React from 'react';
 import Page from '../components/Page';
 import {useEventQuery} from '../types/graphql';
 
+export const EVENT_ID = 'Event:kult2023';
+
 gql`
-  query Event {
-    node(id: "Event:kult2023") {
+  query Event($id: ID!) {
+    node(id: $id) {
       ... on Event {
         start
         end
@@ -29,7 +31,11 @@ gql`
 `;
 
 export default function Home() {
-  const {data} = useEventQuery();
+  const {data} = useEventQuery({
+    variables: {
+      id: EVENT_ID,
+    },
+  });
   const event = data?.node?.__typename === 'Event' ? data.node : undefined;
   if (!event) {
     return null;
@@ -51,7 +57,7 @@ export default function Home() {
       <VStack spacing="5">
         <Heading size="md" mt="4">
           Das Kulturspektakel Gauting findet vom{' '}
-          {event.start.toLocaleDateString('de', {day: '2-digit'})}. -{' '}
+          {event.start.toLocaleDateString('de', {day: '2-digit'})}. bis{' '}
           {event.end.toLocaleDateString('de', {
             day: '2-digit',
             month: 'long',

@@ -1,12 +1,13 @@
 import {gql} from '@apollo/client';
 import {VStack, Heading, Text, Img} from '@chakra-ui/react';
 import React from 'react';
+import {EVENT_ID} from '.';
 import Page from '../components/Page';
 import {useThanksQuery} from '../types/graphql';
 
 gql`
-  query Thanks {
-    node(id: "Event:kult2022") {
+  query Thanks($id: ID!) {
+    node(id: $id) {
       ... on Event {
         bandApplicationEnd
       }
@@ -15,7 +16,11 @@ gql`
 `;
 
 export default function Thanks() {
-  const {data} = useThanksQuery();
+  const {data} = useThanksQuery({
+    variables: {
+      id: EVENT_ID,
+    },
+  });
 
   return (
     <Page>
@@ -24,7 +29,7 @@ export default function Thanks() {
         <Heading size="lg">Danke für eure Bewerbung!</Heading>
         <Text>
           Wir haben dir soeben eine E-Mail zur Bestätigung geschickt. Wir
-          beantworten jede Bewerbung allerdings kann es bis nach dem
+          beantworten jede Bewerbung, allerdings kann es bis nach dem
           Bewerbungsschluss am{' '}
           {data?.node?.__typename === 'Event' &&
             data.node.bandApplicationEnd?.toLocaleDateString('de', {

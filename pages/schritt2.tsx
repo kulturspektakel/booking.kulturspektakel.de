@@ -3,9 +3,7 @@ import {
   FormErrorMessage,
   FormHelperText,
   FormLabel,
-  Input,
   InputGroup,
-  Text,
   InputLeftElement,
 } from '@chakra-ui/react';
 import React from 'react';
