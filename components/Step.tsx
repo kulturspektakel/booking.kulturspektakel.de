@@ -1,8 +1,10 @@
-import React from 'react';
+import React, {useCallback} from 'react';
 import {Button, HStack, Spacer, VStack} from '@chakra-ui/react';
 import {useRouter} from 'next/dist/client/router';
 import {Form, useFormikContext} from 'formik';
 import {Step, Steps} from 'chakra-ui-steps';
+import {useAppContext} from './useAppContext';
+import {CreateBandApplicationInput} from '../types/graphql';
 
 export default function Page({
   children,
@@ -14,7 +16,13 @@ export default function Page({
   step: number;
 }) {
   const router = useRouter();
-  const {isSubmitting} = useFormikContext();
+  const [_, updateContext] = useAppContext();
+  const {isSubmitting, values} =
+    useFormikContext<Partial<CreateBandApplicationInput>>();
+  const onBack = useCallback(() => {
+    updateContext(values);
+    router.back();
+  }, [router, updateContext, values]);
 
   return (
     <Form>
@@ -31,12 +39,7 @@ export default function Page({
         </Steps>
         {children}
         <HStack w="100%">
-          <Button
-            isDisabled={isSubmitting}
-            onClick={() => {
-              router.back();
-            }}
-          >
+          <Button isDisabled={isSubmitting} onClick={onBack}>
             Zurück
           </Button>
           <Spacer />

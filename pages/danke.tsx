@@ -2,6 +2,7 @@ import {gql} from '@apollo/client';
 import {VStack, Heading, Text, Img} from '@chakra-ui/react';
 import React from 'react';
 import {EVENT_ID} from '.';
+import Confetti from '../components/Confetti';
 import Page from '../components/Page';
 import {useThanksQuery} from '../types/graphql';
 
@@ -24,6 +25,7 @@ export default function Thanks() {
 
   return (
     <Page>
+      <Confetti />
       <VStack spacing="5" textAlign="center">
         <Img src="/genre/metal.svg" width="16" />
         <Heading size="lg">Danke für eure Bewerbung!</Heading>

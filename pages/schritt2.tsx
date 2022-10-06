@@ -1,6 +1,5 @@
 import {
   FormControl,
-  FormErrorMessage,
   FormHelperText,
   FormLabel,
   InputGroup,
@@ -56,7 +55,6 @@ export default function Step2() {
               type="text"
               placeholder="https://facebook.com/kulturspektakel"
             />
-            <FormErrorMessage>tes</FormErrorMessage>
           </FormControl>
 
           <FormControl id="website">
