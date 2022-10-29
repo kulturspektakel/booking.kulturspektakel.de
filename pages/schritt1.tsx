@@ -17,6 +17,7 @@ import {AppContextT, useAppContext} from '../components/useAppContext';
 import DistanceWarning from '../components/DistanceWarning';
 import {useRouter} from 'next/dist/client/router';
 import Field from '../components/Field';
+import useIsDJ from '../components/useIsDJ';
 
 const GENRE_CATEGORIES: Map<GenreCategory, string> = new Map([
   [GenreCategory.Pop, 'Pop'],
@@ -35,6 +36,7 @@ const GENRE_CATEGORIES: Map<GenreCategory, string> = new Map([
 
 export default function Step1() {
   const [context, updateContext] = useAppContext();
+  const isDJ = useIsDJ();
   const [city, setCity] = useState(context.city);
   const router = useRouter();
 
@@ -63,20 +65,24 @@ export default function Step1() {
           return (
             <Step step={1}>
               <FormControl id="bandname" isRequired>
-                <FormLabel>Bandname</FormLabel>
+                <FormLabel>
+                  {isDJ ? 'Künstler:innen-Name' : 'Bandname'}
+                </FormLabel>
                 <Field />
               </FormControl>
 
               <HStack w="100%">
                 <FormControl id="genreCategory" isRequired>
                   <FormLabel>Musikrichtung</FormLabel>
-                  <Field as={Select} placeholder="bitte auswählen…">
-                    {Array.from(GENRE_CATEGORIES.entries()).map(([k, v]) => (
-                      <option value={k} key={k}>
-                        {v}
-                      </option>
-                    ))}
-                  </Field>
+                  {!isDJ && (
+                    <Field as={Select} placeholder="bitte auswählen…">
+                      {Array.from(GENRE_CATEGORIES.entries()).map(([k, v]) => (
+                        <option value={k} key={k}>
+                          {v}
+                        </option>
+                      ))}
+                    </Field>
+                  )}
                 </FormControl>
                 <FormControl id="genre">
                   <Field placeholder="genaues Genre (optional)" mt="8" />
@@ -84,7 +90,7 @@ export default function Step1() {
               </HStack>
 
               <FormControl isRequired id="description">
-                <FormLabel>Bandbeschreibung</FormLabel>
+                <FormLabel>{isDJ ? '' : 'Bandbeschreibung'}</FormLabel>
                 <FormHelperText mt="-2" mb="2">
                   Erzählt uns etwas über eure Band! Was macht ihr für Musik? Was
                   ist eure Bandgeschichte?
@@ -103,35 +109,44 @@ export default function Step1() {
 
               <DistanceWarning origin={city} />
 
-              <HStack w="100%" mt="5">
-                <FormControl id="numberOfArtists" isRequired>
-                  <FormLabel>Anzahl Bandmitglieder</FormLabel>
-                  <Field type="number" min={1} />
-                </FormControl>
-                <FormControl id="numberOfNonMaleArtists" isRequired>
-                  <FormLabel>
-                    davon <strong>nicht</strong> männlich
-                  </FormLabel>
-                  <Field type="number" min={0} max={values.numberOfArtists} />
-                </FormControl>
-              </HStack>
-              <Text fontSize="sm" color="gray.500">
-                Die Festival-Branche hat eine geringe
-                Geschlechter&shy;diversität (
-                <Link
-                  textDecoration="underline"
-                  rel="noreferrer"
-                  href="https://bit.ly/2HxZMgl"
-                  target="_blank"
-                >
-                  mehr Informationen
-                </Link>
-                ). Wir wählen die Bands nicht nach Geschlechter&shy;verteilung
-                aus, trotzdem wollen wir einen besseren Überblick über die
-                Situation bekommen. Personen und Gruppen die auf
-                Festival&shy;bühnen unter&shy;repräsentiert sind möchten wir
-                explizit ermutigen sich bei uns zu bewerben.
-              </Text>
+              {!isDJ && (
+                <>
+                  <HStack w="100%" mt="5">
+                    <FormControl id="numberOfArtists" isRequired>
+                      <FormLabel>Anzahl Bandmitglieder</FormLabel>
+                      <Field type="number" min={1} />
+                    </FormControl>
+                    <FormControl id="numberOfNonMaleArtists" isRequired>
+                      <FormLabel>
+                        davon <strong>nicht</strong> männlich
+                      </FormLabel>
+                      <Field
+                        type="number"
+                        min={0}
+                        max={values.numberOfArtists}
+                      />
+                    </FormControl>
+                  </HStack>
+                  <Text fontSize="sm" color="gray.500">
+                    Die Festival-Branche hat eine geringe
+                    Geschlechter&shy;diversität (
+                    <Link
+                      textDecoration="underline"
+                      rel="noreferrer"
+                      href="https://bit.ly/2HxZMgl"
+                      target="_blank"
+                    >
+                      mehr Informationen
+                    </Link>
+                    ). Wir wählen die Bands nicht nach
+                    Geschlechter&shy;verteilung aus, trotzdem wollen wir einen
+                    besseren Überblick über die Situation bekommen. Personen und
+                    Gruppen die auf Festival&shy;bühnen unter&shy;repräsentiert
+                    sind möchten wir explizit ermutigen sich bei uns zu
+                    bewerben.
+                  </Text>
+                </>
+              )}
             </Step>
           );
         }}

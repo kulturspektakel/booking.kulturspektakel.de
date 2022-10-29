@@ -25,6 +25,7 @@ gql`
         end
         bandApplicationStart
         bandApplicationEnd
+        djApplicationEnd
       }
     }
   }
@@ -36,19 +37,28 @@ export default function Home() {
       id: EVENT_ID,
     },
   });
+
   const event = data?.node?.__typename === 'Event' ? data.node : undefined;
   if (!event) {
     return null;
   }
 
   let errorMessage: string | null = null;
+  const now = new Date();
+  const bandApplicationEnded = event.bandApplicationEnd < now;
+  const djApplicationEnded =
+    event.djApplicationEnd && event.djApplicationEnd < now;
+
   if (!event.bandApplicationStart || !event.bandApplicationEnd) {
     errorMessage = 'Aktuell läuft die Bewerbungsphase nicht.';
-  } else if (event.bandApplicationStart > new Date()) {
+  } else if (event.bandApplicationStart > now) {
     errorMessage = `Die Bewerbungsphase beginnt am ${event.bandApplicationStart.toLocaleDateString(
       'de',
     )}`;
-  } else if (event.bandApplicationEnd < new Date()) {
+  } else if (
+    bandApplicationEnded &&
+    (!event.djApplicationEnd || djApplicationEnded)
+  ) {
     errorMessage = `Die Bewerbungsphase ist beendet.`;
   }
 
@@ -103,7 +113,17 @@ export default function Home() {
             </Alert>
           ) : (
             <Link href="/schritt1">
-              <Button colorScheme="blue">Jetzt Bewerben</Button>
+              <Button disabled={bandApplicationEnded} colorScheme="blue">
+                Als Band bewerben
+              </Button>
+            </Link>
+          )}
+
+          {event.djApplicationEnd && (
+            <Link href="/schritt1?dj">
+              <Button colorScheme="blue" disabled={djApplicationEnded}>
+                Als DJ bewerben
+              </Button>
             </Link>
           )}
         </Center>

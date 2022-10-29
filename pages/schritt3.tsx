@@ -25,6 +25,7 @@ import {
   useCreateBandApplicationMutation,
   PreviouslyPlayed,
 } from '../types/graphql';
+import useIsDJ from '../components/useIsDJ';
 
 gql`
   mutation CreateBandApplication($data: CreateBandApplicationInput!) {
@@ -52,6 +53,7 @@ const PLAYED_PREVIOUSLY: Map<PreviouslyPlayed, string> = new Map([
 export default function Step3() {
   const [context, updateContext, resetContext] = useAppContext();
   const router = useRouter();
+  const isDJ = useIsDJ();
   const [create, {error, loading}] = useCreateBandApplicationMutation();
 
   return (
@@ -133,7 +135,10 @@ export default function Step3() {
                   <p>
                     Bitte versuche es nochmals, falls es immer noch nicht
                     klappt, schreibe bitte eine Mail an{' '}
-                    <strong>booking@kulturspektakel.de</strong>.
+                    <strong>
+                      {isDJ ? 'info' : 'booking'}@kulturspektakel.de
+                    </strong>
+                    .
                   </p>
                   <Code borderRadius="md">
                     {error.name}: {error.message}

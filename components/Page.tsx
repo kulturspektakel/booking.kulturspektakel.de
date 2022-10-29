@@ -23,10 +23,10 @@ export default function Page({
     <Container maxW="container.md" pt="10" pb="20">
       <Head>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <title>Bandbewerbungen · Kulturspektakel Gauting</title>
+        <title>Bewerbungen · Kulturspektakel Gauting</title>
       </Head>
       <HStack mb="5">
-        <Heading size="lg">Bandbewerbungen</Heading>
+        <Heading size="lg">Bewerbungen</Heading>
         <Spacer />
         <Link href="https://kulturspektakel.de">
           <Box w={[20, 32, 40]} cursor="pointer">

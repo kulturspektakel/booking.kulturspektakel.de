@@ -217,6 +217,7 @@ export type Event = Node & {
   bandApplicationEnd?: Maybe<Scalars['DateTime']>;
   bandApplicationStart?: Maybe<Scalars['DateTime']>;
   bandsPlaying: Array<BandPlaying>;
+  djApplicationEnd?: Maybe<Scalars['DateTime']>;
   end: Scalars['DateTime'];
   id: Scalars['ID'];
   name: Scalars['String'];
@@ -225,6 +226,7 @@ export type Event = Node & {
 
 export enum GenreCategory {
   BluesFunkJazzSoul = 'Blues_Funk_Jazz_Soul',
+  Dj = 'DJ',
   ElektroHipHop = 'Elektro_HipHop',
   FolkSingerSongwriterCountry = 'Folk_SingerSongwriter_Country',
   HardrockMetalPunk = 'Hardrock_Metal_Punk',
@@ -324,7 +326,7 @@ export type NuclinoPage = Node & {
 
 export type NuclinoSearchResult = {
   __typename?: 'NuclinoSearchResult';
-  highlight: Scalars['String'];
+  highlight?: Maybe<Scalars['String']>;
   page: NuclinoPage;
 };
 
@@ -574,6 +576,7 @@ export type EventQuery = {
         end: Date;
         bandApplicationStart?: Date | null;
         bandApplicationEnd?: Date | null;
+        djApplicationEnd?: Date | null;
       }
     | {__typename?: 'NuclinoPage'}
     | {__typename?: 'Product'}
@@ -700,6 +703,7 @@ export const EventDocument = gql`
         end
         bandApplicationStart
         bandApplicationEnd
+        djApplicationEnd
       }
     }
   }
