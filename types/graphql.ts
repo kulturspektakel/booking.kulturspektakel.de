@@ -177,8 +177,8 @@ export type CreateBandApplicationInput = {
   heardAboutBookingFrom?: InputMaybe<HeardAboutBookingFrom>;
   instagram?: InputMaybe<Scalars['String']>;
   knowsKultFrom?: InputMaybe<Scalars['String']>;
-  numberOfArtists: Scalars['Int'];
-  numberOfNonMaleArtists: Scalars['Int'];
+  numberOfArtists?: InputMaybe<Scalars['Int']>;
+  numberOfNonMaleArtists?: InputMaybe<Scalars['Int']>;
   website?: InputMaybe<Scalars['String']>;
 };
 
@@ -550,7 +550,11 @@ export type ThanksQuery = {
     | {__typename?: 'BandPlaying'}
     | {__typename?: 'Card'}
     | {__typename?: 'Device'}
-    | {__typename?: 'Event'; bandApplicationEnd?: Date | null}
+    | {
+        __typename?: 'Event';
+        bandApplicationEnd?: Date | null;
+        djApplicationEnd?: Date | null;
+      }
     | {__typename?: 'NuclinoPage'}
     | {__typename?: 'Product'}
     | {__typename?: 'ProductList'}
@@ -572,6 +576,7 @@ export type EventQuery = {
     | {__typename?: 'Device'}
     | {
         __typename?: 'Event';
+        name: string;
         start: Date;
         end: Date;
         bandApplicationStart?: Date | null;
@@ -650,6 +655,7 @@ export const ThanksDocument = gql`
     node(id: $id) {
       ... on Event {
         bandApplicationEnd
+        djApplicationEnd
       }
     }
   }
@@ -699,6 +705,7 @@ export const EventDocument = gql`
   query Event($id: ID!) {
     node(id: $id) {
       ... on Event {
+        name
         start
         end
         bandApplicationStart

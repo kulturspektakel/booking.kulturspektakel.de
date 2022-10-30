@@ -24,6 +24,7 @@ import {
   HeardAboutBookingFrom,
   useCreateBandApplicationMutation,
   PreviouslyPlayed,
+  GenreCategory,
 } from '../types/graphql';
 import useIsDJ from '../components/useIsDJ';
 
@@ -62,7 +63,11 @@ export default function Step3() {
         initialValues={context}
         onSubmit={async (values) => {
           updateContext(values);
-          const data = {...context, ...values} as CreateBandApplicationInput;
+          const data = {
+            genreCategory: isDJ ? GenreCategory.Dj : null,
+            ...context,
+            ...values,
+          } as CreateBandApplicationInput;
           const {data: res} = await create({
             variables: {
               data,
@@ -71,13 +76,15 @@ export default function Step3() {
           });
           if (res?.createBandApplication?.id) {
             resetContext();
-            router.push('/danke');
+            router.push({pathname: '/danke', query: router.query});
           }
         }}
       >
         <Step nextButtonLabel="Bewerbung absenden" step={3}>
           <FormControl id="contactName" isRequired>
-            <FormLabel>Ansprechpartner*in</FormLabel>
+            <FormLabel>
+              {isDJ ? `Vollständiger Name` : `Ansprechpartner*in`}
+            </FormLabel>
             <Field />
           </FormControl>
 
@@ -92,38 +99,53 @@ export default function Step3() {
           </FormControl>
 
           <FormControl id="knowsKultFrom">
-            <FormLabel>Woher kennt ihr das Kult?</FormLabel>
+            <FormLabel>
+              {isDJ ? 'Woher kennst du das Kult?' : `Woher kennt ihr das Kult?`}
+            </FormLabel>
             <FormHelperText mt="-2" mb="2">
-              Was verbindet euch mit unserer Veranstaltung? Wart ihr schonmal
+              {isDJ
+                ? 'Was verbindet dich mit unserer Veranstaltung? Woher kennst du das Kulturspektakel? Was wolltest du uns schon immer mal erzählen?'
+                : `Was verbindet euch mit unserer Veranstaltung? Wart ihr schonmal
               da? Woher kennt ihr das Kulturspektakel? Was wolltet ihr uns schon
-              immer mal erzählen?
+              immer mal erzählen?`}
             </FormHelperText>
             <Field as={Textarea} />
           </FormControl>
 
           <FormControl id="hasPreviouslyPlayed">
-            <FormLabel>Habt ihr schonmal bei uns gespielt?</FormLabel>
+            <FormLabel>
+              {isDJ
+                ? 'Hast du schonmal bie uns aufgelegt?'
+                : `Habt ihr schonmal bei uns gespielt?`}
+            </FormLabel>
             <Field as={Select} placeholder="bitte auswählen…">
-              {Array.from(PLAYED_PREVIOUSLY.entries()).map(([k, v]) => (
-                <option key={k} value={k}>
-                  {v}
-                </option>
-              ))}
+              {Array.from(PLAYED_PREVIOUSLY.entries())
+                .filter(
+                  ([v]) =>
+                    !isDJ || (isDJ && v !== PreviouslyPlayed.OtherFormation),
+                )
+                .map(([k, v]) => (
+                  <option key={k} value={k}>
+                    {v}
+                  </option>
+                ))}
             </Field>
           </FormControl>
 
-          <FormControl id="heardAboutBookingFrom">
-            <FormLabel>
-              Wie seid ihr auf unser Booking aufmerksam geworden?
-            </FormLabel>
-            <Field as={Select} placeholder="bitte auswählen…">
-              {Array.from(HEARD_ABOUT.entries()).map(([k, v]) => (
-                <option key={k} value={k}>
-                  {v}
-                </option>
-              ))}
-            </Field>
-          </FormControl>
+          {!isDJ && (
+            <FormControl id="heardAboutBookingFrom">
+              <FormLabel>
+                Wie seid ihr auf unser Booking aufmerksam geworden?
+              </FormLabel>
+              <Field as={Select} placeholder="bitte auswählen…">
+                {Array.from(HEARD_ABOUT.entries()).map(([k, v]) => (
+                  <option key={k} value={k}>
+                    {v}
+                  </option>
+                ))}
+              </Field>
+            </FormControl>
+          )}
           {!loading && error && (
             <Alert status="error" borderRadius="md">
               <AlertIcon />

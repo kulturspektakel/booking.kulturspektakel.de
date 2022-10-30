@@ -12,10 +12,12 @@ import Step from '../components/Step';
 import {useAppContext} from '../components/useAppContext';
 import {useRouter} from 'next/dist/client/router';
 import Field from '../components/Field';
+import useIsDJ from '../components/useIsDJ';
 
 export default function Step2() {
   const [context, updateContext] = useAppContext();
   const router = useRouter();
+  const isDJ = useIsDJ();
 
   return (
     <Page>
@@ -23,15 +25,17 @@ export default function Step2() {
         initialValues={context}
         onSubmit={(values) => {
           updateContext(values);
-          router.push('/schritt3');
+          router.push({pathname: '/schritt3', query: router.query});
         }}
       >
         <Step step={2}>
           <FormControl id="demo" isRequired>
             <FormLabel>Demomaterial: YouTube, Spotify, etc.</FormLabel>
             <FormHelperText mt="-2" mb="2">
-              Bitte gebt uns einen direkten Link zu Demomaterial eurer Band,
-              egal wo. Hauptsache wir können uns etwas von euch anhören.
+              {isDJ
+                ? `Bitte gib uns einen direkten Link zu ein paar Mixes/Beispielen von dir.`
+                : `Bitte gebt uns einen direkten Link zu Demomaterial eurer Band,
+              egal wo. Hauptsache wir können uns etwas von euch anhören.`}
             </FormHelperText>
             <Field
               type="text"

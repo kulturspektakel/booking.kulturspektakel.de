@@ -46,7 +46,7 @@ export default function Step1() {
         initialValues={context}
         onSubmit={(values) => {
           updateContext(values);
-          router.push('/schritt2');
+          router.push({pathname: '/schritt2', query: router.query});
         }}
         validate={(v) => {
           const errors: {[key in keyof AppContextT]: string} = {};
@@ -72,9 +72,11 @@ export default function Step1() {
               </FormControl>
 
               <HStack w="100%">
-                <FormControl id="genreCategory" isRequired>
+                <FormControl id={isDJ ? 'genre' : 'genreCategory'} isRequired>
                   <FormLabel>Musikrichtung</FormLabel>
-                  {!isDJ && (
+                  {isDJ ? (
+                    <Field />
+                  ) : (
                     <Field as={Select} placeholder="bitte auswählen…">
                       {Array.from(GENRE_CATEGORIES.entries()).map(([k, v]) => (
                         <option value={k} key={k}>
@@ -84,16 +86,22 @@ export default function Step1() {
                     </Field>
                   )}
                 </FormControl>
-                <FormControl id="genre">
-                  <Field placeholder="genaues Genre (optional)" mt="8" />
-                </FormControl>
+                {!isDJ && (
+                  <FormControl id="genre">
+                    <Field placeholder="genaues Genre (optional)" mt="8" />
+                  </FormControl>
+                )}
               </HStack>
 
               <FormControl isRequired id="description">
-                <FormLabel>{isDJ ? '' : 'Bandbeschreibung'}</FormLabel>
+                <FormLabel>
+                  {isDJ ? 'Beschreibung' : 'Bandbeschreibung'}
+                </FormLabel>
                 <FormHelperText mt="-2" mb="2">
-                  Erzählt uns etwas über eure Band! Was macht ihr für Musik? Was
-                  ist eure Bandgeschichte?
+                  {isDJ
+                    ? 'Erzähl uns was über dich! Was legst du auf? Wie lange machst du das schon?'
+                    : `Erzählt uns etwas über eure Band! Was macht ihr für Musik? Was
+                  ist eure Bandgeschichte?`}
                 </FormHelperText>
                 <Field as={Textarea} />
               </FormControl>
@@ -123,7 +131,7 @@ export default function Step1() {
                       <Field
                         type="number"
                         min={0}
-                        max={values.numberOfArtists}
+                        max={values.numberOfArtists ?? 100}
                       />
                     </FormControl>
                   </HStack>

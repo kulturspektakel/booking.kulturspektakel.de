@@ -1,18 +1,18 @@
 import {gql} from '@apollo/client';
+import {WarningTwoIcon} from '@chakra-ui/icons';
 import {
   VStack,
   Text,
   Button,
-  Center,
   Heading,
   Link as ChakraLink,
   AlertIcon,
   Alert,
   AlertDescription,
   Box,
-  HStack,
   Spacer,
   Flex,
+  Tag,
 } from '@chakra-ui/react';
 import Link from 'next/link';
 import React from 'react';
@@ -25,6 +25,7 @@ gql`
   query Event($id: ID!) {
     node(id: $id) {
       ... on Event {
+        name
         start
         end
         bandApplicationStart
@@ -34,6 +35,64 @@ gql`
     }
   }
 `;
+
+function BBox({
+  href,
+  disabled,
+  buttonLabel,
+  applicationStart,
+  title,
+  content,
+}: {
+  href: string;
+  title: string;
+  content: string;
+  disabled: boolean;
+  buttonLabel: string;
+  applicationStart: Date;
+}) {
+  return (
+    <Flex
+      mt="5"
+      alignItems="center"
+      direction={{base: 'column', sm: 'row'}}
+      bg="white"
+      borderRadius="lg"
+      p="4"
+      shadow="xs"
+    >
+      <VStack align="start">
+        <Heading size="sm" textAlign="left">
+          {title}
+        </Heading>
+        <Text>
+          {content}
+          <br />
+          <strong>Bewerbungsschluss:</strong>{' '}
+          {disabled ? (
+            <Tag colorScheme="red">
+              <WarningTwoIcon />
+              &nbsp;Abgelaufen
+            </Tag>
+          ) : (
+            applicationStart.toLocaleDateString('de', {
+              day: '2-digit',
+              month: '2-digit',
+              year: 'numeric',
+              timeZone: 'Europe/Berlin',
+            })
+          )}
+        </Text>
+      </VStack>
+      <Spacer />
+      <Link href={href}>
+        <Button m="3" mr="0" disabled={disabled} colorScheme="blue">
+          {buttonLabel}
+        </Button>
+      </Link>
+    </Flex>
+  );
+}
 
 export default function Home() {
   const {data} = useEventQuery({
@@ -49,117 +108,83 @@ export default function Home() {
 
   let errorMessage: string | null = null;
   const now = new Date();
-  const bandApplicationEnded = event.bandApplicationEnd < now;
+  const bandApplicationEnded =
+    (event.bandApplicationEnd && event.bandApplicationEnd < now) ?? false;
   const djApplicationEnded =
-    event.djApplicationEnd && event.djApplicationEnd < now;
+    (event.djApplicationEnd && event.djApplicationEnd < now) ?? false;
 
-  if (!event.bandApplicationStart || !event.bandApplicationEnd) {
+  if (!event.bandApplicationStart) {
     errorMessage = 'Aktuell läuft die Bewerbungsphase nicht.';
   } else if (event.bandApplicationStart > now) {
     errorMessage = `Die Bewerbungsphase beginnt am ${event.bandApplicationStart.toLocaleDateString(
       'de',
     )}`;
-  } else if (
-    bandApplicationEnded &&
-    (!event.djApplicationEnd || djApplicationEnded)
-  ) {
-    errorMessage = `Die Bewerbungsphase ist beendet.`;
+  } else if (bandApplicationEnded && djApplicationEnded) {
+    errorMessage = `Die Bewerbungsphase für das ${event.name} ist beendet.`;
   }
 
   return (
     <Page>
-      <Box bg="white" borderRadius="lg" p="6" shadow="xs">
+      <Box>
         <VStack spacing="5">
           <Heading size="md" mt="4">
-            Das Kulturspektakel Gauting findet vom{' '}
-            {event.start.toLocaleDateString('de', {day: '2-digit'})}. bis{' '}
-            {event.end.toLocaleDateString('de', {
-              day: '2-digit',
-              month: 'long',
-              year: 'numeric',
-            })}{' '}
-            statt.
+            Band- und DJ-Bewerbungen
           </Heading>
           <Text>
-            Die Bewerbung für einen Auftritt beim Kulturspektakel ist
+            Das Kulturspektakel Gauting findet vom{' '}
+            <strong>
+              {event.start.toLocaleDateString('de', {day: '2-digit'})}. bis{' '}
+              {event.end.toLocaleDateString('de', {
+                day: '2-digit',
+                month: 'long',
+                year: 'numeric',
+              })}
+            </strong>{' '}
+            statt. Die Bewerbung für einen Auftritt beim Kulturspektakel ist
             ausschließlich über dieses Bewerbungsformular möglich. Alle anderen
             Anfragen bitte per E-Mail an{' '}
             <ChakraLink href="mailto:info@kulturspektakel.de" color="red.500">
               info@kulturspektakel.de
             </ChakraLink>
             .
-            {event.bandApplicationEnd && (
-              <>
-                {' '}
-                Bewerbungsschluss ist der{' '}
-                {event.bandApplicationEnd?.toLocaleDateString('de', {
-                  day: '2-digit',
-                  month: '2-digit',
-                  year: 'numeric',
-                  timeZone: 'Europe/Berlin',
-                })}
-                , trotzdem möchten wir euch dazu aufrufen eure Bewerbung so früh
-                wie möglich einzureichen.
-              </>
-            )}
           </Text>
           <Text>
             Nach dem Absenden des Formulars wird sich unser Booking-Team per
             E-Mail bei euch melden. Allerdings voraussichtlich erst nach Ablauf
             der Bewerbungsfrist.
           </Text>
-
-          <Flex>
-            <VStack>
-              <Heading size="sm">Bands</Heading>
-              <Text>asd</Text>
-            </VStack>
-            <Spacer />
-            <Link href="/schritt1">
-              <Button disabled={bandApplicationEnded} colorScheme="red">
-                Als Band bewerben
-              </Button>
-            </Link>
-          </Flex>
-
-          <Flex>
-            <VStack>
-              <Heading size="sm">DJs</Heading>
-              <Text>asd</Text>
-            </VStack>
-            <Spacer />
-            <Link href="/schritt1">
-              <Button disabled={djApplicationEnded ?? false} colorScheme="red">
-                Als DJ bewerben
-              </Button>
-            </Link>
-          </Flex>
-
-          <Center>
-            {errorMessage ? (
-              <Alert status="warning" borderRadius="md">
-                <AlertIcon />
-                <AlertDescription color="yellow.900">
-                  {errorMessage}
-                </AlertDescription>
-              </Alert>
-            ) : (
-              <Link href="/schritt1">
-                <Button disabled={bandApplicationEnded} colorScheme="red">
-                  Als Band bewerben
-                </Button>
-              </Link>
-            )}
-
-            {event.djApplicationEnd && (
-              <Link href="/schritt1?dj">
-                <Button colorScheme="red" disabled={djApplicationEnded}>
-                  Als DJ bewerben
-                </Button>
-              </Link>
-            )}
-          </Center>
         </VStack>
+
+        {event.bandApplicationEnd && (
+          <BBox
+            applicationStart={event.bandApplicationEnd}
+            title="Bands"
+            content="Ihr möchtet euch als Band für eine unsere Bühnen bewerben."
+            buttonLabel="Als Band bewerben"
+            href="/schritt1"
+            disabled={bandApplicationEnded}
+          />
+        )}
+
+        {event.djApplicationEnd && (
+          <BBox
+            applicationStart={event.djApplicationEnd}
+            title="DJs"
+            content="Du möchtest dich als DJ für unsere DJ-Area bewerben."
+            buttonLabel="Als DJ bewerben"
+            href="/schritt1?dj"
+            disabled={djApplicationEnded}
+          />
+        )}
+
+        {errorMessage && (
+          <Alert status="warning" borderRadius="md" mt="5">
+            <AlertIcon />
+            <AlertDescription color="yellow.900">
+              {errorMessage}
+            </AlertDescription>
+          </Alert>
+        )}
       </Box>
     </Page>
   );
