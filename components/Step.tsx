@@ -44,7 +44,7 @@ export default function Page({
           </Button>
           <Spacer />
           <Button
-            colorScheme="blue"
+            colorScheme="red"
             type="submit"
             isDisabled={isSubmitting}
             isLoading={isSubmitting}

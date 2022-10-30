@@ -9,8 +9,6 @@ export const AppContext = React.createContext<
   // eslint-disable-next-line @typescript-eslint/no-empty-function
 >([{}, () => {}]);
 
-export const APP_CONTEXT_LOCAL_STORAGE_KEY = 'appContext';
-
 export function useAppContext(): [
   AppContextT,
   (newValues: AppContextT) => void,
@@ -22,17 +20,12 @@ export function useAppContext(): [
     (newValues: AppContextT) => {
       const newContext = {...context, ...newValues};
       setContext(newContext);
-      window.localStorage.setItem(
-        APP_CONTEXT_LOCAL_STORAGE_KEY,
-        JSON.stringify(newContext),
-      );
     },
     [context, setContext],
   );
 
   const resetContext = useCallback(() => {
     setContext({});
-    window.localStorage.removeItem(APP_CONTEXT_LOCAL_STORAGE_KEY);
   }, [setContext]);
   return [context, updateContext, resetContext];
 }
