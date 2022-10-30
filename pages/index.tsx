@@ -159,7 +159,7 @@ export default function Home() {
           <BBox
             applicationStart={event.bandApplicationEnd}
             title="Bands"
-            content="Ihr möchtet euch als Band für eine unsere Bühnen bewerben."
+            content="Ihr möchtet euch als Band für eine unserer Bühnen bewerben."
             buttonLabel="Als Band bewerben"
             href="/schritt1"
             disabled={bandApplicationEnded}
