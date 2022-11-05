@@ -115,7 +115,7 @@ export default function Step3() {
           <FormControl id="hasPreviouslyPlayed">
             <FormLabel>
               {isDJ
-                ? 'Hast du schonmal bie uns aufgelegt?'
+                ? 'Hast du schonmal bei uns aufgelegt?'
                 : `Habt ihr schonmal bei uns gespielt?`}
             </FormLabel>
             <Field as={Select} placeholder="bitte auswählen…">
