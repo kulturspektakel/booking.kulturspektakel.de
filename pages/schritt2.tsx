@@ -29,7 +29,7 @@ export default function Step2() {
         }}
       >
         <Step step={2}>
-          <FormControl id="demo" isRequired>
+          <FormControl id="demo" isRequired={!isDJ}>
             <FormLabel>Demomaterial: YouTube, Spotify, etc.</FormLabel>
             <FormHelperText mt="-2" mb="2">
               {isDJ
