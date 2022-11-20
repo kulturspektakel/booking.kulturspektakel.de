@@ -16,6 +16,8 @@ import {buildClientSchema, IntrospectionQuery} from 'graphql';
 import {GraphQLDateTime, GraphQLDate} from 'graphql-scalars';
 import {AppContext, AppContextT} from '../components/useAppContext';
 import {StepsStyleConfig as Steps} from 'chakra-ui-steps';
+import Head from 'next/head';
+import Script from 'next/script';
 
 const App = ({Component, pageProps}: AppProps) => {
   const client = useMemo(() => initializeApollo(), []);
@@ -38,6 +40,26 @@ const App = ({Component, pageProps}: AppProps) => {
     <ChakraProvider theme={theme}>
       <ApolloProvider client={client}>
         <AppContext.Provider value={context}>
+          <Head>
+            <Script
+              id="fb-pixel"
+              strategy="afterInteractive"
+              dangerouslySetInnerHTML={{
+                __html: `
+                  !function(f,b,e,v,n,t,s)
+                  {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+                  n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+                  if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+                  n.queue=[];t=b.createElement(e);t.async=!0;
+                  t.src=v;s=b.getElementsByTagName(e)[0];
+                  s.parentNode.insertBefore(t,s)}(window, document,'script',
+                  'https://connect.facebook.net/en_US/fbevents.js');
+                  fbq('init', '568483009893821');
+                  fbq('track', 'PageView');
+                `,
+              }}
+            />
+          </Head>
           <Component {...pageProps} />
         </AppContext.Provider>
       </ApolloProvider>

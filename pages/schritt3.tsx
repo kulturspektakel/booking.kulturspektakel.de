@@ -11,7 +11,7 @@ import {
   Box,
   Code,
 } from '@chakra-ui/react';
-import React from 'react';
+import React, {useEffect} from 'react';
 import Page from '../components/Page';
 import {Formik} from 'formik';
 import Step from '../components/Step';
@@ -51,11 +51,25 @@ const PLAYED_PREVIOUSLY: Map<PreviouslyPlayed, string> = new Map([
   [PreviouslyPlayed.No, 'Nein'],
 ]);
 
+const utmSourceMapping: Record<string, HeardAboutBookingFrom> = Object.freeze({
+  fb: HeardAboutBookingFrom.Facebook,
+  ig: HeardAboutBookingFrom.Instagram,
+});
+
 export default function Step3() {
   const [context, updateContext, resetContext] = useAppContext();
   const router = useRouter();
   const isDJ = useIsDJ();
   const [create, {error, loading}] = useCreateBandApplicationMutation();
+  const utmSource = router.query['utm_source'];
+
+  useEffect(() => {
+    if (utmSource) {
+      updateContext({
+        heardAboutBookingFrom: utmSourceMapping[String(utmSource)],
+      });
+    }
+  }, [updateContext, utmSource]);
 
   return (
     <Page>
@@ -132,10 +146,12 @@ export default function Step3() {
             </Field>
           </FormControl>
 
-          {!isDJ && (
+          {!utmSource && (
             <FormControl id="heardAboutBookingFrom">
               <FormLabel>
-                Wie seid ihr auf unser Booking aufmerksam geworden?
+                {isDJ
+                  ? `Wie bist du auf unser Booking aufmerksam geworden?`
+                  : `Wie seid ihr auf unser Booking aufmerksam geworden?`}
               </FormLabel>
               <Field as={Select} placeholder="bitte auswählen…">
                 {Array.from(HEARD_ABOUT.entries()).map(([k, v]) => (

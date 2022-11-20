@@ -167,7 +167,7 @@ export type CreateBandApplicationInput = {
   city: Scalars['String'];
   contactName: Scalars['String'];
   contactPhone: Scalars['String'];
-  demo: Scalars['String'];
+  demo?: InputMaybe<Scalars['String']>;
   description: Scalars['String'];
   email: Scalars['String'];
   facebook?: InputMaybe<Scalars['String']>;
