@@ -1,11 +1,12 @@
 import {
   FormControl,
+  FormErrorMessage,
   FormHelperText,
   FormLabel,
   InputGroup,
   InputLeftElement,
 } from '@chakra-ui/react';
-import React from 'react';
+import React, {useCallback, useState} from 'react';
 import Page from '../components/Page';
 import {Formik} from 'formik';
 import Step from '../components/Step';
@@ -18,6 +19,18 @@ export default function Step2() {
   const [context, updateContext] = useAppContext();
   const router = useRouter();
   const isDJ = useIsDJ();
+  const [demoIsInvalid, setDemoIsInvalid] = useState(false);
+
+  const validateDemo: React.FocusEventHandler<HTMLInputElement> = useCallback(
+    (e) => {
+      setDemoIsInvalid(
+        !/^(https?:\/\/)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)?$/.test(
+          e.target.value,
+        ),
+      );
+    },
+    [setDemoIsInvalid],
+  );
 
   return (
     <Page>
@@ -27,9 +40,14 @@ export default function Step2() {
           updateContext(values);
           router.push({pathname: '/schritt3', query: router.query});
         }}
+        validate={() => {
+          if (demoIsInvalid) {
+            return {demo: demoIsInvalid};
+          }
+        }}
       >
         <Step step={2}>
-          <FormControl id="demo" isRequired={!isDJ}>
+          <FormControl id="demo" isRequired={!isDJ} isInvalid={demoIsInvalid}>
             <FormLabel>Demomaterial: YouTube, Spotify, etc.</FormLabel>
             <FormHelperText mt="-2" mb="2">
               {isDJ
@@ -39,8 +57,13 @@ export default function Step2() {
             </FormHelperText>
             <Field
               type="text"
+              isInvalid={demoIsInvalid}
+              onBlur={validateDemo}
               placeholder="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
             />
+            {demoIsInvalid && (
+              <FormErrorMessage>Ungültiger Link</FormErrorMessage>
+            )}
           </FormControl>
 
           <FormControl id="instagram">
