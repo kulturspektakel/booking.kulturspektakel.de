@@ -14,7 +14,8 @@ import {
   Flex,
   Tag,
 } from '@chakra-ui/react';
-import Link from 'next/link';
+import Link, {LinkProps} from 'next/link';
+import {useRouter} from 'next/router';
 import React from 'react';
 import Page from '../components/Page';
 import {useEventQuery} from '../types/graphql';
@@ -44,7 +45,7 @@ function BBox({
   title,
   content,
 }: {
-  href: string;
+  href: LinkProps['href'];
   title: string;
   content: string;
   disabled: boolean;
@@ -100,6 +101,8 @@ export default function Home() {
       id: EVENT_ID,
     },
   });
+
+  const {query} = useRouter();
 
   const event = data?.node?.__typename === 'Event' ? data.node : undefined;
   if (!event) {
@@ -161,7 +164,7 @@ export default function Home() {
             title="Bands"
             content="Ihr möchtet euch als Band für eine unserer Bühnen bewerben."
             buttonLabel="Als Band bewerben"
-            href="/schritt1"
+            href={{pathname: '/schritt1', query}}
             disabled={bandApplicationEnded}
           />
         )}
@@ -172,7 +175,7 @@ export default function Home() {
             title="DJs"
             content="Du möchtest dich als DJ für unsere DJ-Area bewerben."
             buttonLabel="Als DJ bewerben"
-            href="/schritt1?dj"
+            href={{pathname: '/schritt1', query: {...query, dj: 1}}}
             disabled={djApplicationEnded}
           />
         )}
