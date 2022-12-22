@@ -73,6 +73,7 @@ export default function Application() {
             setCurrentStep(currentStep + 1);
           }
         }}
+        validateOnChange={false}
       >
         <Step
           nextButtonLabel={currentStep === 3 ? 'Bewerbung absenden' : undefined}
