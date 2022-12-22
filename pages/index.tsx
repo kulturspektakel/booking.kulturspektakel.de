@@ -14,28 +14,14 @@ import {
   Flex,
   Tag,
 } from '@chakra-ui/react';
+import {GetStaticProps} from 'next';
 import Link, {LinkProps} from 'next/link';
-import {useRouter} from 'next/router';
 import React from 'react';
 import Page from '../components/Page';
-import {useEventQuery} from '../types/graphql';
+import {EventQuery} from '../types/graphql';
+import {initializeApollo} from './_app';
 
 export const EVENT_ID = 'Event:kult2023';
-
-gql`
-  query Event($id: ID!) {
-    node(id: $id) {
-      ... on Event {
-        name
-        start
-        end
-        bandApplicationStart
-        bandApplicationEnd
-        djApplicationEnd
-      }
-    }
-  }
-`;
 
 function BBox({
   href,
@@ -95,35 +81,24 @@ function BBox({
   );
 }
 
-export default function Home() {
-  const {data} = useEventQuery({
-    variables: {
-      id: EVENT_ID,
-    },
-  });
+type Props = Extract<EventQuery['node'], {__typename?: 'Event'}>;
 
-  const {query} = useRouter();
-
-  const event = data?.node?.__typename === 'Event' ? data.node : undefined;
-  if (!event) {
-    return null;
-  }
-
+export default function Home(props: Props) {
   let errorMessage: string | null = null;
   const now = new Date();
   const bandApplicationEnded =
-    (event.bandApplicationEnd && event.bandApplicationEnd < now) ?? false;
+    (props.bandApplicationEnd && props.bandApplicationEnd < now) ?? false;
   const djApplicationEnded =
-    (event.djApplicationEnd && event.djApplicationEnd < now) ?? false;
+    (props.djApplicationEnd && props.djApplicationEnd < now) ?? false;
 
-  if (!event.bandApplicationStart) {
+  if (!props.bandApplicationStart) {
     errorMessage = 'Aktuell läuft die Bewerbungsphase nicht.';
-  } else if (event.bandApplicationStart > now) {
-    errorMessage = `Die Bewerbungsphase beginnt am ${event.bandApplicationStart.toLocaleDateString(
+  } else if (props.bandApplicationStart > now) {
+    errorMessage = `Die Bewerbungsphase beginnt am ${props.bandApplicationStart.toLocaleDateString(
       'de',
     )}`;
   } else if (bandApplicationEnded && djApplicationEnded) {
-    errorMessage = `Die Bewerbungsphase für das ${event.name} ist beendet.`;
+    errorMessage = `Die Bewerbungsphase für das ${props.name} ist beendet.`;
   }
 
   return (
@@ -136,8 +111,8 @@ export default function Home() {
           <Text>
             Das Kulturspektakel Gauting findet vom{' '}
             <strong>
-              {event.start.toLocaleDateString('de', {day: '2-digit'})}. bis{' '}
-              {event.end.toLocaleDateString('de', {
+              {props.start.toLocaleDateString('de', {day: '2-digit'})}. bis{' '}
+              {props.end.toLocaleDateString('de', {
                 day: '2-digit',
                 month: 'long',
                 year: 'numeric',
@@ -158,24 +133,24 @@ export default function Home() {
           </Text>
         </VStack>
 
-        {event.bandApplicationEnd && (
+        {props.bandApplicationEnd && (
           <BBox
-            applicationStart={event.bandApplicationEnd}
+            applicationStart={props.bandApplicationEnd}
             title="Bands"
             content="Ihr möchtet euch als Band für eine unserer Bühnen bewerben."
             buttonLabel="Als Band bewerben"
-            href={{pathname: '/schritt1', query}}
+            href="/band"
             disabled={bandApplicationEnded}
           />
         )}
 
-        {event.djApplicationEnd && (
+        {props.djApplicationEnd && (
           <BBox
-            applicationStart={event.djApplicationEnd}
+            applicationStart={props.djApplicationEnd}
             title="DJs"
             content="Du möchtest dich als DJ für unsere DJ-Area bewerben."
             buttonLabel="Als DJ bewerben"
-            href={{pathname: '/schritt1', query: {...query, dj: 1}}}
+            href="/dj"
             disabled={djApplicationEnded}
           />
         )}
@@ -192,3 +167,35 @@ export default function Home() {
     </Page>
   );
 }
+
+export const getStaticProps: GetStaticProps<Props> = async () => {
+  const client = initializeApollo();
+
+  const res = await client.query<EventQuery>({
+    query: gql`
+      query Event($id: ID!) {
+        node(id: $id) {
+          ... on Event {
+            name
+            start
+            end
+            bandApplicationStart
+            bandApplicationEnd
+            djApplicationEnd
+          }
+        }
+      }
+    `,
+    variables: {
+      id: EVENT_ID,
+    },
+  });
+
+  if (res.data.node?.__typename === 'Event') {
+    return {
+      props: res.data.node,
+    };
+  }
+
+  throw new Error(`Event ${EVENT_ID} not found`);
+};

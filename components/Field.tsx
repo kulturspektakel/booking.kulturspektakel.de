@@ -1,35 +1,32 @@
 import {Input, InputProps, useFormControlContext} from '@chakra-ui/react';
-import {useFormikContext} from 'formik';
+import {FieldValidator, useField} from 'formik';
 import React from 'react';
 
-export default function Field({
+export default function FieldWrapper({
   as = Input,
-  onBlur: onBlurUser,
+  validate,
   ...props
-}: InputProps) {
+}: InputProps & {
+  validate?: FieldValidator;
+}) {
   const {id, isRequired} = useFormControlContext();
-  const {getFieldProps, touched, errors} =
-    useFormikContext<{[key: string]: string}>();
-  const {name, value: v, onBlur, ...fieldProps} = getFieldProps(id);
-  const value = v ?? '';
 
-  const isInvalid =
-    isRequired &&
-    touched[id] &&
-    (Boolean(errors[id]) || value === '' || value == null);
+  const [field, meta] = useField({
+    name: id,
+    validate: (v) => {
+      if (isRequired && (v === '' || v == null)) {
+        return 'empty';
+      }
+      if (validate) {
+        return validate(v);
+      }
+    },
+  });
 
   const inputProps: InputProps = {
-    name: id,
-    isInvalid,
+    ...field,
+    isInvalid: meta.touched && meta.error ? true : false,
     bg: 'white',
-    value,
-    onBlur: onBlurUser
-      ? (e) => {
-          onBlurUser(e);
-          onBlur(e);
-        }
-      : onBlur,
-    ...fieldProps,
     ...props,
   };
 

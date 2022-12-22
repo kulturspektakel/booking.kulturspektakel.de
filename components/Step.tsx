@@ -1,31 +1,33 @@
-import React, {useCallback} from 'react';
+import React from 'react';
 import {Button, HStack, Spacer, VStack} from '@chakra-ui/react';
-import {useRouter} from 'next/dist/client/router';
 import {Form, useFormikContext} from 'formik';
 import {Step, Steps} from 'chakra-ui-steps';
-import {useAppContext} from './useAppContext';
-import {CreateBandApplicationInput} from '../types/graphql';
+import {Beforeunload} from 'react-beforeunload';
 
 export default function Page({
   children,
   nextButtonLabel,
+  nextDisabled,
   step,
+  onBack,
 }: {
   children: React.ReactNode;
   nextButtonLabel?: string;
+  nextDisabled: boolean;
   step: number;
+  onBack: () => void;
 }) {
-  const router = useRouter();
-  const [_, updateContext] = useAppContext();
-  const {isSubmitting, values} =
-    useFormikContext<Partial<CreateBandApplicationInput>>();
-  const onBack = useCallback(() => {
-    updateContext(values);
-    router.back();
-  }, [router, updateContext, values]);
+  const {isSubmitting, dirty} = useFormikContext();
 
   return (
     <Form>
+      <Beforeunload
+        onBeforeunload={() => {
+          if (dirty) {
+            return 'Deine Bewerbung ist noch nicht abgesendet.';
+          }
+        }}
+      />
       <VStack spacing="5">
         <Steps
           activeStep={step - 1}
@@ -39,15 +41,15 @@ export default function Page({
         </Steps>
         {children}
         <HStack w="100%">
-          <Button isDisabled={isSubmitting} onClick={onBack}>
+          <Button isDisabled={isSubmitting || nextDisabled} onClick={onBack}>
             Zurück
           </Button>
           <Spacer />
           <Button
             colorScheme="blue"
             type="submit"
-            isDisabled={isSubmitting}
-            isLoading={isSubmitting}
+            isDisabled={isSubmitting || nextDisabled}
+            isLoading={isSubmitting || nextDisabled}
           >
             {nextButtonLabel ?? 'Weiter'}
           </Button>

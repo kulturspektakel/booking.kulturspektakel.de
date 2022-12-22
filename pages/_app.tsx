@@ -1,5 +1,5 @@
 import '../styles/globals.css';
-import React, {useMemo, useState} from 'react';
+import React, {useEffect, useMemo} from 'react';
 import {AppProps} from 'next/app';
 import {ChakraProvider, extendTheme} from '@chakra-ui/react';
 import {
@@ -14,18 +14,47 @@ import {withScalars} from 'apollo-link-scalars';
 import introspectionResult from '../types/graphql.schema.json';
 import {buildClientSchema, IntrospectionQuery} from 'graphql';
 import {GraphQLDateTime, GraphQLDate} from 'graphql-scalars';
-import {AppContext, AppContextT} from '../components/useAppContext';
 import {StepsStyleConfig as Steps} from 'chakra-ui-steps';
 import Head from 'next/head';
 import Script from 'next/script';
+import {useRouter} from 'next/router';
+
+export function getUtmSource() {
+  if (typeof window !== 'undefined') {
+    return window.sessionStorage.getItem('utm_source');
+  }
+}
 
 const App = ({Component, pageProps}: AppProps) => {
   const client = useMemo(() => initializeApollo(), []);
-  const context = useState<AppContextT>({});
+  const {query} = useRouter();
+
+  useEffect(() => {
+    const source = query['utm_source'];
+    if (
+      typeof window !== 'undefined' &&
+      !window.sessionStorage.getItem('utm_source') &&
+      source
+    ) {
+      window.sessionStorage.setItem('utm_source', String(source));
+    }
+  }, [query]);
 
   const theme = extendTheme({
     components: {
-      Steps,
+      Steps: {
+        ...Steps,
+        baseStyle: (props: any) => ({
+          ...Steps.baseStyle(props),
+          stepIconContainer: {
+            ...Steps.baseStyle(props).stepIconContainer,
+            _activeStep: {
+              ...(Steps.baseStyle(props).stepIconContainer as any)?._activeStep,
+              bg: 'gray.200',
+            },
+          },
+        }),
+      },
     },
     styles: {
       global: {
@@ -39,13 +68,12 @@ const App = ({Component, pageProps}: AppProps) => {
   return (
     <ChakraProvider theme={theme}>
       <ApolloProvider client={client}>
-        <AppContext.Provider value={context}>
-          <Head>
-            <Script
-              id="fb-pixel"
-              strategy="afterInteractive"
-              dangerouslySetInnerHTML={{
-                __html: `
+        <Head>
+          <Script
+            id="fb-pixel"
+            strategy="afterInteractive"
+            dangerouslySetInnerHTML={{
+              __html: `
                   !function(f,b,e,v,n,t,s)
                   {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
                   n.callMethod.apply(n,arguments):n.queue.push(arguments)};
@@ -57,11 +85,10 @@ const App = ({Component, pageProps}: AppProps) => {
                   fbq('init', '568483009893821');
                   fbq('track', 'PageView');
                 `,
-              }}
-            />
-          </Head>
-          <Component {...pageProps} />
-        </AppContext.Provider>
+            }}
+          />
+        </Head>
+        <Component {...pageProps} />
       </ApolloProvider>
     </ChakraProvider>
   );
@@ -69,7 +96,7 @@ const App = ({Component, pageProps}: AppProps) => {
 
 let apolloClient: ApolloClient<NormalizedCacheObject> | null = null;
 
-function initializeApollo() {
+export function initializeApollo() {
   if (apolloClient) {
     return apolloClient;
   }

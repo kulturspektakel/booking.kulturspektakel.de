@@ -562,6 +562,15 @@ export type ThanksQuery = {
     | null;
 };
 
+export type CreateBandApplicationMutationVariables = Exact<{
+  data: CreateBandApplicationInput;
+}>;
+
+export type CreateBandApplicationMutation = {
+  __typename?: 'Mutation';
+  createBandApplication: {__typename?: 'BandApplication'; id: string};
+};
+
 export type EventQueryVariables = Exact<{
   id: Scalars['ID'];
 }>;
@@ -588,15 +597,6 @@ export type EventQuery = {
     | {__typename?: 'ProductList'}
     | {__typename?: 'Viewer'}
     | null;
-};
-
-export type CreateBandApplicationMutationVariables = Exact<{
-  data: CreateBandApplicationInput;
-}>;
-
-export type CreateBandApplicationMutation = {
-  __typename?: 'Mutation';
-  createBandApplication: {__typename?: 'BandApplication'; id: string};
 };
 
 export const DistanceDocument = gql`
@@ -701,6 +701,56 @@ export type ThanksQueryResult = Apollo.QueryResult<
   ThanksQuery,
   ThanksQueryVariables
 >;
+export const CreateBandApplicationDocument = gql`
+  mutation CreateBandApplication($data: CreateBandApplicationInput!) {
+    createBandApplication(data: $data) {
+      id
+    }
+  }
+`;
+export type CreateBandApplicationMutationFn = Apollo.MutationFunction<
+  CreateBandApplicationMutation,
+  CreateBandApplicationMutationVariables
+>;
+
+/**
+ * __useCreateBandApplicationMutation__
+ *
+ * To run a mutation, you first call `useCreateBandApplicationMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateBandApplicationMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createBandApplicationMutation, { data, loading, error }] = useCreateBandApplicationMutation({
+ *   variables: {
+ *      data: // value for 'data'
+ *   },
+ * });
+ */
+export function useCreateBandApplicationMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    CreateBandApplicationMutation,
+    CreateBandApplicationMutationVariables
+  >,
+) {
+  const options = {...defaultOptions, ...baseOptions};
+  return Apollo.useMutation<
+    CreateBandApplicationMutation,
+    CreateBandApplicationMutationVariables
+  >(CreateBandApplicationDocument, options);
+}
+export type CreateBandApplicationMutationHookResult = ReturnType<
+  typeof useCreateBandApplicationMutation
+>;
+export type CreateBandApplicationMutationResult =
+  Apollo.MutationResult<CreateBandApplicationMutation>;
+export type CreateBandApplicationMutationOptions = Apollo.BaseMutationOptions<
+  CreateBandApplicationMutation,
+  CreateBandApplicationMutationVariables
+>;
 export const EventDocument = gql`
   query Event($id: ID!) {
     node(id: $id) {
@@ -755,54 +805,4 @@ export type EventLazyQueryHookResult = ReturnType<typeof useEventLazyQuery>;
 export type EventQueryResult = Apollo.QueryResult<
   EventQuery,
   EventQueryVariables
->;
-export const CreateBandApplicationDocument = gql`
-  mutation CreateBandApplication($data: CreateBandApplicationInput!) {
-    createBandApplication(data: $data) {
-      id
-    }
-  }
-`;
-export type CreateBandApplicationMutationFn = Apollo.MutationFunction<
-  CreateBandApplicationMutation,
-  CreateBandApplicationMutationVariables
->;
-
-/**
- * __useCreateBandApplicationMutation__
- *
- * To run a mutation, you first call `useCreateBandApplicationMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useCreateBandApplicationMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [createBandApplicationMutation, { data, loading, error }] = useCreateBandApplicationMutation({
- *   variables: {
- *      data: // value for 'data'
- *   },
- * });
- */
-export function useCreateBandApplicationMutation(
-  baseOptions?: Apollo.MutationHookOptions<
-    CreateBandApplicationMutation,
-    CreateBandApplicationMutationVariables
-  >,
-) {
-  const options = {...defaultOptions, ...baseOptions};
-  return Apollo.useMutation<
-    CreateBandApplicationMutation,
-    CreateBandApplicationMutationVariables
-  >(CreateBandApplicationDocument, options);
-}
-export type CreateBandApplicationMutationHookResult = ReturnType<
-  typeof useCreateBandApplicationMutation
->;
-export type CreateBandApplicationMutationResult =
-  Apollo.MutationResult<CreateBandApplicationMutation>;
-export type CreateBandApplicationMutationOptions = Apollo.BaseMutationOptions<
-  CreateBandApplicationMutation,
-  CreateBandApplicationMutationVariables
 >;

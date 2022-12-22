@@ -28,7 +28,7 @@ export default function Page({
       <HStack mb="5">
         <Heading size="lg">Bewerbungen</Heading>
         <Spacer />
-        <Link href="https://kulturspektakel.de">
+        <Link href="/">
           <Box w={[20, 32, 40]} cursor="pointer">
             <img src="/logo.svg" width="100%" />
           </Box>
