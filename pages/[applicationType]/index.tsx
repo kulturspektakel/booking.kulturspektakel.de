@@ -52,7 +52,7 @@ export default function Application() {
       <Formik
         initialValues={{
           heardAboutBookingFrom: utmSourceMapping[getUtmSource() ?? ''],
-          genreCategory: isDJ ? GenreCategory.Dj : null,
+          genreCategory: isDJ ? GenreCategory.Dj : '',
         }}
         onSubmit={async (values) => {
           if (currentStep === 3) {
