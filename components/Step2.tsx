@@ -31,9 +31,9 @@ export default function Step2() {
           placeholder="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
           validate={(url) => {
             if (
-              !isDJ &&
+              url &&
               !/^(https?:\/\/)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)?$/.test(
-                url ?? '',
+                url,
               )
             ) {
               return 'ungültige URL';
