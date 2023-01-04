@@ -48,19 +48,24 @@ export default function Application() {
 
   return (
     <Page>
-      <Formik
+      <Formik<FormikContextT>
         initialValues={{
           heardAboutBookingFrom: utmSourceMapping[getUtmSource() ?? ''],
-          genreCategory: isDJ ? GenreCategory.Dj : '',
+          genreCategory: isDJ ? GenreCategory.Dj : undefined,
         }}
         onSubmit={async (values) => {
           if (currentStep === 3) {
-            const data = {
-              ...values,
-            } as CreateBandApplicationInput;
+            let k: keyof CreateBandApplicationInput;
+            for (k in values) {
+              if (typeof values[k] === 'string') {
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-ignore
+                values[k] = (values[k] as string).trim();
+              }
+            }
             const {data: res} = await create({
               variables: {
-                data,
+                data: values as CreateBandApplicationInput,
               },
               errorPolicy: 'all',
             });
