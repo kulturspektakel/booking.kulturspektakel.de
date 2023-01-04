@@ -45,7 +45,6 @@ export default function Application() {
   const router = useRouter();
   const [create, {error, loading}] = useCreateBandApplicationMutation();
   const [currentStep, setCurrentStep] = useState(1);
-  const [success, setSuccess] = useState(false);
 
   return (
     <Page>
@@ -66,8 +65,7 @@ export default function Application() {
               errorPolicy: 'all',
             });
             if (res?.createBandApplication?.id) {
-              setSuccess(true);
-              router.push(`${router.query.applicationType}/danke`);
+              await router.push(`${router.query.applicationType}/danke`);
             }
           } else {
             setCurrentStep(currentStep + 1);
@@ -77,15 +75,14 @@ export default function Application() {
       >
         <Step
           nextButtonLabel={currentStep === 3 ? 'Bewerbung absenden' : undefined}
-          onBack={() => {
+          onBack={async () => {
             if (currentStep === 1) {
-              router.push('/');
+              await router.push('/');
             } else {
               setCurrentStep(currentStep - 1);
             }
           }}
           step={currentStep}
-          nextDisabled={success}
         >
           {React.createElement(STEPS[currentStep - 1])}
         </Step>

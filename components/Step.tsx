@@ -7,13 +7,11 @@ import {Beforeunload} from 'react-beforeunload';
 export default function Page({
   children,
   nextButtonLabel,
-  nextDisabled,
   step,
   onBack,
 }: {
   children: React.ReactNode;
   nextButtonLabel?: string;
-  nextDisabled: boolean;
   step: number;
   onBack: () => void;
 }) {
@@ -41,15 +39,15 @@ export default function Page({
         </Steps>
         {children}
         <HStack w="100%">
-          <Button isDisabled={isSubmitting || nextDisabled} onClick={onBack}>
+          <Button isDisabled={isSubmitting} onClick={onBack}>
             Zurück
           </Button>
           <Spacer />
           <Button
             colorScheme="blue"
             type="submit"
-            isDisabled={isSubmitting || nextDisabled}
-            isLoading={isSubmitting || nextDisabled}
+            isDisabled={isSubmitting}
+            isLoading={isSubmitting}
           >
             {nextButtonLabel ?? 'Weiter'}
           </Button>
