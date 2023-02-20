@@ -73,7 +73,7 @@ function BBox({
       </VStack>
       <Spacer />
       <Link href={href}>
-        <Button m="3" mr="0" disabled={disabled} colorScheme="blue">
+        <Button m="3" mr="0" isDisabled={disabled} colorScheme="blue">
           {buttonLabel}
         </Button>
       </Link>

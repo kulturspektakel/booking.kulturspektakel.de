@@ -43,13 +43,20 @@ export type BandApplication = Node & {
   bandApplicationRating: Array<BandApplicationRating>;
   bandname: Scalars['String'];
   city: Scalars['String'];
+  comments: BandApplicationCommentsConnection;
   contactName: Scalars['String'];
   contactPhone: Scalars['String'];
   contactedByViewer?: Maybe<Viewer>;
+  createdAt: Scalars['DateTime'];
   demo?: Maybe<Scalars['String']>;
+  demoEmbed?: Maybe<Scalars['String']>;
+  demoEmbedType?: Maybe<DemoEmbedType>;
+  demoEmbedUrl?: Maybe<Scalars['String']>;
   description?: Maybe<Scalars['String']>;
   distance?: Maybe<Scalars['Float']>;
   email: Scalars['String'];
+  event: Event;
+  eventId: Scalars['ID'];
   facebook?: Maybe<Scalars['String']>;
   facebookLikes?: Maybe<Scalars['Int']>;
   genre?: Maybe<Scalars['String']>;
@@ -60,10 +67,47 @@ export type BandApplication = Node & {
   instagram?: Maybe<Scalars['String']>;
   instagramFollower?: Maybe<Scalars['Int']>;
   knowsKultFrom?: Maybe<Scalars['String']>;
+  latitude?: Maybe<Scalars['Float']>;
+  longitude?: Maybe<Scalars['Float']>;
   numberOfArtists?: Maybe<Scalars['Int']>;
   numberOfNonMaleArtists?: Maybe<Scalars['Int']>;
+  pastApplications: Array<BandApplication>;
+  pastPerformances: Array<BandPlaying>;
   rating?: Maybe<Scalars['Float']>;
   website?: Maybe<Scalars['String']>;
+};
+
+export type BandApplicationCommentsArgs = {
+  after?: InputMaybe<Scalars['String']>;
+  before?: InputMaybe<Scalars['String']>;
+  first?: InputMaybe<Scalars['Int']>;
+  last?: InputMaybe<Scalars['Int']>;
+};
+
+export type BandApplicationComment = Node & {
+  __typename?: 'BandApplicationComment';
+  comment: Scalars['String'];
+  createdAt: Scalars['DateTime'];
+  id: Scalars['ID'];
+  user: Viewer;
+};
+
+export type BandApplicationCommentInput = {
+  bandApplicationId: Scalars['ID'];
+  comment: Scalars['String'];
+};
+
+export type BandApplicationCommentsConnection = {
+  __typename?: 'BandApplicationCommentsConnection';
+  edges: Array<BandApplicationCommentsConnectionEdge>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int'];
+};
+
+export type BandApplicationCommentsConnectionEdge = {
+  __typename?: 'BandApplicationCommentsConnectionEdge';
+  cursor: Scalars['String'];
+  node: BandApplicationComment;
 };
 
 export type BandApplicationRating = {
@@ -72,10 +116,18 @@ export type BandApplicationRating = {
   viewer: Viewer;
 };
 
+export type BandApplicationUpdateInput = {
+  contacted?: InputMaybe<Scalars['Boolean']>;
+  instagramFollower?: InputMaybe<Scalars['Int']>;
+};
+
 export type BandPlaying = Node & {
   __typename?: 'BandPlaying';
+  area: Area;
   description?: Maybe<Scalars['String']>;
   endTime: Scalars['DateTime'];
+  event: Event;
+  eventId: Scalars['ID'];
   genre?: Maybe<Scalars['String']>;
   id: Scalars['ID'];
   name: Scalars['String'];
@@ -182,6 +234,18 @@ export type CreateBandApplicationInput = {
   website?: InputMaybe<Scalars['String']>;
 };
 
+export enum DemoEmbedType {
+  BandcampAlbum = 'BandcampAlbum',
+  BandcampTrack = 'BandcampTrack',
+  SoundcloudUrl = 'SoundcloudUrl',
+  SpotifyAlbum = 'SpotifyAlbum',
+  SpotifyArtist = 'SpotifyArtist',
+  SpotifyTrack = 'SpotifyTrack',
+  Unresolvable = 'Unresolvable',
+  YouTubePlaylist = 'YouTubePlaylist',
+  YouTubeVideo = 'YouTubeVideo',
+}
+
 export type Device = Billable &
   Node &
   Transactionable & {
@@ -223,6 +287,12 @@ export type Event = Node & {
   name: Scalars['String'];
   start: Scalars['DateTime'];
 };
+
+export enum EventType {
+  Kulturspektakel = 'Kulturspektakel',
+  Locker = 'Locker',
+  Other = 'Other',
+}
 
 export enum GenreCategory {
   BluesFunkJazzSoul = 'Blues_Funk_Jazz_Soul',
@@ -270,9 +340,12 @@ export type MissingTransaction = Transaction & {
 export type Mutation = {
   __typename?: 'Mutation';
   createBandApplication: BandApplication;
+  createBandApplicationComment: BandApplication;
   createOrder: Order;
+  deleteBandApplicationComment: BandApplication;
   markBandApplicationContacted: BandApplication;
   rateBandApplication: BandApplication;
+  updateBandApplication: BandApplication;
   updateDeviceProductList: Device;
   upsertProductList: ProductList;
 };
@@ -281,11 +354,19 @@ export type MutationCreateBandApplicationArgs = {
   data: CreateBandApplicationInput;
 };
 
+export type MutationCreateBandApplicationCommentArgs = {
+  input: BandApplicationCommentInput;
+};
+
 export type MutationCreateOrderArgs = {
   deposit: Scalars['Int'];
   deviceTime: Scalars['DateTime'];
   payment: OrderPayment;
   products: Array<OrderItemInput>;
+};
+
+export type MutationDeleteBandApplicationCommentArgs = {
+  id: Scalars['ID'];
 };
 
 export type MutationMarkBandApplicationContactedArgs = {
@@ -296,6 +377,11 @@ export type MutationMarkBandApplicationContactedArgs = {
 export type MutationRateBandApplicationArgs = {
   bandApplicationId: Scalars['ID'];
   rating?: InputMaybe<Scalars['Int']>;
+};
+
+export type MutationUpdateBandApplicationArgs = {
+  bandApplicationId: Scalars['ID'];
+  data?: InputMaybe<BandApplicationUpdateInput>;
 };
 
 export type MutationUpdateDeviceProductListArgs = {
@@ -336,6 +422,12 @@ export type NuclinoUser = {
   firstName: Scalars['String'];
   id: Scalars['ID'];
   lastName: Scalars['String'];
+};
+
+export type ObfuscatedBandApplication = {
+  __typename?: 'ObfuscatedBandApplication';
+  applicationTime: Scalars['DateTime'];
+  obfuscatedEmail: Scalars['String'];
 };
 
 export type OpeningHour = {
@@ -382,6 +474,14 @@ export enum OrderPayment {
   SumUp = 'SUM_UP',
   Voucher = 'VOUCHER',
 }
+
+export type PageInfo = {
+  __typename?: 'PageInfo';
+  endCursor?: Maybe<Scalars['String']>;
+  hasNextPage: Scalars['Boolean'];
+  hasPreviousPage: Scalars['Boolean'];
+  startCursor?: Maybe<Scalars['String']>;
+};
 
 export enum PreviouslyPlayed {
   No = 'No',
@@ -432,10 +532,12 @@ export type Query = {
   __typename?: 'Query';
   areas: Array<Area>;
   cardStatus: CardStatus;
+  checkDuplicateApplication?: Maybe<ObfuscatedBandApplication>;
   config: Config;
   devices: Array<Device>;
   distanceToKult?: Maybe<Scalars['Float']>;
   events: Array<Event>;
+  findBandPlaying?: Maybe<Array<BandPlaying>>;
   node?: Maybe<Node>;
   nodes: Array<Maybe<Node>>;
   nuclinoPages: Array<NuclinoSearchResult>;
@@ -448,12 +550,25 @@ export type QueryCardStatusArgs = {
   payload: Scalars['String'];
 };
 
+export type QueryCheckDuplicateApplicationArgs = {
+  bandname: Scalars['String'];
+  eventId: Scalars['ID'];
+};
+
 export type QueryDevicesArgs = {
   type?: InputMaybe<DeviceType>;
 };
 
 export type QueryDistanceToKultArgs = {
   origin: Scalars['String'];
+};
+
+export type QueryEventsArgs = {
+  type?: InputMaybe<EventType>;
+};
+
+export type QueryFindBandPlayingArgs = {
+  query: Scalars['String'];
 };
 
 export type QueryNodeArgs = {
@@ -538,6 +653,20 @@ export type DistanceQuery = {
   distanceToKult?: number | null;
 };
 
+export type DuplicateApplicationWarningQueryVariables = Exact<{
+  bandname: Scalars['String'];
+  eventId: Scalars['ID'];
+}>;
+
+export type DuplicateApplicationWarningQuery = {
+  __typename?: 'Query';
+  checkDuplicateApplication?: {
+    __typename?: 'ObfuscatedBandApplication';
+    applicationTime: Date;
+    obfuscatedEmail: string;
+  } | null;
+};
+
 export type ThanksQueryVariables = Exact<{
   id: Scalars['ID'];
 }>;
@@ -547,6 +676,7 @@ export type ThanksQuery = {
   node?:
     | {__typename?: 'Area'}
     | {__typename?: 'BandApplication'}
+    | {__typename?: 'BandApplicationComment'}
     | {__typename?: 'BandPlaying'}
     | {__typename?: 'Card'}
     | {__typename?: 'Device'}
@@ -580,6 +710,7 @@ export type EventQuery = {
   node?:
     | {__typename?: 'Area'}
     | {__typename?: 'BandApplication'}
+    | {__typename?: 'BandApplicationComment'}
     | {__typename?: 'BandPlaying'}
     | {__typename?: 'Card'}
     | {__typename?: 'Device'}
@@ -649,6 +780,66 @@ export type DistanceLazyQueryHookResult = ReturnType<
 export type DistanceQueryResult = Apollo.QueryResult<
   DistanceQuery,
   DistanceQueryVariables
+>;
+export const DuplicateApplicationWarningDocument = gql`
+  query DuplicateApplicationWarning($bandname: String!, $eventId: ID!) {
+    checkDuplicateApplication(bandname: $bandname, eventId: $eventId) {
+      applicationTime
+      obfuscatedEmail
+    }
+  }
+`;
+
+/**
+ * __useDuplicateApplicationWarningQuery__
+ *
+ * To run a query within a React component, call `useDuplicateApplicationWarningQuery` and pass it any options that fit your needs.
+ * When your component renders, `useDuplicateApplicationWarningQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useDuplicateApplicationWarningQuery({
+ *   variables: {
+ *      bandname: // value for 'bandname'
+ *      eventId: // value for 'eventId'
+ *   },
+ * });
+ */
+export function useDuplicateApplicationWarningQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    DuplicateApplicationWarningQuery,
+    DuplicateApplicationWarningQueryVariables
+  >,
+) {
+  const options = {...defaultOptions, ...baseOptions};
+  return Apollo.useQuery<
+    DuplicateApplicationWarningQuery,
+    DuplicateApplicationWarningQueryVariables
+  >(DuplicateApplicationWarningDocument, options);
+}
+export function useDuplicateApplicationWarningLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    DuplicateApplicationWarningQuery,
+    DuplicateApplicationWarningQueryVariables
+  >,
+) {
+  const options = {...defaultOptions, ...baseOptions};
+  return Apollo.useLazyQuery<
+    DuplicateApplicationWarningQuery,
+    DuplicateApplicationWarningQueryVariables
+  >(DuplicateApplicationWarningDocument, options);
+}
+export type DuplicateApplicationWarningQueryHookResult = ReturnType<
+  typeof useDuplicateApplicationWarningQuery
+>;
+export type DuplicateApplicationWarningLazyQueryHookResult = ReturnType<
+  typeof useDuplicateApplicationWarningLazyQuery
+>;
+export type DuplicateApplicationWarningQueryResult = Apollo.QueryResult<
+  DuplicateApplicationWarningQuery,
+  DuplicateApplicationWarningQueryVariables
 >;
 export const ThanksDocument = gql`
   query Thanks($id: ID!) {

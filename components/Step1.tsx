@@ -15,6 +15,7 @@ import DistanceWarning from './DistanceWarning';
 import Field from './Field';
 import useIsDJ from './useIsDJ';
 import {FormikContextT} from '../pages/[applicationType]';
+import DuplicateApplicationWarning from './DuplicateApplicationWarning';
 
 const GENRE_CATEGORIES: Map<GenreCategory, string> = new Map([
   [GenreCategory.Pop, 'Pop'],
@@ -127,6 +128,7 @@ export default function Step1() {
           </Text>
         </>
       )}
+      <DuplicateApplicationWarning bandname={values.bandname} />
     </>
   );
 }
