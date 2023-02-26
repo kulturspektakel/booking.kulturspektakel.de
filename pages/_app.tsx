@@ -1,5 +1,5 @@
 import '../styles/globals.css';
-import React, {useEffect, useMemo} from 'react';
+import React, {useMemo} from 'react';
 import {AppProps} from 'next/app';
 import {ChakraProvider, extendTheme} from '@chakra-ui/react';
 import {
@@ -17,28 +17,9 @@ import {GraphQLDateTime, GraphQLDate} from 'graphql-scalars';
 import {StepsStyleConfig as Steps} from 'chakra-ui-steps';
 import Head from 'next/head';
 import Script from 'next/script';
-import {useRouter} from 'next/router';
-
-export function getUtmSource() {
-  if (typeof window !== 'undefined') {
-    return window.sessionStorage.getItem('utm_source');
-  }
-}
 
 const App = ({Component, pageProps}: AppProps) => {
   const client = useMemo(() => initializeApollo(), []);
-  const {query} = useRouter();
-
-  useEffect(() => {
-    const source = query['utm_source'];
-    if (
-      typeof window !== 'undefined' &&
-      !window.sessionStorage.getItem('utm_source') &&
-      source
-    ) {
-      window.sessionStorage.setItem('utm_source', String(source));
-    }
-  }, [query]);
 
   const theme = extendTheme({
     components: {

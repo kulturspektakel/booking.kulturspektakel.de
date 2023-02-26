@@ -281,6 +281,7 @@ export type Event = Node & {
   bandApplicationEnd?: Maybe<Scalars['DateTime']>;
   bandApplicationStart?: Maybe<Scalars['DateTime']>;
   bandsPlaying: Array<BandPlaying>;
+  description?: Maybe<Scalars['String']>;
   djApplicationEnd?: Maybe<Scalars['DateTime']>;
   end: Scalars['DateTime'];
   id: Scalars['ID'];
@@ -667,6 +668,34 @@ export type DuplicateApplicationWarningQuery = {
   } | null;
 };
 
+export type EventDetailsFragment = {
+  __typename?: 'Event';
+  name: string;
+  start: Date;
+  end: Date;
+  description?: string | null;
+};
+
+export type LineupTableQueryVariables = Exact<{[key: string]: never}>;
+
+export type LineupTableQuery = {
+  __typename?: 'Query';
+  areas: Array<{__typename?: 'Area'; id: string; displayName: string}>;
+};
+
+export type LineupDetailsFragment = {
+  __typename?: 'Event';
+  name: string;
+  start: Date;
+  end: Date;
+  bandsPlaying: Array<{
+    __typename?: 'BandPlaying';
+    genre?: string | null;
+    name: string;
+    area: {__typename?: 'Area'; id: string};
+  }>;
+};
+
 export type ThanksQueryVariables = Exact<{
   id: Scalars['ID'];
 }>;
@@ -701,6 +730,20 @@ export type CreateBandApplicationMutation = {
   createBandApplication: {__typename?: 'BandApplication'; id: string};
 };
 
+export type EventsQueryVariables = Exact<{[key: string]: never}>;
+
+export type EventsQuery = {
+  __typename?: 'Query';
+  events: Array<{
+    __typename?: 'Event';
+    id: string;
+    name: string;
+    start: Date;
+    end: Date;
+    description?: string | null;
+  }>;
+};
+
 export type EventQueryVariables = Exact<{
   id: Scalars['ID'];
 }>;
@@ -730,6 +773,68 @@ export type EventQuery = {
     | null;
 };
 
+export type LineupQueryVariables = Exact<{
+  id: Scalars['ID'];
+}>;
+
+export type LineupQuery = {
+  __typename?: 'Query';
+  node?:
+    | {__typename?: 'Area'}
+    | {__typename?: 'BandApplication'}
+    | {__typename?: 'BandApplicationComment'}
+    | {__typename?: 'BandPlaying'}
+    | {__typename?: 'Card'}
+    | {__typename?: 'Device'}
+    | {
+        __typename?: 'Event';
+        name: string;
+        start: Date;
+        end: Date;
+        bandsPlaying: Array<{
+          __typename?: 'BandPlaying';
+          genre?: string | null;
+          name: string;
+          area: {__typename?: 'Area'; id: string};
+        }>;
+      }
+    | {__typename?: 'NuclinoPage'}
+    | {__typename?: 'Product'}
+    | {__typename?: 'ProductList'}
+    | {__typename?: 'Viewer'}
+    | null;
+  events: Array<{__typename?: 'Event'; id: string; start: Date}>;
+};
+
+export type PostersQueryVariables = Exact<{[key: string]: never}>;
+
+export type PostersQuery = {
+  __typename?: 'Query';
+  events: Array<{__typename?: 'Event'; id: string; start: Date}>;
+};
+
+export const EventDetailsFragmentDoc = gql`
+  fragment EventDetails on Event {
+    name
+    start
+    end
+    description
+  }
+`;
+export const LineupDetailsFragmentDoc = gql`
+  fragment LineupDetails on Event {
+    name
+    start
+    end
+    bandsPlaying {
+      genre
+      name
+      area {
+        id
+      }
+    }
+  }
+`;
 export const DistanceDocument = gql`
   query Distance($origin: String!) {
     distanceToKult(origin: $origin)
@@ -841,6 +946,62 @@ export type DuplicateApplicationWarningQueryResult = Apollo.QueryResult<
   DuplicateApplicationWarningQuery,
   DuplicateApplicationWarningQueryVariables
 >;
+export const LineupTableDocument = gql`
+  query LineupTable {
+    areas {
+      id
+      displayName
+    }
+  }
+`;
+
+/**
+ * __useLineupTableQuery__
+ *
+ * To run a query within a React component, call `useLineupTableQuery` and pass it any options that fit your needs.
+ * When your component renders, `useLineupTableQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useLineupTableQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useLineupTableQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    LineupTableQuery,
+    LineupTableQueryVariables
+  >,
+) {
+  const options = {...defaultOptions, ...baseOptions};
+  return Apollo.useQuery<LineupTableQuery, LineupTableQueryVariables>(
+    LineupTableDocument,
+    options,
+  );
+}
+export function useLineupTableLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    LineupTableQuery,
+    LineupTableQueryVariables
+  >,
+) {
+  const options = {...defaultOptions, ...baseOptions};
+  return Apollo.useLazyQuery<LineupTableQuery, LineupTableQueryVariables>(
+    LineupTableDocument,
+    options,
+  );
+}
+export type LineupTableQueryHookResult = ReturnType<typeof useLineupTableQuery>;
+export type LineupTableLazyQueryHookResult = ReturnType<
+  typeof useLineupTableLazyQuery
+>;
+export type LineupTableQueryResult = Apollo.QueryResult<
+  LineupTableQuery,
+  LineupTableQueryVariables
+>;
 export const ThanksDocument = gql`
   query Thanks($id: ID!) {
     node(id: $id) {
@@ -942,6 +1103,55 @@ export type CreateBandApplicationMutationOptions = Apollo.BaseMutationOptions<
   CreateBandApplicationMutation,
   CreateBandApplicationMutationVariables
 >;
+export const EventsDocument = gql`
+  query Events {
+    events(type: Other) {
+      id
+      ...EventDetails
+    }
+  }
+  ${EventDetailsFragmentDoc}
+`;
+
+/**
+ * __useEventsQuery__
+ *
+ * To run a query within a React component, call `useEventsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useEventsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useEventsQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useEventsQuery(
+  baseOptions?: Apollo.QueryHookOptions<EventsQuery, EventsQueryVariables>,
+) {
+  const options = {...defaultOptions, ...baseOptions};
+  return Apollo.useQuery<EventsQuery, EventsQueryVariables>(
+    EventsDocument,
+    options,
+  );
+}
+export function useEventsLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<EventsQuery, EventsQueryVariables>,
+) {
+  const options = {...defaultOptions, ...baseOptions};
+  return Apollo.useLazyQuery<EventsQuery, EventsQueryVariables>(
+    EventsDocument,
+    options,
+  );
+}
+export type EventsQueryHookResult = ReturnType<typeof useEventsQuery>;
+export type EventsLazyQueryHookResult = ReturnType<typeof useEventsLazyQuery>;
+export type EventsQueryResult = Apollo.QueryResult<
+  EventsQuery,
+  EventsQueryVariables
+>;
 export const EventDocument = gql`
   query Event($id: ID!) {
     node(id: $id) {
@@ -996,4 +1206,110 @@ export type EventLazyQueryHookResult = ReturnType<typeof useEventLazyQuery>;
 export type EventQueryResult = Apollo.QueryResult<
   EventQuery,
   EventQueryVariables
+>;
+export const LineupDocument = gql`
+  query Lineup($id: ID!) {
+    node(id: $id) {
+      ... on Event {
+        ...LineupDetails
+      }
+    }
+    events(type: Kulturspektakel) {
+      id
+      start
+    }
+  }
+  ${LineupDetailsFragmentDoc}
+`;
+
+/**
+ * __useLineupQuery__
+ *
+ * To run a query within a React component, call `useLineupQuery` and pass it any options that fit your needs.
+ * When your component renders, `useLineupQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useLineupQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useLineupQuery(
+  baseOptions: Apollo.QueryHookOptions<LineupQuery, LineupQueryVariables>,
+) {
+  const options = {...defaultOptions, ...baseOptions};
+  return Apollo.useQuery<LineupQuery, LineupQueryVariables>(
+    LineupDocument,
+    options,
+  );
+}
+export function useLineupLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<LineupQuery, LineupQueryVariables>,
+) {
+  const options = {...defaultOptions, ...baseOptions};
+  return Apollo.useLazyQuery<LineupQuery, LineupQueryVariables>(
+    LineupDocument,
+    options,
+  );
+}
+export type LineupQueryHookResult = ReturnType<typeof useLineupQuery>;
+export type LineupLazyQueryHookResult = ReturnType<typeof useLineupLazyQuery>;
+export type LineupQueryResult = Apollo.QueryResult<
+  LineupQuery,
+  LineupQueryVariables
+>;
+export const PostersDocument = gql`
+  query Posters {
+    events(type: Kulturspektakel) {
+      id
+      start
+    }
+  }
+`;
+
+/**
+ * __usePostersQuery__
+ *
+ * To run a query within a React component, call `usePostersQuery` and pass it any options that fit your needs.
+ * When your component renders, `usePostersQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = usePostersQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function usePostersQuery(
+  baseOptions?: Apollo.QueryHookOptions<PostersQuery, PostersQueryVariables>,
+) {
+  const options = {...defaultOptions, ...baseOptions};
+  return Apollo.useQuery<PostersQuery, PostersQueryVariables>(
+    PostersDocument,
+    options,
+  );
+}
+export function usePostersLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    PostersQuery,
+    PostersQueryVariables
+  >,
+) {
+  const options = {...defaultOptions, ...baseOptions};
+  return Apollo.useLazyQuery<PostersQuery, PostersQueryVariables>(
+    PostersDocument,
+    options,
+  );
+}
+export type PostersQueryHookResult = ReturnType<typeof usePostersQuery>;
+export type PostersLazyQueryHookResult = ReturnType<typeof usePostersLazyQuery>;
+export type PostersQueryResult = Apollo.QueryResult<
+  PostersQuery,
+  PostersQueryVariables
 >;

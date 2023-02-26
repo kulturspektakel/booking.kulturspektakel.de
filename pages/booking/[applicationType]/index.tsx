@@ -1,18 +1,18 @@
 import React, {useState} from 'react';
-import Page from '../../components/Page';
-import useIsDJ from '../../components/useIsDJ';
-import Step1 from '../../components/Step1';
-import Step2 from '../../components/Step2';
-import Step3 from '../../components/Step3';
+import Page from '../../../components/booking/Page';
+import useIsDJ from '../../../components/booking/useIsDJ';
+import Step1 from '../../../components/booking/Step1';
+import Step2 from '../../../components/booking/Step2';
+import Step3 from '../../../components/booking/Step3';
+import Step from '../../../components/booking/Step';
 import {Formik} from 'formik';
-import Step from '../../components/Step';
 import {useRouter} from 'next/router';
 import {
   CreateBandApplicationInput,
   GenreCategory,
   HeardAboutBookingFrom,
   useCreateBandApplicationMutation,
-} from '../../types/graphql';
+} from '../../../types/graphql';
 import {gql} from '@apollo/client';
 import {
   Alert,
@@ -22,7 +22,6 @@ import {
   Box,
   Code,
 } from '@chakra-ui/react';
-import {getUtmSource} from '../_app';
 
 gql`
   mutation CreateBandApplication($data: CreateBandApplicationInput!) {
@@ -31,6 +30,12 @@ gql`
     }
   }
 `;
+
+export function getUtmSource() {
+  if (typeof window !== 'undefined') {
+    return window.sessionStorage.getItem('utm_source');
+  }
+}
 
 const utmSourceMapping: Record<string, HeardAboutBookingFrom> = Object.freeze({
   fb: HeardAboutBookingFrom.Facebook,
@@ -70,7 +75,9 @@ export default function Application() {
               errorPolicy: 'all',
             });
             if (res?.createBandApplication?.id) {
-              await router.push(`${router.query.applicationType}/danke`);
+              await router.push(
+                `/booking/${router.query.applicationType}/danke`,
+              );
             }
           } else {
             setCurrentStep(currentStep + 1);

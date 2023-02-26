@@ -10,7 +10,7 @@ import React from 'react';
 import Field from './Field';
 import useIsDJ from './useIsDJ';
 import {useFormikContext} from 'formik';
-import {FormikContextT} from '../pages/[applicationType]';
+import {FormikContextT} from '../../pages/booking/[applicationType]';
 
 export default function Step2() {
   const isDJ = useIsDJ();

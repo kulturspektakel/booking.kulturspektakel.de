@@ -2,12 +2,12 @@ import {gql} from '@apollo/client';
 import {VStack, Heading, Text, Img} from '@chakra-ui/react';
 import {GetStaticPaths, GetStaticProps} from 'next';
 import React from 'react';
-import {EVENT_ID} from '..';
-import Confetti from '../../components/Confetti';
-import Page from '../../components/Page';
-import useIsDJ from '../../components/useIsDJ';
-import {ThanksQuery} from '../../types/graphql';
-import {initializeApollo} from '../_app';
+import {EVENT_ID} from '../..';
+import Confetti from '../../../components/booking/Confetti';
+import Page from '../../../components/booking/Page';
+import useIsDJ from '../../../components/booking/useIsDJ';
+import {ThanksQuery} from '../../../types/graphql';
+import {initializeApollo} from '../../_app';
 
 type Props = Extract<ThanksQuery['node'], {__typename?: 'Event'}>;
 

@@ -17,7 +17,7 @@ import {
 import {GetStaticProps} from 'next';
 import Link, {LinkProps} from 'next/link';
 import React from 'react';
-import Page from '../components/Page';
+import Page from '../components/booking/Page';
 import {EventQuery} from '../types/graphql';
 import {initializeApollo} from './_app';
 
@@ -139,7 +139,7 @@ export default function Home(props: Props) {
             title="Bands"
             content="Ihr möchtet euch als Band für eine unserer Bühnen bewerben."
             buttonLabel="Als Band bewerben"
-            href="/band"
+            href="/booking/band"
             disabled={bandApplicationEnded}
           />
         )}
@@ -150,7 +150,7 @@ export default function Home(props: Props) {
             title="DJs"
             content="Du möchtest dich als DJ für unsere DJ-Area bewerben."
             buttonLabel="Als DJ bewerben"
-            href="/dj"
+            href="/booking/dj"
             disabled={djApplicationEnded}
           />
         )}

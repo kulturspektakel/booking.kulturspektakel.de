@@ -9,12 +9,12 @@ import {
   Select,
 } from '@chakra-ui/react';
 import React from 'react';
-import {GenreCategory} from '../types/graphql';
+import {GenreCategory} from '../../types/graphql';
 import {useFormikContext} from 'formik';
 import DistanceWarning from './DistanceWarning';
 import Field from './Field';
 import useIsDJ from './useIsDJ';
-import {FormikContextT} from '../pages/[applicationType]';
+import {FormikContextT} from '../../pages/booking/[applicationType]';
 import DuplicateApplicationWarning from './DuplicateApplicationWarning';
 
 const GENRE_CATEGORIES: Map<GenreCategory, string> = new Map([

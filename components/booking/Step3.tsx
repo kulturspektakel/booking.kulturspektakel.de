@@ -7,9 +7,9 @@ import {
 } from '@chakra-ui/react';
 import React from 'react';
 import Field from './Field';
-import {HeardAboutBookingFrom, PreviouslyPlayed} from '../types/graphql';
+import {HeardAboutBookingFrom, PreviouslyPlayed} from '../../types/graphql';
 import useIsDJ from './useIsDJ';
-import {getUtmSource} from '../pages/_app';
+import {getUtmSource} from '../../pages/booking/[applicationType]';
 
 const HEARD_ABOUT: Map<HeardAboutBookingFrom, string> = new Map([
   [HeardAboutBookingFrom.BYon, 'BY-on'],
