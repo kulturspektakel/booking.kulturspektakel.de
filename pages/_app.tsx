@@ -22,6 +22,10 @@ const App = ({Component, pageProps}: AppProps) => {
   const client = useMemo(() => initializeApollo(), []);
 
   const theme = extendTheme({
+    fonts: {
+      heading: `Highflier, sans-serif`,
+      body: `Raleway, sans-serif`,
+    },
     components: {
       Steps: {
         ...Steps,

@@ -1,17 +1,18 @@
 import React from 'react';
 import Page from '../../components/Page';
 import {gql} from '@apollo/client';
-import {useEventsQuery} from '../../types/graphql';
-import Event from '../../components/events/Event';
+import {useNewsArchiveQuery} from '../../types/graphql';
+import ArticleHead from '../../components/news/ArticleHead';
+import {Heading} from '@chakra-ui/react';
 
 gql`
-  query News {
-    news(first: 10) {
+  query NewsArchive {
+    news(first: 200) {
       edges {
         node {
           title
           createdAt
-          content
+          slug
         }
       }
     }
@@ -19,13 +20,28 @@ gql`
 `;
 
 export default function Events() {
-  const {data} = useEventsQuery();
+  const {data} = useNewsArchiveQuery();
   return (
     <Page>
-      Neben dem Kult veranstalten wir ab und an noch weitere Events
       <ol>
-        {data?.events.map((e) => (
-          <Event {...e} key={e.id} />
+        {data?.news.edges.map(({node}, i) => (
+          <>
+            {(i === 0 ||
+              data.news.edges[i - 1].node.createdAt.getFullYear() !==
+                node.createdAt.getFullYear()) && (
+              <Heading mt="8" textAlign="center">
+                {node.createdAt.getFullYear()}
+              </Heading>
+            )}
+            <li>
+              <ArticleHead
+                key={node.slug}
+                title={node.title}
+                createdAt={node.createdAt}
+                slug={node.slug}
+              />
+            </li>
+          </>
         ))}
       </ol>
     </Page>

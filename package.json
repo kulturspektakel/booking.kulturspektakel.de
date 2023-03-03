@@ -27,6 +27,7 @@
     "react-beforeunload": "^2.5.3",
     "react-confetti": "^6.1.0",
     "react-dom": "18.2.0",
+    "react-markdown": "^8.0.5",
     "react-use": "^17.4.0",
     "superjson": "^1.12.2"
   },

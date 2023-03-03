@@ -1,3 +1,16 @@
+
+@font-face {
+  font-family: 'Highflier';
+  src: url('/highflier_regular-webfont.woff2') format('woff2'),
+       url('/highflier_regular-webfont.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+
+h1, h2, h3 {
+  font-family: 'Highflier';
+}
+
 html,
 body {
   padding: 0;

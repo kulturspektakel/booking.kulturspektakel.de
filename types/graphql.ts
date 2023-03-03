@@ -38,6 +38,13 @@ export type AreaOpeningHourArgs = {
   day?: InputMaybe<Scalars['Date']>;
 };
 
+export type Asset = {
+  copyright?: Maybe<Scalars['String']>;
+  id: Scalars['String'];
+  title?: Maybe<Scalars['String']>;
+  uri: Scalars['String'];
+};
+
 export type BandApplication = Node & {
   __typename?: 'BandApplication';
   bandApplicationRating: Array<BandApplicationRating>;
@@ -280,13 +287,39 @@ export type Event = Node & {
   bandApplication: Array<BandApplication>;
   bandApplicationEnd?: Maybe<Scalars['DateTime']>;
   bandApplicationStart?: Maybe<Scalars['DateTime']>;
-  bandsPlaying: Array<BandPlaying>;
+  bandsPlaying: EventBandsPlayingConnection;
   description?: Maybe<Scalars['String']>;
   djApplicationEnd?: Maybe<Scalars['DateTime']>;
   end: Scalars['DateTime'];
   id: Scalars['ID'];
   name: Scalars['String'];
+  poster?: Maybe<PixelImage>;
   start: Scalars['DateTime'];
+};
+
+export type EventBandsPlayingArgs = {
+  after?: InputMaybe<Scalars['String']>;
+  before?: InputMaybe<Scalars['String']>;
+  first?: InputMaybe<Scalars['Int']>;
+  last?: InputMaybe<Scalars['Int']>;
+};
+
+export type EventPosterArgs = {
+  height?: InputMaybe<Scalars['Int']>;
+  width?: InputMaybe<Scalars['Int']>;
+};
+
+export type EventBandsPlayingConnection = {
+  __typename?: 'EventBandsPlayingConnection';
+  edges: Array<EventBandsPlayingConnectionEdge>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int'];
+};
+
+export type EventBandsPlayingConnectionEdge = {
+  __typename?: 'EventBandsPlayingConnectionEdge';
+  cursor: Scalars['String'];
+  node: BandPlaying;
 };
 
 export enum EventType {
@@ -398,6 +431,15 @@ export type MutationUpsertProductListArgs = {
   products?: InputMaybe<Array<ProductInput>>;
 };
 
+export type News = Node & {
+  __typename?: 'News';
+  content: Scalars['String'];
+  createdAt: Scalars['Date'];
+  id: Scalars['ID'];
+  slug: Scalars['String'];
+  title: Scalars['String'];
+};
+
 export type Node = {
   id: Scalars['ID'];
 };
@@ -484,6 +526,22 @@ export type PageInfo = {
   startCursor?: Maybe<Scalars['String']>;
 };
 
+export type PixelImage = Asset & {
+  __typename?: 'PixelImage';
+  copyright?: Maybe<Scalars['String']>;
+  format: PixelImageFormat;
+  height: Scalars['Int'];
+  id: Scalars['String'];
+  title?: Maybe<Scalars['String']>;
+  uri: Scalars['String'];
+  width: Scalars['Int'];
+};
+
+export enum PixelImageFormat {
+  Jpeg = 'JPEG',
+  Png = 'PNG',
+}
+
 export enum PreviouslyPlayed {
   No = 'No',
   OtherFormation = 'OtherFormation',
@@ -538,7 +596,8 @@ export type Query = {
   devices: Array<Device>;
   distanceToKult?: Maybe<Scalars['Float']>;
   events: Array<Event>;
-  findBandPlaying?: Maybe<Array<BandPlaying>>;
+  findBandPlaying: Array<BandPlaying>;
+  news: QueryNewsConnection;
   node?: Maybe<Node>;
   nodes: Array<Maybe<Node>>;
   nuclinoPages: Array<NuclinoSearchResult>;
@@ -565,11 +624,19 @@ export type QueryDistanceToKultArgs = {
 };
 
 export type QueryEventsArgs = {
+  limit?: InputMaybe<Scalars['Int']>;
   type?: InputMaybe<EventType>;
 };
 
 export type QueryFindBandPlayingArgs = {
   query: Scalars['String'];
+};
+
+export type QueryNewsArgs = {
+  after?: InputMaybe<Scalars['String']>;
+  before?: InputMaybe<Scalars['String']>;
+  first?: InputMaybe<Scalars['Int']>;
+  last?: InputMaybe<Scalars['Int']>;
 };
 
 export type QueryNodeArgs = {
@@ -582,6 +649,19 @@ export type QueryNodesArgs = {
 
 export type QueryNuclinoPagesArgs = {
   query: Scalars['String'];
+};
+
+export type QueryNewsConnection = {
+  __typename?: 'QueryNewsConnection';
+  edges: Array<QueryNewsConnectionEdge>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int'];
+};
+
+export type QueryNewsConnectionEdge = {
+  __typename?: 'QueryNewsConnectionEdge';
+  cursor: Scalars['String'];
+  node: News;
 };
 
 export type SalesNumber = {
@@ -676,6 +756,20 @@ export type EventDetailsFragment = {
   description?: string | null;
 };
 
+export type BandSerachQueryVariables = Exact<{
+  query: Scalars['String'];
+}>;
+
+export type BandSerachQuery = {
+  __typename?: 'Query';
+  findBandPlaying: Array<{
+    __typename?: 'BandPlaying';
+    name: string;
+    id: string;
+    eventId: string;
+  }>;
+};
+
 export type LineupTableQueryVariables = Exact<{[key: string]: never}>;
 
 export type LineupTableQuery = {
@@ -688,12 +782,27 @@ export type LineupDetailsFragment = {
   name: string;
   start: Date;
   end: Date;
-  bandsPlaying: Array<{
-    __typename?: 'BandPlaying';
-    genre?: string | null;
-    name: string;
-    area: {__typename?: 'Area'; id: string};
-  }>;
+  bandsPlaying: {
+    __typename?: 'EventBandsPlayingConnection';
+    edges: Array<{
+      __typename?: 'EventBandsPlayingConnectionEdge';
+      node: {
+        __typename?: 'BandPlaying';
+        genre?: string | null;
+        name: string;
+        startTime: Date;
+        area: {__typename?: 'Area'; id: string};
+      };
+    }>;
+  };
+};
+
+export type ArticleFragment = {
+  __typename?: 'News';
+  slug: string;
+  title: string;
+  createdAt: Date;
+  content: string;
 };
 
 export type ThanksQueryVariables = Exact<{
@@ -714,6 +823,7 @@ export type ThanksQuery = {
         bandApplicationEnd?: Date | null;
         djApplicationEnd?: Date | null;
       }
+    | {__typename?: 'News'}
     | {__typename?: 'NuclinoPage'}
     | {__typename?: 'Product'}
     | {__typename?: 'ProductList'}
@@ -766,6 +876,7 @@ export type EventQuery = {
         bandApplicationEnd?: Date | null;
         djApplicationEnd?: Date | null;
       }
+    | {__typename?: 'News'}
     | {__typename?: 'NuclinoPage'}
     | {__typename?: 'Product'}
     | {__typename?: 'ProductList'}
@@ -791,19 +902,109 @@ export type LineupQuery = {
         name: string;
         start: Date;
         end: Date;
-        bandsPlaying: Array<{
-          __typename?: 'BandPlaying';
-          genre?: string | null;
-          name: string;
-          area: {__typename?: 'Area'; id: string};
-        }>;
+        bandsPlaying: {
+          __typename?: 'EventBandsPlayingConnection';
+          edges: Array<{
+            __typename?: 'EventBandsPlayingConnectionEdge';
+            node: {
+              __typename?: 'BandPlaying';
+              genre?: string | null;
+              name: string;
+              startTime: Date;
+              area: {__typename?: 'Area'; id: string};
+            };
+          }>;
+        };
+      }
+    | {__typename?: 'News'}
+    | {__typename?: 'NuclinoPage'}
+    | {__typename?: 'Product'}
+    | {__typename?: 'ProductList'}
+    | {__typename?: 'Viewer'}
+    | null;
+  events: Array<{
+    __typename?: 'Event';
+    id: string;
+    start: Date;
+    bandsPlaying: {
+      __typename?: 'EventBandsPlayingConnection';
+      totalCount: number;
+    };
+  }>;
+};
+
+export type LineupRedirectQueryVariables = Exact<{[key: string]: never}>;
+
+export type LineupRedirectQuery = {
+  __typename?: 'Query';
+  events: Array<{
+    __typename?: 'Event';
+    id: string;
+    bandsPlaying: {
+      __typename?: 'EventBandsPlayingConnection';
+      totalCount: number;
+    };
+  }>;
+};
+
+export type NewsSingleQueryVariables = Exact<{
+  id: Scalars['ID'];
+}>;
+
+export type NewsSingleQuery = {
+  __typename?: 'Query';
+  node?:
+    | {__typename?: 'Area'}
+    | {__typename?: 'BandApplication'}
+    | {__typename?: 'BandApplicationComment'}
+    | {__typename?: 'BandPlaying'}
+    | {__typename?: 'Card'}
+    | {__typename?: 'Device'}
+    | {__typename?: 'Event'}
+    | {
+        __typename?: 'News';
+        slug: string;
+        title: string;
+        createdAt: Date;
+        content: string;
       }
     | {__typename?: 'NuclinoPage'}
     | {__typename?: 'Product'}
     | {__typename?: 'ProductList'}
     | {__typename?: 'Viewer'}
     | null;
-  events: Array<{__typename?: 'Event'; id: string; start: Date}>;
+};
+
+export type NewsArchiveQueryVariables = Exact<{[key: string]: never}>;
+
+export type NewsArchiveQuery = {
+  __typename?: 'Query';
+  news: {
+    __typename?: 'QueryNewsConnection';
+    edges: Array<{
+      __typename?: 'QueryNewsConnectionEdge';
+      node: {__typename?: 'News'; title: string; createdAt: Date; slug: string};
+    }>;
+  };
+};
+
+export type NewsQueryVariables = Exact<{[key: string]: never}>;
+
+export type NewsQuery = {
+  __typename?: 'Query';
+  news: {
+    __typename?: 'QueryNewsConnection';
+    edges: Array<{
+      __typename?: 'QueryNewsConnectionEdge';
+      node: {
+        __typename?: 'News';
+        slug: string;
+        title: string;
+        createdAt: Date;
+        content: string;
+      };
+    }>;
+  };
 };
 
 export type PostersQueryVariables = Exact<{[key: string]: never}>;
@@ -827,12 +1028,25 @@ export const LineupDetailsFragmentDoc = gql`
     start
     end
     bandsPlaying {
-      genre
-      name
-      area {
-        id
+      edges {
+        node {
+          genre
+          name
+          startTime
+          area {
+            id
+          }
+        }
       }
     }
+  }
+`;
+export const ArticleFragmentDoc = gql`
+  fragment Article on News {
+    slug
+    title
+    createdAt
+    content
   }
 `;
 export const DistanceDocument = gql`
@@ -945,6 +1159,64 @@ export type DuplicateApplicationWarningLazyQueryHookResult = ReturnType<
 export type DuplicateApplicationWarningQueryResult = Apollo.QueryResult<
   DuplicateApplicationWarningQuery,
   DuplicateApplicationWarningQueryVariables
+>;
+export const BandSerachDocument = gql`
+  query BandSerach($query: String!) {
+    findBandPlaying(query: $query) {
+      name
+      id
+      eventId
+    }
+  }
+`;
+
+/**
+ * __useBandSerachQuery__
+ *
+ * To run a query within a React component, call `useBandSerachQuery` and pass it any options that fit your needs.
+ * When your component renders, `useBandSerachQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useBandSerachQuery({
+ *   variables: {
+ *      query: // value for 'query'
+ *   },
+ * });
+ */
+export function useBandSerachQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    BandSerachQuery,
+    BandSerachQueryVariables
+  >,
+) {
+  const options = {...defaultOptions, ...baseOptions};
+  return Apollo.useQuery<BandSerachQuery, BandSerachQueryVariables>(
+    BandSerachDocument,
+    options,
+  );
+}
+export function useBandSerachLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    BandSerachQuery,
+    BandSerachQueryVariables
+  >,
+) {
+  const options = {...defaultOptions, ...baseOptions};
+  return Apollo.useLazyQuery<BandSerachQuery, BandSerachQueryVariables>(
+    BandSerachDocument,
+    options,
+  );
+}
+export type BandSerachQueryHookResult = ReturnType<typeof useBandSerachQuery>;
+export type BandSerachLazyQueryHookResult = ReturnType<
+  typeof useBandSerachLazyQuery
+>;
+export type BandSerachQueryResult = Apollo.QueryResult<
+  BandSerachQuery,
+  BandSerachQueryVariables
 >;
 export const LineupTableDocument = gql`
   query LineupTable {
@@ -1217,6 +1489,9 @@ export const LineupDocument = gql`
     events(type: Kulturspektakel) {
       id
       start
+      bandsPlaying {
+        totalCount
+      }
     }
   }
   ${LineupDetailsFragmentDoc}
@@ -1262,6 +1537,232 @@ export type LineupQueryResult = Apollo.QueryResult<
   LineupQuery,
   LineupQueryVariables
 >;
+export const LineupRedirectDocument = gql`
+  query LineupRedirect {
+    events(limit: 2, type: Kulturspektakel) {
+      id
+      bandsPlaying {
+        totalCount
+      }
+    }
+  }
+`;
+
+/**
+ * __useLineupRedirectQuery__
+ *
+ * To run a query within a React component, call `useLineupRedirectQuery` and pass it any options that fit your needs.
+ * When your component renders, `useLineupRedirectQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useLineupRedirectQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useLineupRedirectQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    LineupRedirectQuery,
+    LineupRedirectQueryVariables
+  >,
+) {
+  const options = {...defaultOptions, ...baseOptions};
+  return Apollo.useQuery<LineupRedirectQuery, LineupRedirectQueryVariables>(
+    LineupRedirectDocument,
+    options,
+  );
+}
+export function useLineupRedirectLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    LineupRedirectQuery,
+    LineupRedirectQueryVariables
+  >,
+) {
+  const options = {...defaultOptions, ...baseOptions};
+  return Apollo.useLazyQuery<LineupRedirectQuery, LineupRedirectQueryVariables>(
+    LineupRedirectDocument,
+    options,
+  );
+}
+export type LineupRedirectQueryHookResult = ReturnType<
+  typeof useLineupRedirectQuery
+>;
+export type LineupRedirectLazyQueryHookResult = ReturnType<
+  typeof useLineupRedirectLazyQuery
+>;
+export type LineupRedirectQueryResult = Apollo.QueryResult<
+  LineupRedirectQuery,
+  LineupRedirectQueryVariables
+>;
+export const NewsSingleDocument = gql`
+  query NewsSingle($id: ID!) {
+    node(id: $id) {
+      ... on News {
+        ...Article
+      }
+    }
+  }
+  ${ArticleFragmentDoc}
+`;
+
+/**
+ * __useNewsSingleQuery__
+ *
+ * To run a query within a React component, call `useNewsSingleQuery` and pass it any options that fit your needs.
+ * When your component renders, `useNewsSingleQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useNewsSingleQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useNewsSingleQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    NewsSingleQuery,
+    NewsSingleQueryVariables
+  >,
+) {
+  const options = {...defaultOptions, ...baseOptions};
+  return Apollo.useQuery<NewsSingleQuery, NewsSingleQueryVariables>(
+    NewsSingleDocument,
+    options,
+  );
+}
+export function useNewsSingleLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    NewsSingleQuery,
+    NewsSingleQueryVariables
+  >,
+) {
+  const options = {...defaultOptions, ...baseOptions};
+  return Apollo.useLazyQuery<NewsSingleQuery, NewsSingleQueryVariables>(
+    NewsSingleDocument,
+    options,
+  );
+}
+export type NewsSingleQueryHookResult = ReturnType<typeof useNewsSingleQuery>;
+export type NewsSingleLazyQueryHookResult = ReturnType<
+  typeof useNewsSingleLazyQuery
+>;
+export type NewsSingleQueryResult = Apollo.QueryResult<
+  NewsSingleQuery,
+  NewsSingleQueryVariables
+>;
+export const NewsArchiveDocument = gql`
+  query NewsArchive {
+    news(first: 200) {
+      edges {
+        node {
+          title
+          createdAt
+          slug
+        }
+      }
+    }
+  }
+`;
+
+/**
+ * __useNewsArchiveQuery__
+ *
+ * To run a query within a React component, call `useNewsArchiveQuery` and pass it any options that fit your needs.
+ * When your component renders, `useNewsArchiveQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useNewsArchiveQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useNewsArchiveQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    NewsArchiveQuery,
+    NewsArchiveQueryVariables
+  >,
+) {
+  const options = {...defaultOptions, ...baseOptions};
+  return Apollo.useQuery<NewsArchiveQuery, NewsArchiveQueryVariables>(
+    NewsArchiveDocument,
+    options,
+  );
+}
+export function useNewsArchiveLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    NewsArchiveQuery,
+    NewsArchiveQueryVariables
+  >,
+) {
+  const options = {...defaultOptions, ...baseOptions};
+  return Apollo.useLazyQuery<NewsArchiveQuery, NewsArchiveQueryVariables>(
+    NewsArchiveDocument,
+    options,
+  );
+}
+export type NewsArchiveQueryHookResult = ReturnType<typeof useNewsArchiveQuery>;
+export type NewsArchiveLazyQueryHookResult = ReturnType<
+  typeof useNewsArchiveLazyQuery
+>;
+export type NewsArchiveQueryResult = Apollo.QueryResult<
+  NewsArchiveQuery,
+  NewsArchiveQueryVariables
+>;
+export const NewsDocument = gql`
+  query News {
+    news(first: 10) {
+      edges {
+        node {
+          ...Article
+        }
+      }
+    }
+  }
+  ${ArticleFragmentDoc}
+`;
+
+/**
+ * __useNewsQuery__
+ *
+ * To run a query within a React component, call `useNewsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useNewsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useNewsQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useNewsQuery(
+  baseOptions?: Apollo.QueryHookOptions<NewsQuery, NewsQueryVariables>,
+) {
+  const options = {...defaultOptions, ...baseOptions};
+  return Apollo.useQuery<NewsQuery, NewsQueryVariables>(NewsDocument, options);
+}
+export function useNewsLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<NewsQuery, NewsQueryVariables>,
+) {
+  const options = {...defaultOptions, ...baseOptions};
+  return Apollo.useLazyQuery<NewsQuery, NewsQueryVariables>(
+    NewsDocument,
+    options,
+  );
+}
+export type NewsQueryHookResult = ReturnType<typeof useNewsQuery>;
+export type NewsLazyQueryHookResult = ReturnType<typeof useNewsLazyQuery>;
+export type NewsQueryResult = Apollo.QueryResult<NewsQuery, NewsQueryVariables>;
 export const PostersDocument = gql`
   query Posters {
     events(type: Kulturspektakel) {
