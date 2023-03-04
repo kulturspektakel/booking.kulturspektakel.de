@@ -13,6 +13,7 @@ class Typeahead<T> extends EventTarget {
   private matchStringExtractor: (data: T) => string = (data) => data.name;
   private debounce: number;
   private displaySetLimit = 5;
+  private minimumQueryLength = 2;
 
   constructor(fetcher: (query: string) => Promise<T[]>, debounce?: number) {
     super();
@@ -72,7 +73,11 @@ class Typeahead<T> extends EventTarget {
     this.currentQuery = query;
 
     // STEP 2: NETWORK
-    if (this.requests.has(query) || displaySet.size >= this.displaySetLimit) {
+    if (
+      this.requests.has(query) ||
+      displaySet.size >= this.displaySetLimit ||
+      query.length < this.minimumQueryLength
+    ) {
       this.dispatchEvent(new CustomEvent<boolean>('loading', {detail: false}));
       // query is already fetched or we have enough results we can bail early
       return;
