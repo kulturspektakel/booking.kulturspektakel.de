@@ -3,7 +3,7 @@ import Page from '../../components/Page';
 import {gql} from '@apollo/client';
 import {useNewsArchiveQuery} from '../../types/graphql';
 import ArticleHead from '../../components/news/ArticleHead';
-import {Heading} from '@chakra-ui/react';
+import {Heading, List, ListItem} from '@chakra-ui/react';
 
 gql`
   query NewsArchive {
@@ -23,7 +23,7 @@ export default function Events() {
   const {data} = useNewsArchiveQuery();
   return (
     <Page>
-      <ol>
+      <List>
         {data?.news.edges.map(({node}, i) => (
           <>
             {(i === 0 ||
@@ -33,17 +33,17 @@ export default function Events() {
                 {node.createdAt.getFullYear()}
               </Heading>
             )}
-            <li>
+            <ListItem>
               <ArticleHead
                 key={node.slug}
                 title={node.title}
                 createdAt={node.createdAt}
                 slug={node.slug}
               />
-            </li>
+            </ListItem>
           </>
         ))}
-      </ol>
+      </List>
     </Page>
   );
 }

@@ -1,8 +1,8 @@
 import React from 'react';
 import {gql} from '@apollo/client';
-import {ArticleFragment} from '../../types/graphql';
-import {Text, Heading, Box} from '@chakra-ui/react';
+import {Text, Heading} from '@chakra-ui/react';
 import Link from 'next/link';
+import DateString from '../DateString';
 
 gql`
   fragment Article on News {
@@ -23,9 +23,7 @@ export default function ArticleHead(props: {
       <Heading textTransform="uppercase">{props.title}</Heading>
       <Link href={`/news/${props.slug}`}>
         <Text>
-          <time dateTime={props.createdAt.toISOString()}>
-            {props.createdAt.toLocaleDateString('de-DE')}
-          </time>
+          <DateString date={props.createdAt} />
         </Text>
       </Link>
     </>
