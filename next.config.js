@@ -7,6 +7,16 @@ const {withSentryConfig} = require('@sentry/nextjs');
 // https://docs.sentry.io/platforms/javascript/guides/nextjs/
 
 const moduleExports = {
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'cms.kulturspektakel.de',
+        port: '',
+      },
+    ],
+  },
+
   // Your existing module.exports
   experimental: {
     swcPlugins: [['next-superjson-plugin', {}]],

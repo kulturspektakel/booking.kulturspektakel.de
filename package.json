@@ -17,6 +17,7 @@
     "@sentry/nextjs": "^7.38.0",
     "apollo-link-scalars": "^4.0.1",
     "chakra-ui-steps": "^1.8.0",
+    "downshift": "^7.2.2",
     "formik": "^2.2.9",
     "framer-motion": "^7.6.7",
     "graphql": "^16.6.0",

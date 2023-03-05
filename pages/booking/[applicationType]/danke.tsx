@@ -1,7 +1,8 @@
 import {gql} from '@apollo/client';
 import {VStack, Heading, Text, Img} from '@chakra-ui/react';
-import {GetStaticPaths, GetStaticProps} from 'next';
+import {GetStaticProps} from 'next';
 import React from 'react';
+import {getStaticPaths as gsp} from '.';
 import {EVENT_ID} from '../..';
 import Confetti from '../../../components/booking/Confetti';
 import Page from '../../../components/booking/Page';
@@ -44,15 +45,7 @@ export default function Thanks(props: Props) {
   );
 }
 
-export const getStaticPaths: GetStaticPaths = () => {
-  return {
-    paths: [
-      {params: {applicationType: 'band'}},
-      {params: {applicationType: 'dj'}},
-    ],
-    fallback: false,
-  };
-};
+export const getStaticPaths = gsp;
 
 export const getStaticProps: GetStaticProps<Props> = async () => {
   const client = initializeApollo();

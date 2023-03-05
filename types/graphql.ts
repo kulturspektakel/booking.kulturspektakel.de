@@ -629,6 +629,7 @@ export type QueryEventsArgs = {
 };
 
 export type QueryFindBandPlayingArgs = {
+  limit?: InputMaybe<Scalars['Int']>;
   query: Scalars['String'];
 };
 
@@ -758,6 +759,7 @@ export type EventDetailsFragment = {
 
 export type BandSerachQueryVariables = Exact<{
   query: Scalars['String'];
+  limit: Scalars['Int'];
 }>;
 
 export type BandSerachQuery = {
@@ -779,6 +781,7 @@ export type LineupTableQuery = {
 
 export type LineupDetailsFragment = {
   __typename?: 'Event';
+  id: string;
   name: string;
   start: Date;
   end: Date;
@@ -791,7 +794,12 @@ export type LineupDetailsFragment = {
         genre?: string | null;
         name: string;
         startTime: Date;
-        area: {__typename?: 'Area'; id: string};
+        area: {
+          __typename?: 'Area';
+          id: string;
+          displayName: string;
+          themeColor: string;
+        };
       };
     }>;
   };
@@ -899,6 +907,7 @@ export type LineupQuery = {
     | {__typename?: 'Device'}
     | {
         __typename?: 'Event';
+        id: string;
         name: string;
         start: Date;
         end: Date;
@@ -911,7 +920,12 @@ export type LineupQuery = {
               genre?: string | null;
               name: string;
               startTime: Date;
-              area: {__typename?: 'Area'; id: string};
+              area: {
+                __typename?: 'Area';
+                id: string;
+                displayName: string;
+                themeColor: string;
+              };
             };
           }>;
         };
@@ -931,6 +945,13 @@ export type LineupQuery = {
       totalCount: number;
     };
   }>;
+};
+
+export type LineUpStaticPathsQueryVariables = Exact<{[key: string]: never}>;
+
+export type LineUpStaticPathsQuery = {
+  __typename?: 'Query';
+  events: Array<{__typename?: 'Event'; id: string; start: Date}>;
 };
 
 export type LineupRedirectQueryVariables = Exact<{[key: string]: never}>;
@@ -1011,7 +1032,18 @@ export type PostersQueryVariables = Exact<{[key: string]: never}>;
 
 export type PostersQuery = {
   __typename?: 'Query';
-  events: Array<{__typename?: 'Event'; id: string; start: Date}>;
+  events: Array<{
+    __typename?: 'Event';
+    id: string;
+    start: Date;
+    end: Date;
+    poster?: {
+      __typename?: 'PixelImage';
+      uri: string;
+      copyright?: string | null;
+      title?: string | null;
+    } | null;
+  }>;
 };
 
 export const EventDetailsFragmentDoc = gql`
@@ -1024,10 +1056,11 @@ export const EventDetailsFragmentDoc = gql`
 `;
 export const LineupDetailsFragmentDoc = gql`
   fragment LineupDetails on Event {
+    id
     name
     start
     end
-    bandsPlaying {
+    bandsPlaying(first: 100) {
       edges {
         node {
           genre
@@ -1035,6 +1068,8 @@ export const LineupDetailsFragmentDoc = gql`
           startTime
           area {
             id
+            displayName
+            themeColor
           }
         }
       }
@@ -1161,8 +1196,8 @@ export type DuplicateApplicationWarningQueryResult = Apollo.QueryResult<
   DuplicateApplicationWarningQueryVariables
 >;
 export const BandSerachDocument = gql`
-  query BandSerach($query: String!) {
-    findBandPlaying(query: $query) {
+  query BandSerach($query: String!, $limit: Int!) {
+    findBandPlaying(query: $query, limit: $limit) {
       name
       id
       eventId
@@ -1183,6 +1218,7 @@ export const BandSerachDocument = gql`
  * const { data, loading, error } = useBandSerachQuery({
  *   variables: {
  *      query: // value for 'query'
+ *      limit: // value for 'limit'
  *   },
  * });
  */
@@ -1537,6 +1573,64 @@ export type LineupQueryResult = Apollo.QueryResult<
   LineupQuery,
   LineupQueryVariables
 >;
+export const LineUpStaticPathsDocument = gql`
+  query LineUpStaticPaths {
+    events(type: Kulturspektakel) {
+      id
+      start
+    }
+  }
+`;
+
+/**
+ * __useLineUpStaticPathsQuery__
+ *
+ * To run a query within a React component, call `useLineUpStaticPathsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useLineUpStaticPathsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useLineUpStaticPathsQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useLineUpStaticPathsQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    LineUpStaticPathsQuery,
+    LineUpStaticPathsQueryVariables
+  >,
+) {
+  const options = {...defaultOptions, ...baseOptions};
+  return Apollo.useQuery<
+    LineUpStaticPathsQuery,
+    LineUpStaticPathsQueryVariables
+  >(LineUpStaticPathsDocument, options);
+}
+export function useLineUpStaticPathsLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    LineUpStaticPathsQuery,
+    LineUpStaticPathsQueryVariables
+  >,
+) {
+  const options = {...defaultOptions, ...baseOptions};
+  return Apollo.useLazyQuery<
+    LineUpStaticPathsQuery,
+    LineUpStaticPathsQueryVariables
+  >(LineUpStaticPathsDocument, options);
+}
+export type LineUpStaticPathsQueryHookResult = ReturnType<
+  typeof useLineUpStaticPathsQuery
+>;
+export type LineUpStaticPathsLazyQueryHookResult = ReturnType<
+  typeof useLineUpStaticPathsLazyQuery
+>;
+export type LineUpStaticPathsQueryResult = Apollo.QueryResult<
+  LineUpStaticPathsQuery,
+  LineUpStaticPathsQueryVariables
+>;
 export const LineupRedirectDocument = gql`
   query LineupRedirect {
     events(limit: 2, type: Kulturspektakel) {
@@ -1768,6 +1862,12 @@ export const PostersDocument = gql`
     events(type: Kulturspektakel) {
       id
       start
+      end
+      poster {
+        uri
+        copyright
+        title
+      }
     }
   }
 `;

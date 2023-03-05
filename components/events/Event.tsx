@@ -2,6 +2,7 @@ import React from 'react';
 
 import {gql} from '@apollo/client';
 import {EventDetailsFragment} from '../../types/graphql';
+import DateString from '../DateString';
 
 gql`
   fragment EventDetails on Event {
@@ -16,8 +17,7 @@ export default function Event(props: EventDetailsFragment) {
   return (
     <li>
       <h3>{props.name}</h3>
-      {props.start.toLocaleDateString('de-DE')} bis{' '}
-      {props.end.toLocaleDateString('de-DE')}
+      <DateString date={props.start} to={props.end} />
       <p>{props.description}</p>
     </li>
   );

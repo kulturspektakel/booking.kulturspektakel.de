@@ -2,8 +2,10 @@ import React, {useMemo} from 'react';
 
 import {gql} from '@apollo/client';
 import {LineupDetailsFragment, useLineupTableQuery} from '../../types/graphql';
-import {Heading} from '@chakra-ui/react';
+import {Box, Heading, List, ListItem} from '@chakra-ui/react';
 import BandSearch from './BandSearch';
+import {isSameDay} from '../DateString';
+import TimeString from '../TimeString';
 
 gql`
   query LineupTable {
@@ -14,10 +16,11 @@ gql`
   }
 
   fragment LineupDetails on Event {
+    id
     name
     start
     end
-    bandsPlaying {
+    bandsPlaying(first: 100) {
       edges {
         node {
           genre
@@ -25,6 +28,8 @@ gql`
           startTime
           area {
             id
+            displayName
+            themeColor
           }
         }
       }
@@ -56,18 +61,40 @@ export default function Event(props: LineupDetailsFragment) {
   return (
     <>
       <BandSearch />
-      {days.map((d) => (
-        <li key={d.toDateString()}>
-          <Heading textAlign="center">
-            {d.toLocaleDateString('de-DE', {weekday: 'long'})}
-          </Heading>
-          <ol>
-            {areas?.map((a) => (
-              <li key={a.id}>{a.displayName}</li>
-            ))}
-          </ol>
-        </li>
-      ))}
+      <List>
+        <List>
+          {areas?.map((a) => (
+            <ListItem key={a.id}>{a.displayName}</ListItem>
+          ))}
+        </List>
+        {days.map((day) => (
+          <ListItem key={day.toDateString()}>
+            <Heading textAlign="center">
+              {day.toLocaleDateString('de-DE', {weekday: 'long'})}
+            </Heading>
+            <List>
+              {props.bandsPlaying.edges
+                .filter(({node}) => isSameDay(node.startTime, day))
+                .map(({node}) => (
+                  <Box
+                    key={node.name}
+                    borderRadius="xl"
+                    bg={node.area.themeColor}
+                    p="5"
+                    m="2"
+                    display="inline-block"
+                    boxShadow="sm"
+                  >
+                    <TimeString date={node.startTime} />
+                    &nbsp;
+                    {node.area.displayName}
+                    <Heading>{node.name}</Heading>
+                  </Box>
+                ))}
+            </List>
+          </ListItem>
+        ))}
+      </List>
     </>
   );
 }

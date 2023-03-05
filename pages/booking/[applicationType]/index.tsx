@@ -22,6 +22,7 @@ import {
   Box,
   Code,
 } from '@chakra-ui/react';
+import {GetStaticPaths, GetStaticProps} from 'next';
 
 gql`
   mutation CreateBandApplication($data: CreateBandApplicationInput!) {
@@ -45,7 +46,11 @@ const utmSourceMapping: Record<string, HeardAboutBookingFrom> = Object.freeze({
 export type FormikContextT = Partial<CreateBandApplicationInput>;
 
 const STEPS = [Step1, Step2, Step3];
-export default function Application() {
+
+// eslint-disable-next-line @typescript-eslint/ban-types
+type Props = {};
+
+export default function Application(props: Props) {
   const isDJ = useIsDJ();
   const router = useRouter();
   const [create, {error, loading}] = useCreateBandApplicationMutation();
@@ -122,3 +127,19 @@ export default function Application() {
     </Page>
   );
 }
+
+export const getStaticPaths: GetStaticPaths = () => {
+  return {
+    paths: [
+      {params: {applicationType: 'band'}},
+      {params: {applicationType: 'dj'}},
+    ],
+    fallback: false,
+  };
+};
+
+export const getStaticProps: GetStaticProps<Props> = async () => {
+  return {
+    props: {},
+  };
+};

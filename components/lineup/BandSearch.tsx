@@ -1,11 +1,27 @@
 import {gql, useApolloClient} from '@apollo/client';
-import {Box, Input, Menu, MenuItem, Spinner, Stack} from '@chakra-ui/react';
-import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import {
+  Box,
+  Center,
+  Input,
+  InputGroup,
+  InputLeftElement,
+  List,
+  ListItem,
+  Popover,
+  PopoverAnchor,
+  PopoverContent,
+  Spinner,
+} from '@chakra-ui/react';
+import React, {useMemo, useRef} from 'react';
+import {useCombobox} from 'downshift';
 import {BandSerachQuery} from '../../types/graphql';
 import {TomoTypeaheadConfig, useTypeahead} from './TomoTypeahead';
+import {Search2Icon} from '@chakra-ui/icons';
 
 export default function BandSearch() {
   const client = useApolloClient();
+  const minimumQueryLength = 2;
+  const displaySetLimit = 10;
 
   const config: TomoTypeaheadConfig<
     BandSerachQuery['findBandPlaying'][number]
@@ -15,8 +31,8 @@ export default function BandSearch() {
         client
           .query<BandSerachQuery>({
             query: gql`
-              query BandSerach($query: String!) {
-                findBandPlaying(query: $query) {
+              query BandSerach($query: String!, $limit: Int!) {
+                findBandPlaying(query: $query, limit: $limit) {
                   name
                   id
                   eventId
@@ -25,81 +41,75 @@ export default function BandSearch() {
             `,
             variables: {
               query,
+              limit: displaySetLimit,
             },
           })
           .then((d) => d.data.findBandPlaying),
       keyExtractor: (data) => data.id,
       matchStringExtractor: (data) => data.name.toLocaleLowerCase(),
+      minimumQueryLength,
+      displaySetLimit,
     }),
     [client],
   );
 
-  const [selected, setSelected] = useState(-1);
-  const [focused, setFocused] = useState(false);
-  const ref = useRef();
-
   const {data, loading, setQuery} = useTypeahead(config);
+  const {
+    getItemProps,
+    isOpen,
+    getInputProps,
+    getMenuProps,
+    highlightedIndex,
+    inputValue,
+  } = useCombobox({
+    items: data,
+    onInputValueChange: (e) => setQuery(e.inputValue ?? ''),
+  });
 
-  const onKeyDown: React.KeyboardEventHandler<HTMLInputElement> = useCallback(
-    (e) => {
-      if (e.key == 'ArrowUp') {
-        e.preventDefault();
-        setSelected((s) => {
-          s--;
-          if (s < 0 && data.length > 0) {
-            s = data.length - 1;
-          }
-          return s;
-        });
-      } else if (e.key == 'ArrowDown') {
-        e.preventDefault();
-        setSelected((s) => {
-          s++;
-          if (s >= data.length) {
-            s = 0;
-          }
-          return s;
-        });
-      } else if (e.key == 'ArrowUp') {
-        e.preventDefault();
-      } else if (e.key == 'ArrowUp') {
-        e.preventDefault();
-      }
-    },
-    [],
-  );
-
-  useEffect(() => {
-    const item = data[selected];
-    if (item != null) {
-      // ref.current.value =
-    }
-  }, [ref, selected]);
-
-  console.log(loading);
+  const ref = useRef<HTMLInputElement | null>(null);
 
   return (
-    <Box
-      onFocus={() => setFocused(true)}
-      onBlur={() => setFocused(false)}
-      position="relative"
-    >
-      <Menu isOpen={data.length > 0 && focused} computePositionOnMount={true}>
-        <Input
-          ref={ref}
-          placeholder="Bands suchen…"
-          onChange={async (e) => setQuery(e.target.value)}
-          onKeyDown={onKeyDown}
-        />
-        <Stack position="absolute" bg="Background">
-          {data.map((d, i) => (
-            <MenuItem key={d.id}>
-              {d.name} ({d.eventId.replace(/[^\d]/g, '')})
-            </MenuItem>
-          ))}
-          {loading && <Spinner />}
-        </Stack>
-      </Menu>
+    <Box>
+      <Popover
+        isOpen={isOpen && inputValue.length >= minimumQueryLength}
+        initialFocusRef={ref}
+      >
+        <PopoverAnchor>
+          <InputGroup>
+            <InputLeftElement pointerEvents="none">
+              <Search2Icon color="gray.300" />
+            </InputLeftElement>
+            <Input
+              borderRadius="999em"
+              placeholder="Bands suchen…"
+              {...getInputProps({ref})}
+            />
+          </InputGroup>
+        </PopoverAnchor>
+        <PopoverContent>
+          <List {...getMenuProps()}>
+            {data.map((item, index) => (
+              <ListItem
+                p="2"
+                key={item.id}
+                {...getItemProps({item, index})}
+                bg={highlightedIndex === index ? 'red' : ''}
+                _hover={{bg: 'yellow'}}
+              >
+                {item.name} ({item.eventId.replace(/[^\d]/g, '')})
+              </ListItem>
+            ))}
+            {inputValue.length >= minimumQueryLength &&
+              data.length === 0 &&
+              !loading && <Center p="2">Keine Band gefunden</Center>}
+            {loading && (
+              <Center p="2">
+                <Spinner />
+              </Center>
+            )}
+          </List>
+        </PopoverContent>
+      </Popover>
     </Box>
   );
 }

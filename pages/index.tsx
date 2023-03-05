@@ -18,6 +18,7 @@ import {GetStaticProps} from 'next';
 import Link, {LinkProps} from 'next/link';
 import React from 'react';
 import Page from '../components/booking/Page';
+import DateString from '../components/DateString';
 import {EventQuery} from '../types/graphql';
 import {initializeApollo} from './_app';
 
@@ -62,12 +63,7 @@ function BBox({
               &nbsp;Abgelaufen
             </Tag>
           ) : (
-            applicationStart.toLocaleDateString('de', {
-              day: '2-digit',
-              month: '2-digit',
-              year: 'numeric',
-              timeZone: 'Europe/Berlin',
-            })
+            <DateString date={applicationStart} />
           )}
         </Text>
       </VStack>
@@ -111,12 +107,7 @@ export default function Home(props: Props) {
           <Text>
             Das Kulturspektakel Gauting findet vom{' '}
             <strong>
-              {props.start.toLocaleDateString('de', {day: '2-digit'})}. bis{' '}
-              {props.end.toLocaleDateString('de', {
-                day: '2-digit',
-                month: 'long',
-                year: 'numeric',
-              })}
+              <DateString date={props.start} to={props.end} />
             </strong>{' '}
             statt. Die Bewerbung für einen Auftritt beim Kulturspektakel ist
             ausschließlich über dieses Bewerbungsformular möglich. Alle anderen
