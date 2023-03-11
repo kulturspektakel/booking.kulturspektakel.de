@@ -1,13 +1,9 @@
 import React, {useMemo, useState} from 'react';
-
 import {gql, useSuspenseQuery_experimental} from '@apollo/client';
-import {
-  LineupDetailsFragment,
-  LineupTableQuery,
-  useLineupTableQuery,
-} from '../../types/graphql';
+import {LineupTableQuery} from '../../types/graphql';
 import {
   Box,
+  Button,
   Heading,
   List,
   ListItem,
@@ -21,12 +17,14 @@ import DateString, {isSameDay} from '../DateString';
 import TimeString from '../TimeString';
 import Image from 'next/image';
 import Link from 'next/link';
+import {CloseIcon} from '@chakra-ui/icons';
 
 const LineupTableQ = gql`
   query LineupTable($id: ID!) {
     areas {
       id
       displayName
+      themeColor
     }
     event: node(id: $id) {
       ... on Event {
@@ -69,7 +67,7 @@ export default function LineupTable(props: {eventId: string}) {
     throw new Error();
   }
 
-  const [stages, selectStages] = useState<Set<string>>(new Set());
+  const [stage, selectStage] = useState<string | null>(null);
 
   const areas = useMemo(() => {
     const activeAreas = new Set(
@@ -95,10 +93,17 @@ export default function LineupTable(props: {eventId: string}) {
       <List>
         <List>
           {areas?.map((a) => (
-            <Tag size="lg" borderRadius="full" aria-pressed="false" key={a.id}>
-              <TagLabel>{a.displayName}</TagLabel>
-              <TagCloseButton />
-            </Tag>
+            <Button
+              size="lg"
+              borderRadius="full"
+              aria-pressed="false"
+              key={a.id}
+              onClick={() => selectStage(stage === a.id ? null : a.id)}
+              bg={stage === a.id ? a.themeColor : undefined}
+            >
+              {a.displayName}
+              <CloseIcon />
+            </Button>
           ))}
         </List>
         {days.map((day) => (
@@ -115,67 +120,77 @@ export default function LineupTable(props: {eventId: string}) {
             </Heading>
             <List>
               {event.bandsPlaying.edges
-                .filter(({node}) => isSameDay(node.startTime, day))
+                .filter(
+                  ({node}) =>
+                    isSameDay(node.startTime, day) &&
+                    (stage === node.area.id || stage == null),
+                )
                 .map(({node}) => (
-                  <ScaleFade key={node.id} initialScale={0.9} in={true}>
-                    <Link href={``}>
-                      <Box
-                        color={node.area.id === 'dj' ? 'white' : undefined}
-                        borderRadius="xl"
-                        // bg={node.area.themeColor}
-                        p="4"
-                        pe="6"
-                        m="2"
-                        h="48"
-                        maxW="300"
-                        display="inline-block"
-                        boxShadow="sm"
-                        position="relative"
-                        overflow="hidden"
-                      >
-                        <Box zIndex="3" position="relative">
-                          <strong>
-                            <TimeString date={node.startTime} />
-                            &nbsp;
-                            {node.area.displayName}
-                          </strong>
-                          <Heading
-                            textTransform="uppercase"
-                            lineHeight="0.9"
-                            mt="1.5"
-                            mb="-1"
-                          >
-                            {node.name}
-                          </Heading>
-                          <strong>{node.genre}</strong>
-                        </Box>
+                  <Box key={node.id} display="inline-block">
+                    <ScaleFade initialScale={0.9} in={true}>
+                      <Link href={``}>
                         <Box
-                          // bgGradient={`linear(to-b, ${node.area.themeColor}, transparent)`}
-                          position="absolute"
-                          left="0"
-                          top="0"
-                          right="0"
-                          h="60"
-                          zIndex="2"
-                        />
-                        {node.photo != null && (
-                          <Image
-                            src={node.photo.uri}
-                            fill
-                            alt=""
-                            style={{
-                              filter: `grayscale(1)`,
-                              opacity: 0.7,
-                              objectFit: 'cover',
-                              objectPosition: '0 30%',
-                              mixBlendMode: 'overlay',
-                              zIndex: 1,
-                            }}
+                          color={
+                            node.area.id === 'Area:dj' ? 'white' : undefined
+                          }
+                          borderRadius="xl"
+                          bg={node.area.themeColor}
+                          p="4"
+                          pe="6"
+                          m="2"
+                          h="48"
+                          maxW="300"
+                          boxShadow="sm"
+                          position="relative"
+                          overflow="hidden"
+                        >
+                          <Box zIndex="3" position="relative">
+                            <strong>
+                              <TimeString date={node.startTime} />
+                              &nbsp;
+                              {node.area.displayName}
+                            </strong>
+                            <Heading
+                              textTransform="uppercase"
+                              lineHeight="0.9"
+                              mt="1.5"
+                              mb="-1"
+                              noOfLines={3}
+                            >
+                              {node.name}
+                            </Heading>
+                            <strong>{node.genre}</strong>
+                          </Box>
+                          <Box
+                            bgGradient={`linear(to-b, ${node.area.themeColor}, transparent)`}
+                            position="absolute"
+                            left="0"
+                            top="0"
+                            right="0"
+                            h="60"
+                            zIndex="2"
                           />
-                        )}
-                      </Box>
-                    </Link>
-                  </ScaleFade>
+                          {node.photo != null && (
+                            <Image
+                              src={node.photo.uri}
+                              alt=""
+                              sizes="300px"
+                              quality={50}
+                              fill
+                              style={{
+                                filter: `grayscale(1)`,
+                                opacity: 0.7,
+                                objectFit: 'cover',
+                                objectPosition: '0 30%',
+                                mixBlendMode: 'overlay',
+                                zIndex: 1,
+                              }}
+                            />
+                          )}
+                        </Box>
+                      </Link>
+                    </ScaleFade>
+                  </Box>
                 ))}
             </List>
           </ListItem>

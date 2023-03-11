@@ -44,7 +44,13 @@ export default function BandSearch() {
               limit: displaySetLimit,
             },
           })
-          .then((d) => d.data.findBandPlaying),
+          .then((d) => {
+            if (d.data == null) {
+              console.error(d.error);
+              throw new Error(`GraphQL error: ${d.errors?.[0].message}`);
+            }
+            return d.data.findBandPlaying;
+          }),
       keyExtractor: (data) => data.id,
       matchStringExtractor: (data) => data.name.toLocaleLowerCase(),
       minimumQueryLength,
@@ -64,9 +70,10 @@ export default function BandSearch() {
     highlightedIndex,
     inputValue,
   } = useCombobox({
+    id: 'band-search',
     items: data,
     onInputValueChange: (e) => setQuery(e.inputValue ?? ''),
-    // itemToString: (node) => node?.name ?? '',
+    itemToString: (node) => node?.name ?? '',
     stateReducer: (state, {type, changes}) => {
       switch (type) {
         case useCombobox.stateChangeTypes.ItemClick:

@@ -784,7 +784,12 @@ export type LineupTableQueryVariables = Exact<{
 
 export type LineupTableQuery = {
   __typename?: 'Query';
-  areas: Array<{__typename?: 'Area'; id: string; displayName: string}>;
+  areas: Array<{
+    __typename?: 'Area';
+    id: string;
+    displayName: string;
+    themeColor: string;
+  }>;
   event?:
     | {__typename?: 'Area'}
     | {__typename?: 'BandApplication'}
@@ -825,6 +830,21 @@ export type LineupTableQuery = {
     | {__typename?: 'ProductList'}
     | {__typename?: 'Viewer'}
     | null;
+};
+
+export type YearSelectorQueryVariables = Exact<{[key: string]: never}>;
+
+export type YearSelectorQuery = {
+  __typename?: 'Query';
+  events: Array<{
+    __typename?: 'Event';
+    id: string;
+    start: Date;
+    bandsPlaying: {
+      __typename?: 'EventBandsPlayingConnection';
+      totalCount: number;
+    };
+  }>;
 };
 
 export type ArticleFragment = {
@@ -931,21 +951,6 @@ export type NewsQuery = {
       };
     }>;
   };
-};
-
-export type LineupQueryVariables = Exact<{[key: string]: never}>;
-
-export type LineupQuery = {
-  __typename?: 'Query';
-  events: Array<{
-    __typename?: 'Event';
-    id: string;
-    start: Date;
-    bandsPlaying: {
-      __typename?: 'EventBandsPlayingConnection';
-      totalCount: number;
-    };
-  }>;
 };
 
 export type LineUpStaticPathsQueryVariables = Exact<{[key: string]: never}>;
@@ -1219,6 +1224,7 @@ export const LineupTableDocument = gql`
     areas {
       id
       displayName
+      themeColor
     }
     event: node(id: $id) {
       ... on Event {
@@ -1296,6 +1302,67 @@ export type LineupTableLazyQueryHookResult = ReturnType<
 export type LineupTableQueryResult = Apollo.QueryResult<
   LineupTableQuery,
   LineupTableQueryVariables
+>;
+export const YearSelectorDocument = gql`
+  query YearSelector {
+    events(type: Kulturspektakel) {
+      id
+      start
+      bandsPlaying {
+        totalCount
+      }
+    }
+  }
+`;
+
+/**
+ * __useYearSelectorQuery__
+ *
+ * To run a query within a React component, call `useYearSelectorQuery` and pass it any options that fit your needs.
+ * When your component renders, `useYearSelectorQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useYearSelectorQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useYearSelectorQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    YearSelectorQuery,
+    YearSelectorQueryVariables
+  >,
+) {
+  const options = {...defaultOptions, ...baseOptions};
+  return Apollo.useQuery<YearSelectorQuery, YearSelectorQueryVariables>(
+    YearSelectorDocument,
+    options,
+  );
+}
+export function useYearSelectorLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    YearSelectorQuery,
+    YearSelectorQueryVariables
+  >,
+) {
+  const options = {...defaultOptions, ...baseOptions};
+  return Apollo.useLazyQuery<YearSelectorQuery, YearSelectorQueryVariables>(
+    YearSelectorDocument,
+    options,
+  );
+}
+export type YearSelectorQueryHookResult = ReturnType<
+  typeof useYearSelectorQuery
+>;
+export type YearSelectorLazyQueryHookResult = ReturnType<
+  typeof useYearSelectorLazyQuery
+>;
+export type YearSelectorQueryResult = Apollo.QueryResult<
+  YearSelectorQuery,
+  YearSelectorQueryVariables
 >;
 export const ThanksDocument = gql`
   query Thanks($id: ID!) {
@@ -1548,57 +1615,6 @@ export function useNewsLazyQuery(
 export type NewsQueryHookResult = ReturnType<typeof useNewsQuery>;
 export type NewsLazyQueryHookResult = ReturnType<typeof useNewsLazyQuery>;
 export type NewsQueryResult = Apollo.QueryResult<NewsQuery, NewsQueryVariables>;
-export const LineupDocument = gql`
-  query Lineup {
-    events(type: Kulturspektakel) {
-      id
-      start
-      bandsPlaying {
-        totalCount
-      }
-    }
-  }
-`;
-
-/**
- * __useLineupQuery__
- *
- * To run a query within a React component, call `useLineupQuery` and pass it any options that fit your needs.
- * When your component renders, `useLineupQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useLineupQuery({
- *   variables: {
- *   },
- * });
- */
-export function useLineupQuery(
-  baseOptions?: Apollo.QueryHookOptions<LineupQuery, LineupQueryVariables>,
-) {
-  const options = {...defaultOptions, ...baseOptions};
-  return Apollo.useQuery<LineupQuery, LineupQueryVariables>(
-    LineupDocument,
-    options,
-  );
-}
-export function useLineupLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<LineupQuery, LineupQueryVariables>,
-) {
-  const options = {...defaultOptions, ...baseOptions};
-  return Apollo.useLazyQuery<LineupQuery, LineupQueryVariables>(
-    LineupDocument,
-    options,
-  );
-}
-export type LineupQueryHookResult = ReturnType<typeof useLineupQuery>;
-export type LineupLazyQueryHookResult = ReturnType<typeof useLineupLazyQuery>;
-export type LineupQueryResult = Apollo.QueryResult<
-  LineupQuery,
-  LineupQueryVariables
->;
 export const LineUpStaticPathsDocument = gql`
   query LineUpStaticPaths {
     events(type: Kulturspektakel) {

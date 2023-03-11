@@ -157,7 +157,6 @@ class TomoTypeahead<T> extends EventTarget {
         // do not trigger an update, because it's not the current display set
         this.appendToDisplaySet(displaySet, data, false);
       } else {
-        this.dispatchEvent(new TomoTypeaheadLoadingStateChangeEvent(false));
         this.appendToDisplaySet(displaySet, data);
       }
 
@@ -174,8 +173,13 @@ class TomoTypeahead<T> extends EventTarget {
             this.requests.delete(query);
           }
         })
-        .catch(() => {
+        .catch((e) => {
           this.requests.delete(query);
+        })
+        .finally(() => {
+          if (this.currentQuery === query) {
+            this.dispatchEvent(new TomoTypeaheadLoadingStateChangeEvent(false));
+          }
         }),
     );
   }
