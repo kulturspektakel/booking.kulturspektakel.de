@@ -9,6 +9,7 @@ import {
   NormalizedCacheObject,
   ApolloLink,
   HttpLink,
+  SuspenseCache,
 } from '@apollo/client';
 import {withScalars} from 'apollo-link-scalars';
 import introspectionResult from '../types/graphql.schema.json';
@@ -23,8 +24,8 @@ const App = ({Component, pageProps}: AppProps) => {
 
   const theme = extendTheme({
     fonts: {
-      heading: `Highflier, sans-serif`,
-      body: `Raleway, sans-serif`,
+      heading: `"Conduit ITC ExtraBold", sans-serif`,
+      body: `"Space Grotesk", sans-serif`,
     },
     components: {
       Steps: {
@@ -50,9 +51,11 @@ const App = ({Component, pageProps}: AppProps) => {
     },
   });
 
+  const suspenseCache = useMemo(() => new SuspenseCache(), []);
+
   return (
     <ChakraProvider theme={theme}>
-      <ApolloProvider client={client}>
+      <ApolloProvider client={client} suspenseCache={suspenseCache}>
         <Head>
           <Script
             id="fb-pixel"

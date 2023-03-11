@@ -54,6 +54,8 @@ export default function BandSearch() {
   );
 
   const {data, loading, setQuery} = useTypeahead(config);
+  const ref = useRef<HTMLInputElement | null>(null);
+
   const {
     getItemProps,
     isOpen,
@@ -64,9 +66,20 @@ export default function BandSearch() {
   } = useCombobox({
     items: data,
     onInputValueChange: (e) => setQuery(e.inputValue ?? ''),
+    // itemToString: (node) => node?.name ?? '',
+    stateReducer: (state, {type, changes}) => {
+      switch (type) {
+        case useCombobox.stateChangeTypes.ItemClick:
+          ref.current?.blur();
+          return {
+            ...changes,
+            inputValue: '',
+          };
+        default:
+          return changes;
+      }
+    },
   });
-
-  const ref = useRef<HTMLInputElement | null>(null);
 
   return (
     <Box>
@@ -86,15 +99,15 @@ export default function BandSearch() {
             />
           </InputGroup>
         </PopoverAnchor>
-        <PopoverContent>
+        <PopoverContent overflow="hidden">
           <List {...getMenuProps()}>
             {data.map((item, index) => (
               <ListItem
                 p="2"
                 key={item.id}
                 {...getItemProps({item, index})}
-                bg={highlightedIndex === index ? 'red' : ''}
-                _hover={{bg: 'yellow'}}
+                bg={highlightedIndex === index ? 'Highlight' : ''}
+                _hover={{bg: 'Highlight'}}
               >
                 {item.name} ({item.eventId.replace(/[^\d]/g, '')})
               </ListItem>

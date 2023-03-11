@@ -19,7 +19,7 @@ const moduleExports = {
 
   // Your existing module.exports
   experimental: {
-    swcPlugins: [['next-superjson-plugin', {}]],
+    // swcPlugins: [['next-superjson-plugin', {}]],
   },
   sentry: {
     // Use `hidden-source-map` rather than `source-map` as the Webpack `devtool`

@@ -138,7 +138,13 @@ export type BandPlaying = Node & {
   genre?: Maybe<Scalars['String']>;
   id: Scalars['ID'];
   name: Scalars['String'];
+  photo?: Maybe<PixelImage>;
   startTime: Scalars['DateTime'];
+};
+
+export type BandPlayingPhotoArgs = {
+  height?: InputMaybe<Scalars['Int']>;
+  width?: InputMaybe<Scalars['Int']>;
 };
 
 export type Billable = {
@@ -772,37 +778,53 @@ export type BandSerachQuery = {
   }>;
 };
 
-export type LineupTableQueryVariables = Exact<{[key: string]: never}>;
+export type LineupTableQueryVariables = Exact<{
+  id: Scalars['ID'];
+}>;
 
 export type LineupTableQuery = {
   __typename?: 'Query';
   areas: Array<{__typename?: 'Area'; id: string; displayName: string}>;
-};
-
-export type LineupDetailsFragment = {
-  __typename?: 'Event';
-  id: string;
-  name: string;
-  start: Date;
-  end: Date;
-  bandsPlaying: {
-    __typename?: 'EventBandsPlayingConnection';
-    edges: Array<{
-      __typename?: 'EventBandsPlayingConnectionEdge';
-      node: {
-        __typename?: 'BandPlaying';
-        genre?: string | null;
+  event?:
+    | {__typename?: 'Area'}
+    | {__typename?: 'BandApplication'}
+    | {__typename?: 'BandApplicationComment'}
+    | {__typename?: 'BandPlaying'}
+    | {__typename?: 'Card'}
+    | {__typename?: 'Device'}
+    | {
+        __typename?: 'Event';
+        id: string;
         name: string;
-        startTime: Date;
-        area: {
-          __typename?: 'Area';
-          id: string;
-          displayName: string;
-          themeColor: string;
+        start: Date;
+        end: Date;
+        bandsPlaying: {
+          __typename?: 'EventBandsPlayingConnection';
+          edges: Array<{
+            __typename?: 'EventBandsPlayingConnectionEdge';
+            node: {
+              __typename?: 'BandPlaying';
+              id: string;
+              genre?: string | null;
+              name: string;
+              startTime: Date;
+              photo?: {__typename?: 'PixelImage'; uri: string} | null;
+              area: {
+                __typename?: 'Area';
+                id: string;
+                displayName: string;
+                themeColor: string;
+              };
+            };
+          }>;
         };
-      };
-    }>;
-  };
+      }
+    | {__typename?: 'News'}
+    | {__typename?: 'NuclinoPage'}
+    | {__typename?: 'Product'}
+    | {__typename?: 'ProductList'}
+    | {__typename?: 'Viewer'}
+    | null;
 };
 
 export type ArticleFragment = {
@@ -911,50 +933,10 @@ export type NewsQuery = {
   };
 };
 
-export type LineupQueryVariables = Exact<{
-  id: Scalars['ID'];
-}>;
+export type LineupQueryVariables = Exact<{[key: string]: never}>;
 
 export type LineupQuery = {
   __typename?: 'Query';
-  node?:
-    | {__typename?: 'Area'}
-    | {__typename?: 'BandApplication'}
-    | {__typename?: 'BandApplicationComment'}
-    | {__typename?: 'BandPlaying'}
-    | {__typename?: 'Card'}
-    | {__typename?: 'Device'}
-    | {
-        __typename?: 'Event';
-        id: string;
-        name: string;
-        start: Date;
-        end: Date;
-        bandsPlaying: {
-          __typename?: 'EventBandsPlayingConnection';
-          edges: Array<{
-            __typename?: 'EventBandsPlayingConnectionEdge';
-            node: {
-              __typename?: 'BandPlaying';
-              genre?: string | null;
-              name: string;
-              startTime: Date;
-              area: {
-                __typename?: 'Area';
-                id: string;
-                displayName: string;
-                themeColor: string;
-              };
-            };
-          }>;
-        };
-      }
-    | {__typename?: 'News'}
-    | {__typename?: 'NuclinoPage'}
-    | {__typename?: 'Product'}
-    | {__typename?: 'ProductList'}
-    | {__typename?: 'Viewer'}
-    | null;
   events: Array<{
     __typename?: 'Event';
     id: string;
@@ -1052,28 +1034,6 @@ export const EventDetailsFragmentDoc = gql`
     start
     end
     description
-  }
-`;
-export const LineupDetailsFragmentDoc = gql`
-  fragment LineupDetails on Event {
-    id
-    name
-    start
-    end
-    bandsPlaying(first: 100) {
-      edges {
-        node {
-          genre
-          name
-          startTime
-          area {
-            id
-            displayName
-            themeColor
-          }
-        }
-      }
-    }
   }
 `;
 export const ArticleFragmentDoc = gql`
@@ -1255,10 +1215,36 @@ export type BandSerachQueryResult = Apollo.QueryResult<
   BandSerachQueryVariables
 >;
 export const LineupTableDocument = gql`
-  query LineupTable {
+  query LineupTable($id: ID!) {
     areas {
       id
       displayName
+    }
+    event: node(id: $id) {
+      ... on Event {
+        id
+        name
+        start
+        end
+        bandsPlaying(first: 100) {
+          edges {
+            node {
+              id
+              genre
+              name
+              startTime
+              photo {
+                uri
+              }
+              area {
+                id
+                displayName
+                themeColor
+              }
+            }
+          }
+        }
+      }
     }
   }
 `;
@@ -1275,11 +1261,12 @@ export const LineupTableDocument = gql`
  * @example
  * const { data, loading, error } = useLineupTableQuery({
  *   variables: {
+ *      id: // value for 'id'
  *   },
  * });
  */
 export function useLineupTableQuery(
-  baseOptions?: Apollo.QueryHookOptions<
+  baseOptions: Apollo.QueryHookOptions<
     LineupTableQuery,
     LineupTableQueryVariables
   >,
@@ -1562,12 +1549,7 @@ export type NewsQueryHookResult = ReturnType<typeof useNewsQuery>;
 export type NewsLazyQueryHookResult = ReturnType<typeof useNewsLazyQuery>;
 export type NewsQueryResult = Apollo.QueryResult<NewsQuery, NewsQueryVariables>;
 export const LineupDocument = gql`
-  query Lineup($id: ID!) {
-    node(id: $id) {
-      ... on Event {
-        ...LineupDetails
-      }
-    }
+  query Lineup {
     events(type: Kulturspektakel) {
       id
       start
@@ -1576,7 +1558,6 @@ export const LineupDocument = gql`
       }
     }
   }
-  ${LineupDetailsFragmentDoc}
 `;
 
 /**
@@ -1591,12 +1572,11 @@ export const LineupDocument = gql`
  * @example
  * const { data, loading, error } = useLineupQuery({
  *   variables: {
- *      id: // value for 'id'
  *   },
  * });
  */
 export function useLineupQuery(
-  baseOptions: Apollo.QueryHookOptions<LineupQuery, LineupQueryVariables>,
+  baseOptions?: Apollo.QueryHookOptions<LineupQuery, LineupQueryVariables>,
 ) {
   const options = {...defaultOptions, ...baseOptions};
   return Apollo.useQuery<LineupQuery, LineupQueryVariables>(

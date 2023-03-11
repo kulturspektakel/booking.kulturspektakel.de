@@ -166,11 +166,17 @@ class TomoTypeahead<T> extends EventTarget {
 
     this.requests.set(
       query,
-      req().then((data) => {
-        if (data != null) {
-          this.requests.set(query, data);
-        }
-      }),
+      req()
+        .then((data) => {
+          if (data != null) {
+            this.requests.set(query, data);
+          } else {
+            this.requests.delete(query);
+          }
+        })
+        .catch(() => {
+          this.requests.delete(query);
+        }),
     );
   }
 
