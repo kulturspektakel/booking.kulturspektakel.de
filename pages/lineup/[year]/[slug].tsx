@@ -1,43 +1,20 @@
-import React, {Suspense} from 'react';
+import React from 'react';
 import {gql} from '@apollo/client';
 import {LineUpStaticPathsQuery} from '../../../types/graphql';
 import Page from '../../../components/Page';
 import {useRouter} from 'next/router';
-import {Center, Heading, HStack, Spacer, Spinner} from '@chakra-ui/react';
 import {GetStaticPaths, GetStaticProps} from 'next';
 import {initializeApollo} from '../../_app';
-import LineupTable from '../../../components/lineup/LineupTable';
-import YearSelector from '../../../components/lineup/YearSelector';
 
 // eslint-disable-next-line @typescript-eslint/ban-types
 type Props = {};
 
-export default function LineupPage(props: Props) {
+export default function BandPage(props: Props) {
   const {query} = useRouter();
-  const id = `Event:kult${query.year}`;
+  const eventId = `Event:kult${query.year}`;
+  const slug = query.slug;
 
-  return (
-    <Page>
-      <HStack>
-        <Heading textTransform="uppercase" as="h1">
-          Lineup&nbsp;{query.year}
-        </Heading>
-        <Spacer />
-        <Suspense fallback={null}>
-          <YearSelector eventId={id} />
-        </Suspense>
-      </HStack>
-      <Suspense
-        fallback={
-          <Center>
-            <Spinner />
-          </Center>
-        }
-      >
-        <LineupTable eventId={id} />
-      </Suspense>
-    </Page>
-  );
+  return <Page>test</Page>;
 }
 
 export const getStaticPaths: GetStaticPaths = async () => {

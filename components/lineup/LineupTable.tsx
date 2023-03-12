@@ -1,30 +1,16 @@
 import React, {useMemo, useState} from 'react';
 import {gql, useSuspenseQuery_experimental} from '@apollo/client';
-import {LineupTableQuery} from '../../types/graphql';
-import {
-  Box,
-  Button,
-  Heading,
-  List,
-  ListItem,
-  ScaleFade,
-  Tag,
-  TagCloseButton,
-  TagLabel,
-} from '@chakra-ui/react';
+import {LineupTableDocument, LineupTableQuery} from '../../types/graphql';
+import {Heading, HStack, List, ListItem, Spacer} from '@chakra-ui/react';
 import BandSearch from './BandSearch';
 import DateString, {isSameDay} from '../DateString';
-import TimeString from '../TimeString';
-import Image from 'next/image';
-import Link from 'next/link';
-import {CloseIcon} from '@chakra-ui/icons';
+import BandBox from './BandBox';
+import AreaPill from './AreaPill';
 
-const LineupTableQ = gql`
+gql`
   query LineupTable($id: ID!) {
     areas {
-      id
-      displayName
-      themeColor
+      ...AreaPill
     }
     event: node(id: $id) {
       ... on Event {
@@ -36,17 +22,8 @@ const LineupTableQ = gql`
           edges {
             node {
               id
-              genre
-              name
-              startTime
-              photo {
-                uri
-              }
-              area {
-                id
-                displayName
-                themeColor
-              }
+              slug
+              ...BandBox
             }
           }
         }
@@ -56,11 +33,14 @@ const LineupTableQ = gql`
 `;
 
 export default function LineupTable(props: {eventId: string}) {
-  const {data} = useSuspenseQuery_experimental<LineupTableQuery>(LineupTableQ, {
-    variables: {
-      id: props.eventId,
+  const {data} = useSuspenseQuery_experimental<LineupTableQuery>(
+    LineupTableDocument,
+    {
+      variables: {
+        id: props.eventId,
+      },
     },
-  });
+  );
 
   const event = data.event;
   if (event == null || event.__typename !== 'Event') {
@@ -89,26 +69,22 @@ export default function LineupTable(props: {eventId: string}) {
 
   return (
     <>
-      <BandSearch />
       <List>
-        <List>
+        <HStack mt="4">
           {areas?.map((a) => (
-            <Button
-              size="lg"
-              borderRadius="full"
-              aria-pressed="false"
+            <AreaPill
+              area={a}
+              isSelected={a.id === stage}
+              onChange={selectStage}
               key={a.id}
-              onClick={() => selectStage(stage === a.id ? null : a.id)}
-              bg={stage === a.id ? a.themeColor : undefined}
-            >
-              {a.displayName}
-              <CloseIcon />
-            </Button>
+            />
           ))}
-        </List>
+          <Spacer />
+          <BandSearch />
+        </HStack>
         {days.map((day) => (
           <ListItem key={day.toDateString()}>
-            <Heading textAlign="center" mt="8" mb="8" textTransform="uppercase">
+            <Heading textAlign="center" mt="8" mb="" textTransform="uppercase">
               <DateString
                 date={day}
                 options={{
@@ -126,71 +102,11 @@ export default function LineupTable(props: {eventId: string}) {
                     (stage === node.area.id || stage == null),
                 )
                 .map(({node}) => (
-                  <Box key={node.id} display="inline-block">
-                    <ScaleFade initialScale={0.9} in={true}>
-                      <Link href={``}>
-                        <Box
-                          color={
-                            node.area.id === 'Area:dj' ? 'white' : undefined
-                          }
-                          borderRadius="xl"
-                          bg={node.area.themeColor}
-                          p="4"
-                          pe="6"
-                          m="2"
-                          h="48"
-                          maxW="300"
-                          boxShadow="sm"
-                          position="relative"
-                          overflow="hidden"
-                        >
-                          <Box zIndex="3" position="relative">
-                            <strong>
-                              <TimeString date={node.startTime} />
-                              &nbsp;
-                              {node.area.displayName}
-                            </strong>
-                            <Heading
-                              textTransform="uppercase"
-                              lineHeight="0.9"
-                              mt="1.5"
-                              mb="-1"
-                              noOfLines={3}
-                            >
-                              {node.name}
-                            </Heading>
-                            <strong>{node.genre}</strong>
-                          </Box>
-                          <Box
-                            bgGradient={`linear(to-b, ${node.area.themeColor}, transparent)`}
-                            position="absolute"
-                            left="0"
-                            top="0"
-                            right="0"
-                            h="60"
-                            zIndex="2"
-                          />
-                          {node.photo != null && (
-                            <Image
-                              src={node.photo.uri}
-                              alt=""
-                              sizes="300px"
-                              quality={50}
-                              fill
-                              style={{
-                                filter: `grayscale(1)`,
-                                opacity: 0.7,
-                                objectFit: 'cover',
-                                objectPosition: '0 30%',
-                                mixBlendMode: 'overlay',
-                                zIndex: 1,
-                              }}
-                            />
-                          )}
-                        </Box>
-                      </Link>
-                    </ScaleFade>
-                  </Box>
+                  <BandBox
+                    href={`${props.eventId.replace(/[^\d]/g, '')}/${node.slug}`}
+                    key={node.id}
+                    band={node}
+                  />
                 ))}
             </List>
           </ListItem>

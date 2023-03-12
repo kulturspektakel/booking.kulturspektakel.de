@@ -139,6 +139,7 @@ export type BandPlaying = Node & {
   id: Scalars['ID'];
   name: Scalars['String'];
   photo?: Maybe<PixelImage>;
+  slug: Scalars['String'];
   startTime: Scalars['DateTime'];
 };
 
@@ -763,6 +764,28 @@ export type EventDetailsFragment = {
   description?: string | null;
 };
 
+export type AreaPillFragment = {
+  __typename?: 'Area';
+  id: string;
+  displayName: string;
+  themeColor: string;
+};
+
+export type BandBoxFragment = {
+  __typename?: 'BandPlaying';
+  id: string;
+  genre?: string | null;
+  name: string;
+  startTime: Date;
+  photo?: {__typename?: 'PixelImage'; uri: string} | null;
+  area: {
+    __typename?: 'Area';
+    id: string;
+    displayName: string;
+    themeColor: string;
+  };
+};
+
 export type BandSerachQueryVariables = Exact<{
   query: Scalars['String'];
   limit: Scalars['Int'];
@@ -810,6 +833,7 @@ export type LineupTableQuery = {
             node: {
               __typename?: 'BandPlaying';
               id: string;
+              slug: string;
               genre?: string | null;
               name: string;
               startTime: Date;
@@ -1041,6 +1065,29 @@ export const EventDetailsFragmentDoc = gql`
     description
   }
 `;
+export const AreaPillFragmentDoc = gql`
+  fragment AreaPill on Area {
+    id
+    displayName
+    themeColor
+  }
+`;
+export const BandBoxFragmentDoc = gql`
+  fragment BandBox on BandPlaying {
+    id
+    genre
+    name
+    startTime
+    photo {
+      uri
+    }
+    area {
+      id
+      displayName
+      themeColor
+    }
+  }
+`;
 export const ArticleFragmentDoc = gql`
   fragment Article on News {
     slug
@@ -1222,9 +1269,7 @@ export type BandSerachQueryResult = Apollo.QueryResult<
 export const LineupTableDocument = gql`
   query LineupTable($id: ID!) {
     areas {
-      id
-      displayName
-      themeColor
+      ...AreaPill
     }
     event: node(id: $id) {
       ... on Event {
@@ -1236,23 +1281,16 @@ export const LineupTableDocument = gql`
           edges {
             node {
               id
-              genre
-              name
-              startTime
-              photo {
-                uri
-              }
-              area {
-                id
-                displayName
-                themeColor
-              }
+              slug
+              ...BandBox
             }
           }
         }
       }
     }
   }
+  ${AreaPillFragmentDoc}
+  ${BandBoxFragmentDoc}
 `;
 
 /**
