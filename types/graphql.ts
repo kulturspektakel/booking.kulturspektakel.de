@@ -597,6 +597,7 @@ export type ProductListSalesNumbersArgs = {
 export type Query = {
   __typename?: 'Query';
   areas: Array<Area>;
+  bandPlaying?: Maybe<BandPlaying>;
   cardStatus: CardStatus;
   checkDuplicateApplication?: Maybe<ObfuscatedBandApplication>;
   config: Config;
@@ -611,6 +612,11 @@ export type Query = {
   productLists: Array<ProductList>;
   transactions: Transactions;
   viewer?: Maybe<Viewer>;
+};
+
+export type QueryBandPlayingArgs = {
+  eventId: Scalars['ID'];
+  slug: Scalars['String'];
 };
 
 export type QueryCardStatusArgs = {
@@ -786,6 +792,28 @@ export type BandBoxFragment = {
   };
 };
 
+export type BandDetailQueryVariables = Exact<{
+  eventId: Scalars['ID'];
+  slug: Scalars['String'];
+}>;
+
+export type BandDetailQuery = {
+  __typename?: 'Query';
+  bandPlaying?: {
+    __typename?: 'BandPlaying';
+    name: string;
+    description?: string | null;
+    startTime: Date;
+    genre?: string | null;
+    photo?: {
+      __typename?: 'PixelImage';
+      uri: string;
+      title?: string | null;
+    } | null;
+    area: {__typename?: 'Area'; displayName: string};
+  } | null;
+};
+
 export type BandSerachQueryVariables = Exact<{
   query: Scalars['String'];
   limit: Scalars['Int'];
@@ -797,7 +825,7 @@ export type BandSerachQuery = {
     __typename?: 'BandPlaying';
     name: string;
     id: string;
-    eventId: string;
+    event: {__typename?: 'Event'; id: string};
   }>;
 };
 
@@ -837,6 +865,7 @@ export type LineupTableQuery = {
               genre?: string | null;
               name: string;
               startTime: Date;
+              event: {__typename?: 'Event'; id: string};
               photo?: {__typename?: 'PixelImage'; uri: string} | null;
               area: {
                 __typename?: 'Area';
@@ -1207,12 +1236,81 @@ export type DuplicateApplicationWarningQueryResult = Apollo.QueryResult<
   DuplicateApplicationWarningQuery,
   DuplicateApplicationWarningQueryVariables
 >;
+export const BandDetailDocument = gql`
+  query BandDetail($eventId: ID!, $slug: String!) {
+    bandPlaying(eventId: $eventId, slug: $slug) {
+      name
+      description
+      startTime
+      genre
+      photo {
+        uri
+        title
+      }
+      area {
+        displayName
+      }
+    }
+  }
+`;
+
+/**
+ * __useBandDetailQuery__
+ *
+ * To run a query within a React component, call `useBandDetailQuery` and pass it any options that fit your needs.
+ * When your component renders, `useBandDetailQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useBandDetailQuery({
+ *   variables: {
+ *      eventId: // value for 'eventId'
+ *      slug: // value for 'slug'
+ *   },
+ * });
+ */
+export function useBandDetailQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    BandDetailQuery,
+    BandDetailQueryVariables
+  >,
+) {
+  const options = {...defaultOptions, ...baseOptions};
+  return Apollo.useQuery<BandDetailQuery, BandDetailQueryVariables>(
+    BandDetailDocument,
+    options,
+  );
+}
+export function useBandDetailLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    BandDetailQuery,
+    BandDetailQueryVariables
+  >,
+) {
+  const options = {...defaultOptions, ...baseOptions};
+  return Apollo.useLazyQuery<BandDetailQuery, BandDetailQueryVariables>(
+    BandDetailDocument,
+    options,
+  );
+}
+export type BandDetailQueryHookResult = ReturnType<typeof useBandDetailQuery>;
+export type BandDetailLazyQueryHookResult = ReturnType<
+  typeof useBandDetailLazyQuery
+>;
+export type BandDetailQueryResult = Apollo.QueryResult<
+  BandDetailQuery,
+  BandDetailQueryVariables
+>;
 export const BandSerachDocument = gql`
   query BandSerach($query: String!, $limit: Int!) {
     findBandPlaying(query: $query, limit: $limit) {
       name
       id
-      eventId
+      event {
+        id
+      }
     }
   }
 `;
@@ -1282,6 +1380,9 @@ export const LineupTableDocument = gql`
             node {
               id
               slug
+              event {
+                id
+              }
               ...BandBox
             }
           }

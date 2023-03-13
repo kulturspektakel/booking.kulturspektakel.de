@@ -1,5 +1,6 @@
 import {gql} from '@apollo/client';
 import {GetStaticProps} from 'next';
+import {yearFromEventId} from '../../components/lineup/LineupTable';
 import {LineupRedirectQuery} from '../../types/graphql';
 import {initializeApollo} from '../_app';
 
@@ -25,7 +26,7 @@ export const getStaticProps: GetStaticProps = async () => {
 
   return {
     redirect: {
-      destination: `/lineup/${eventID.replace(/[^\d]/g, '')}`,
+      destination: `/lineup/${yearFromEventId(eventID)}`,
       permanent: false,
     },
   };

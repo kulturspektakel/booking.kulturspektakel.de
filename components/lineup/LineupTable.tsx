@@ -1,11 +1,16 @@
-import React, {useMemo, useState} from 'react';
+import React, {useCallback, useMemo, useState} from 'react';
 import {gql, useSuspenseQuery_experimental} from '@apollo/client';
-import {LineupTableDocument, LineupTableQuery} from '../../types/graphql';
+import {
+  BandSerachQuery,
+  LineupTableDocument,
+  LineupTableQuery,
+} from '../../types/graphql';
 import {Heading, HStack, List, ListItem, Spacer} from '@chakra-ui/react';
 import BandSearch from './BandSearch';
 import DateString, {isSameDay} from '../DateString';
 import BandBox from './BandBox';
 import AreaPill from './AreaPill';
+import {useRouter} from 'next/router';
 
 gql`
   query LineupTable($id: ID!) {
@@ -23,6 +28,9 @@ gql`
             node {
               id
               slug
+              event {
+                id
+              }
               ...BandBox
             }
           }
@@ -31,6 +39,27 @@ gql`
     }
   }
 `;
+
+export function yearFromEventId(eventId: string): string {
+  return eventId.replace(/[^\d]/g, '');
+}
+
+type BS = BandSerachQuery['findBandPlaying'][number] | undefined;
+function useBandSearchNavigation(eventId: string): [BS, (value: BS) => void] {
+  const {push} = useRouter();
+  const [band, setBand] = useState<BS>();
+  const selectBand = useCallback(
+    async (band: BS) => {
+      if (band != null && band?.event.id !== eventId) {
+        await push(yearFromEventId(band.event.id), undefined, {shallow: true});
+      }
+      setBand(band);
+    },
+    [eventId, push],
+  );
+
+  return [band, selectBand];
+}
 
 export default function LineupTable(props: {eventId: string}) {
   const {data} = useSuspenseQuery_experimental<LineupTableQuery>(
@@ -46,6 +75,8 @@ export default function LineupTable(props: {eventId: string}) {
   if (event == null || event.__typename !== 'Event') {
     throw new Error();
   }
+
+  const [band, selectBand] = useBandSearchNavigation(props.eventId);
 
   const [stage, selectStage] = useState<string | null>(null);
 
@@ -80,7 +111,7 @@ export default function LineupTable(props: {eventId: string}) {
             />
           ))}
           <Spacer />
-          <BandSearch />
+          <BandSearch onSelect={selectBand} />
         </HStack>
         {days.map((day) => (
           <ListItem key={day.toDateString()}>
@@ -106,6 +137,8 @@ export default function LineupTable(props: {eventId: string}) {
                     href={`${props.eventId.replace(/[^\d]/g, '')}/${node.slug}`}
                     key={node.id}
                     band={node}
+                    isHighlighted={node.id === band?.id}
+                    onHighlight={selectBand}
                   />
                 ))}
             </List>
