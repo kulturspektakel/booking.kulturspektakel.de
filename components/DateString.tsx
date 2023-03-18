@@ -50,10 +50,12 @@ export default function DateString({
     month: 'numeric',
     year: 'numeric',
   },
+  until = 'bis',
 }: {
   date: Date;
   to?: Date;
   options?: Intl.DateTimeFormatOptions;
+  until?: string;
 }) {
   // always force to Berlin timezone
   options = {...options, timeZone};
@@ -67,7 +69,7 @@ export default function DateString({
 
   const toString = to.toLocaleDateString(locale, options);
   const toElement = <time dateTime={date.toISOString()}>{toString}</time>;
-  let connectingElement = <> bis </>;
+  let connectingElement = <> {until} </>;
   if (isSameDay(new Date(date.getDate() + 1), to)) {
     connectingElement = <> und </>;
   }

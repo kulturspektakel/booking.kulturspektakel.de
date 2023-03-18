@@ -84,7 +84,12 @@ export default function LineupTable(props: {eventId: string}) {
         </HStack>
         {days.map((day) => (
           <ListItem key={day.toDateString()}>
-            <Heading textAlign="center" mt="8" mb="" textTransform="uppercase">
+            <Heading
+              textAlign="center"
+              mt="16"
+              mb="12"
+              textTransform="uppercase"
+            >
               <DateString
                 date={day}
                 options={{

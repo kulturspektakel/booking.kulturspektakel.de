@@ -24,8 +24,13 @@ const App = ({Component, pageProps}: AppProps) => {
 
   const theme = extendTheme({
     fonts: {
-      heading: `"Conduit ITC ExtraBold", sans-serif`,
+      heading: `"Space Grotesk", "Conduit ITC ExtraBold", sans-serif`,
       body: `"Space Grotesk", sans-serif`,
+    },
+    colors: {
+      brand: {
+        '900': '#073332',
+      },
     },
     components: {
       Steps: {

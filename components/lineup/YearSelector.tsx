@@ -29,6 +29,7 @@ export default function YearSelector(props: {eventId: string}) {
 
   return (
     <Select
+      fontWeight="bold"
       w="auto"
       onChange={(e) =>
         push(e.target.value.replace(/[^\d]/g, ''), '', {shallow: true})

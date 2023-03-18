@@ -18,16 +18,15 @@ gql`
 
 export default function Article(props: ArticleFragment) {
   return (
-    <Box mb="8">
+    <Box mb="16">
       <ArticleHead title={props.title} createdAt={props.createdAt} />
       <ReactMarkdown
         components={{
           h1: Heading,
           h2: Heading,
           p: Text,
-          img: (props) =>
-            null,
-            // <Image src={props.src ?? ''} alt={props.alt ?? props.title ?? ''} />
+          img: (props) => null,
+          // <Image src={props.src ?? ''} alt={props.alt ?? props.title ?? ''} />
         }}
       >
         {props.content}

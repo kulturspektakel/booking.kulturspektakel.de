@@ -2,7 +2,6 @@ import React, {useState} from 'react';
 import {gql} from '@apollo/client';
 import {Button, Center, ScaleFade} from '@chakra-ui/react';
 import {CloseIcon} from '@chakra-ui/icons';
-import {AreaSelectorFragment} from '../../types/graphql';
 
 gql`
   fragment AreaPill on Area {

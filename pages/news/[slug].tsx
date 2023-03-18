@@ -20,7 +20,7 @@ export default function NewsSingle() {
   const {query} = useRouter();
   const {data} = useNewsSingleQuery({
     variables: {
-      id: `Slug:${query.slug}`,
+      id: `News:${query.slug}`,
     },
   });
 

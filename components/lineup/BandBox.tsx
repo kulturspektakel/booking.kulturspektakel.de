@@ -1,10 +1,10 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {gql} from '@apollo/client';
 import {BandBoxFragment} from '../../types/graphql';
-import {Box, Heading} from '@chakra-ui/react';
+import {Box, Heading, Text, Link} from '@chakra-ui/react';
 import TimeString from '../TimeString';
 import Image from 'next/image';
-import Link from 'next/link';
+import NextLink from 'next/link';
 
 gql`
   fragment BandBox on BandPlaying {
@@ -30,70 +30,86 @@ export default function BandBox({
   href: string;
   band: BandBoxFragment;
 }) {
+  const [hover, setHover] = useState(false);
+
   return (
-    <Box display="inline-block">
-      <Link href={href}>
-        <Box
-          // color={band.area.id === 'Area:dj' ? 'white' : undefined}
-          borderRadius="xl"
-          bg={band.area.themeColor}
-          p="4"
-          pe="6"
-          m="1.5"
-          mb="0"
-          h="40"
-          maxW="300"
-          boxShadow="sm"
-          position="relative"
-          overflow="hidden"
+    <Link
+      onFocus={() => setHover(true)}
+      onBlur={() => setHover(false)}
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
+      as={NextLink}
+      display="inline-block"
+      borderRadius="xl"
+      overflow="hidden"
+      m="1.5"
+      mb="0"
+      href={href}
+      color={hover && band.area.id === 'Area:dj' ? 'white' : undefined}
+      bg="gray.100"
+      p="4"
+      pe="6"
+      h="40"
+      maxW="300"
+      position="relative"
+      _hover={{
+        textDecoration: 'none',
+        bgColor: band.area.themeColor,
+      }}
+      _focusVisible={{
+        outlineColor: 'black',
+      }}
+      _active={{
+        outlineColor: 'black',
+      }}
+    >
+      <Box zIndex="3" position="relative">
+        <Text fontWeight="bold">
+          <TimeString date={band.startTime} />
+          &nbsp;
+          {band.area.displayName}
+        </Text>
+        <Text
+          size="lg"
+          lineHeight="1"
+          pt="0.2"
+          pb="0.5"
+          noOfLines={3}
+          fontWeight="bold"
+          fontSize="1.7em"
         >
-          <Box zIndex="3" position="relative">
-            <strong>
-              <TimeString date={band.startTime} />
-              &nbsp;
-              {band.area.displayName}
-            </strong>
-            <Heading
-              as="h3"
-              size="lg"
-              textTransform="uppercase"
-              lineHeight="0.9"
-              mt="1.5"
-              mb="-0.5"
-              noOfLines={3}
-            >
-              {band.name}
-            </Heading>
-            <strong>{band.genre}</strong>
-          </Box>
-          <Box
-            bgGradient={`linear(to-b, ${band.area.themeColor}, transparent)`}
-            position="absolute"
-            left="0"
-            top="0"
-            right="0"
-            h="60"
-            zIndex="2"
-          />
-          {band.photo != null && (
-            <Image
-              src={band.photo.uri}
-              alt=""
-              sizes="300px"
-              quality={50}
-              fill
-              style={{
-                filter: `grayscale(1)`,
-                opacity: 0.7,
-                objectFit: 'cover',
-                objectPosition: '0 30%',
-                mixBlendMode: 'overlay',
-                zIndex: 1,
-              }}
-            />
-          )}
-        </Box>
-      </Link>
-    </Box>
+          {band.name}
+        </Text>
+        {band.genre}
+      </Box>
+      {hover && (
+        <Box
+          bgGradient={`linear(to-b, ${band.area.themeColor}, transparent)`}
+          position="absolute"
+          left="0"
+          top="0"
+          right="0"
+          h="60"
+          zIndex="2"
+        />
+      )}
+      {hover && band.photo != null && (
+        <Image
+          src={band.photo.uri}
+          alt=""
+          sizes="300px"
+          quality={50}
+          fill
+          style={{
+            filter: `grayscale(1)`,
+            opacity: 0.8,
+            objectFit: 'cover',
+            objectPosition: '0 30%',
+            mixBlendMode: 'overlay',
+            zIndex: 1,
+          }}
+        />
+      )}
+    </Link>
   );
 }

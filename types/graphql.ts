@@ -597,6 +597,7 @@ export type ProductListSalesNumbersArgs = {
 export type Query = {
   __typename?: 'Query';
   areas: Array<Area>;
+  bandPlaying?: Maybe<BandPlaying>;
   cardStatus: CardStatus;
   checkDuplicateApplication?: Maybe<ObfuscatedBandApplication>;
   config: Config;
@@ -611,6 +612,11 @@ export type Query = {
   productLists: Array<ProductList>;
   transactions: Transactions;
   viewer?: Maybe<Viewer>;
+};
+
+export type QueryBandPlayingArgs = {
+  eventId: Scalars['ID'];
+  slug: Scalars['String'];
 };
 
 export type QueryCardStatusArgs = {
@@ -731,6 +737,13 @@ export type Viewer = Node & {
   email: Scalars['String'];
   id: Scalars['ID'];
   profilePicture?: Maybe<Scalars['String']>;
+};
+
+export type PageQueryVariables = Exact<{[key: string]: never}>;
+
+export type PageQuery = {
+  __typename?: 'Query';
+  events: Array<{__typename?: 'Event'; start: Date; end: Date}>;
 };
 
 export type DistanceQueryVariables = Exact<{
@@ -1096,6 +1109,48 @@ export const ArticleFragmentDoc = gql`
     content
   }
 `;
+export const PageDocument = gql`
+  query Page {
+    events(limit: 1, type: Kulturspektakel) {
+      start
+      end
+    }
+  }
+`;
+
+/**
+ * __usePageQuery__
+ *
+ * To run a query within a React component, call `usePageQuery` and pass it any options that fit your needs.
+ * When your component renders, `usePageQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = usePageQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function usePageQuery(
+  baseOptions?: Apollo.QueryHookOptions<PageQuery, PageQueryVariables>,
+) {
+  const options = {...defaultOptions, ...baseOptions};
+  return Apollo.useQuery<PageQuery, PageQueryVariables>(PageDocument, options);
+}
+export function usePageLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<PageQuery, PageQueryVariables>,
+) {
+  const options = {...defaultOptions, ...baseOptions};
+  return Apollo.useLazyQuery<PageQuery, PageQueryVariables>(
+    PageDocument,
+    options,
+  );
+}
+export type PageQueryHookResult = ReturnType<typeof usePageQuery>;
+export type PageLazyQueryHookResult = ReturnType<typeof usePageLazyQuery>;
+export type PageQueryResult = Apollo.QueryResult<PageQuery, PageQueryVariables>;
 export const DistanceDocument = gql`
   query Distance($origin: String!) {
     distanceToKult(origin: $origin)
