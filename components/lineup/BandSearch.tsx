@@ -14,31 +14,37 @@ import {
 } from '@chakra-ui/react';
 import React, {useMemo, useRef} from 'react';
 import {useCombobox} from 'downshift';
-import {BandSerachQuery} from '../../types/graphql';
+import {BandSerachDocument, BandSerachQuery} from '../../types/graphql';
 import {TomoTypeaheadConfig, useTypeahead} from './TomoTypeahead';
 import {Search2Icon} from '@chakra-ui/icons';
+import {yearFromEventId} from './LineupTable';
 
-export default function BandSearch() {
+gql`
+  query BandSerach($query: String!, $limit: Int!) {
+    findBandPlaying(query: $query, limit: $limit) {
+      name
+      id
+      event {
+        id
+      }
+    }
+  }
+`;
+
+type BS = BandSerachQuery['findBandPlaying'][number];
+export default function BandSearch(props: {
+  onSelect: (value: BS | undefined) => void;
+}) {
   const client = useApolloClient();
   const minimumQueryLength = 2;
   const displaySetLimit = 10;
 
-  const config: TomoTypeaheadConfig<
-    BandSerachQuery['findBandPlaying'][number]
-  > = useMemo(
+  const config: TomoTypeaheadConfig<BS> = useMemo(
     () => ({
       fetcher: (query: string) =>
         client
           .query<BandSerachQuery>({
-            query: gql`
-              query BandSerach($query: String!, $limit: Int!) {
-                findBandPlaying(query: $query, limit: $limit) {
-                  name
-                  id
-                  eventId
-                }
-              }
-            `,
+            query: BandSerachDocument,
             variables: {
               query,
               limit: displaySetLimit,
@@ -46,7 +52,6 @@ export default function BandSearch() {
           })
           .then((d) => {
             if (d.data == null) {
-              console.error(d.error);
               throw new Error(`GraphQL error: ${d.errors?.[0].message}`);
             }
             return d.data.findBandPlaying;
@@ -72,12 +77,16 @@ export default function BandSearch() {
   } = useCombobox({
     id: 'band-search',
     items: data,
+    onSelectedItemChange: (item) =>
+      props.onSelect(item.selectedItem ?? undefined),
     onInputValueChange: (e) => setQuery(e.inputValue ?? ''),
     itemToString: (node) => node?.name ?? '',
     stateReducer: (state, {type, changes}) => {
       switch (type) {
+        case useCombobox.stateChangeTypes.InputKeyDownEnter:
         case useCombobox.stateChangeTypes.ItemClick:
           ref.current?.blur();
+
           return {
             ...changes,
             inputValue: '',
@@ -93,6 +102,7 @@ export default function BandSearch() {
       <Popover
         isOpen={isOpen && inputValue.length >= minimumQueryLength}
         initialFocusRef={ref}
+        placement="bottom-start"
       >
         <PopoverAnchor>
           <InputGroup>
@@ -100,7 +110,7 @@ export default function BandSearch() {
               <Search2Icon color="gray.300" />
             </InputLeftElement>
             <Input
-              borderRadius="999em"
+              borderRadius="full"
               placeholder="Bands suchen…"
               {...getInputProps({ref})}
             />
@@ -116,7 +126,7 @@ export default function BandSearch() {
                 bg={highlightedIndex === index ? 'Highlight' : ''}
                 _hover={{bg: 'Highlight'}}
               >
-                {item.name} ({item.eventId.replace(/[^\d]/g, '')})
+                {item.name} ({yearFromEventId(item.event.id)})
               </ListItem>
             ))}
             {inputValue.length >= minimumQueryLength &&

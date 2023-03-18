@@ -3,6 +3,7 @@ import {gql, useSuspenseQuery_experimental} from '@apollo/client';
 import {Select} from '@chakra-ui/react';
 import {useRouter} from 'next/router';
 import {YearSelectorQuery} from '../../types/graphql';
+import {yearFromEventId} from './LineupTable';
 
 const YearSelectorQ = gql`
   query YearSelector {
@@ -32,7 +33,7 @@ export default function YearSelector(props: {eventId: string}) {
       fontWeight="bold"
       w="auto"
       onChange={(e) =>
-        push(e.target.value.replace(/[^\d]/g, ''), '', {shallow: true})
+        push(yearFromEventId(e.target.value), undefined, {shallow: true})
       }
       value={props.eventId}
     >
