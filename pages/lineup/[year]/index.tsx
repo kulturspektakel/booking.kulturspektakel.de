@@ -19,9 +19,7 @@ export default function LineupPage(props: Props) {
   return (
     <Page>
       <HStack>
-        <Heading textTransform="uppercase" as="h1">
-          Lineup&nbsp;{query.year}
-        </Heading>
+        <Heading as="h1">Lineup&nbsp;{query.year}</Heading>
         <Spacer />
         <Suspense fallback={null}>
           <YearSelector eventId={id} />

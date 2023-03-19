@@ -29,11 +29,11 @@ export default function Events() {
             {(i === 0 ||
               data.news.edges[i - 1].node.createdAt.getFullYear() !==
                 node.createdAt.getFullYear()) && (
-              <Heading mt="8" textAlign="center">
+              <Heading mt="8" mb="8" textAlign="center">
                 {node.createdAt.getFullYear()}
               </Heading>
             )}
-            <ListItem>
+            <ListItem mb="4">
               <ArticleHead
                 key={node.slug}
                 title={node.title}

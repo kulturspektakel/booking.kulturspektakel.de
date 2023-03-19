@@ -67,19 +67,18 @@ export default function BandBox({
         <Text fontWeight="bold">
           <TimeString date={band.startTime} />
           &nbsp;
-          {band.area.displayName}
+          <mark>{band.area.displayName}</mark>
         </Text>
-        <Text
+        <Heading
           size="lg"
           lineHeight="1"
           pt="0.2"
           pb="0.5"
           noOfLines={3}
           fontWeight="bold"
-          fontSize="1.7em"
         >
           {band.name}
-        </Text>
+        </Heading>
         {band.genre}
       </Box>
       {hover && (

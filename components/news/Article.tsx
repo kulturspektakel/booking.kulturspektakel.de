@@ -18,7 +18,7 @@ gql`
 
 export default function Article(props: ArticleFragment) {
   return (
-    <Box mb="16">
+    <Box mb="10" mt="10">
       <ArticleHead title={props.title} createdAt={props.createdAt} />
       <ReactMarkdown
         components={{

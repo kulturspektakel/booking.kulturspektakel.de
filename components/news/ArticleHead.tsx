@@ -20,10 +20,19 @@ export default function ArticleHead(props: {
 }) {
   return (
     <>
-      <Heading textTransform="uppercase">{props.title}</Heading>
+      <Heading color="red.500" size="lg">
+        {props.title}
+      </Heading>
       <Link href={`/news/${props.slug}`}>
-        <Text>
-          <DateString date={props.createdAt} />
+        <Text as="mark">
+          <DateString
+            options={{
+              day: 'numeric',
+              month: 'long',
+              year: 'numeric',
+            }}
+            date={props.createdAt}
+          />
         </Text>
       </Link>
     </>

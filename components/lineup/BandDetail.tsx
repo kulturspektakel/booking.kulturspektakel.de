@@ -63,7 +63,7 @@ export default function BandDetail(props: {slug: string; eventId: string}) {
         }}
       />{' '}
       {band.area.displayName}
-      <Heading textTransform="uppercase">{band.name}</Heading>
+      <Heading>{band.name}</Heading>
       {band.genre}
       {band.photo && (
         <Image

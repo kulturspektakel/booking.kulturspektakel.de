@@ -56,7 +56,7 @@ export default function Page({children}: {children: React.ReactNode}) {
   const isLanding = pathname === '/';
 
   return (
-    <Flex direction="column" minH="100vh">
+    <Flex direction="column" minH="100vh" position="sticky" top="0">
       <VStack
         bg="brand.900"
         p="4"
@@ -108,7 +108,6 @@ export default function Page({children}: {children: React.ReactNode}) {
                 href={href}
                 borderRadius="full"
                 fontWeight="bold"
-                color="brand.900"
               >
                 {label}
               </Button>
