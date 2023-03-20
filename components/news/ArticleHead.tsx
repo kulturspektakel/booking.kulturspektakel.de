@@ -3,6 +3,7 @@ import {gql} from '@apollo/client';
 import {Text, Heading} from '@chakra-ui/react';
 import Link from 'next/link';
 import DateString from '../DateString';
+import Mark from '../Mark';
 
 gql`
   fragment Article on News {
@@ -24,7 +25,7 @@ export default function ArticleHead(props: {
         {props.title}
       </Heading>
       <Link href={`/news/${props.slug}`}>
-        <Text as="mark">
+        <Mark>
           <DateString
             options={{
               day: 'numeric',
@@ -33,7 +34,7 @@ export default function ArticleHead(props: {
             }}
             date={props.createdAt}
           />
-        </Text>
+        </Mark>
       </Link>
     </>
   );

@@ -5,6 +5,7 @@ import {Box, Heading, Text, Link} from '@chakra-ui/react';
 import TimeString from '../TimeString';
 import Image from 'next/image';
 import NextLink from 'next/link';
+import Mark from '../Mark';
 
 gql`
   fragment BandBox on BandPlaying {
@@ -67,7 +68,7 @@ export default function BandBox({
         <Text fontWeight="bold">
           <TimeString date={band.startTime} />
           &nbsp;
-          <mark>{band.area.displayName}</mark>
+          <Mark bgColor={band.area.themeColor}>{band.area.displayName}</Mark>
         </Text>
         <Heading
           size="lg"

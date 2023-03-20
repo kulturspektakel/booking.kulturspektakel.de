@@ -22,6 +22,7 @@
     "framer-motion": "^7.6.7",
     "graphql": "^16.6.0",
     "graphql-scalars": "^1.20.4",
+    "hex-rgb": "^5.0.0",
     "next": "^13.2.4",
     "next-superjson-plugin": "^0.5.6",
     "react": "18.2.0",
