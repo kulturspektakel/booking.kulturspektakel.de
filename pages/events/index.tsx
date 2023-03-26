@@ -3,13 +3,24 @@ import Page from '../../components/Page';
 
 import {gql} from '@apollo/client';
 import {EventsDocument, EventsQuery} from '../../types/graphql';
-import {AspectRatio, Box, Heading, SimpleGrid, Text} from '@chakra-ui/react';
+import {
+  AspectRatio,
+  Box,
+  Center,
+  Heading,
+  Link,
+  SimpleGrid,
+  Text,
+} from '@chakra-ui/react';
 import {GetStaticProps} from 'next/types';
 import {initializeApollo} from '../_app';
 import {NotAllowedIcon} from '@chakra-ui/icons';
 import DateString from '../../components/DateString';
 import Image from 'next/image';
 import Mark from '../../components/Mark';
+import Card from '../../components/Card';
+import NextLink from 'next/link';
+import {yearFromEventId} from '../../components/lineup/LineupTable';
 
 gql`
   query Events {
@@ -24,6 +35,9 @@ gql`
         copyright
         width
         height
+      }
+      bandsPlaying {
+        totalCount
       }
     }
   }
@@ -40,20 +54,20 @@ export default function Events({data}: Props) {
       <SimpleGrid columns={2} spacing={6}>
         {data.events.map((e) => (
           <SimpleGrid columns={2} spacing={4} key={e.id}>
-            <Box borderRadius="lg" boxShadow="sm" overflow="hidden">
-              <AspectRatio ratio={1 / 1.4} bgColor="white">
-                {e.poster != null ? (
-                  <Image
-                    src={e.poster.uri}
-                    alt=""
-                    width={e.poster.width}
-                    height={e.poster.height}
-                  />
-                ) : (
+            <Card aspectRatio="1 / 1.4">
+              {e.poster != null ? (
+                <Image
+                  src={e.poster.uri}
+                  alt=""
+                  width={e.poster.width}
+                  height={e.poster.height}
+                />
+              ) : (
+                <Center height="100%">
                   <NotAllowedIcon boxSize="6" />
-                )}
-              </AspectRatio>
-            </Box>
+                </Center>
+              )}
+            </Card>
             <Box>
               <Heading mt="2" size="md">
                 {e.name}
@@ -71,6 +85,11 @@ export default function Events({data}: Props) {
               </Mark>
               {e.poster?.copyright != null && (
                 <Text>Poster von {e.poster.copyright}</Text>
+              )}
+              {e.bandsPlaying?.totalCount > 0 && (
+                <Link as={NextLink} href={`/lineup/${yearFromEventId(e.id)}`}>
+                  Lineup
+                </Link>
               )}
               <Text mt="2">{e.description}</Text>
             </Box>

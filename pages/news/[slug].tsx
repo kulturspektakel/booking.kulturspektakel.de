@@ -1,7 +1,11 @@
 import React from 'react';
 import Page from '../../components/Page';
 import {gql} from '@apollo/client';
-import {NewsSingleDocument, NewsSingleQuery} from '../../types/graphql';
+import {
+  NewsSingleDocument,
+  NewsSingleQuery,
+  NewsStaticPathsQuery,
+} from '../../types/graphql';
 import Article from '../../components/news/Article';
 import Head from 'next/head';
 import {GetStaticPaths, GetStaticProps} from 'next';
@@ -37,10 +41,23 @@ type ParsedUrlQuery = {
 };
 
 export const getStaticPaths: GetStaticPaths<ParsedUrlQuery> = async () => {
-  // TODO
+  const client = initializeApollo();
+  const {data} = await client.query<NewsStaticPathsQuery>({
+    query: gql`
+      query NewsStaticPaths {
+        news(first: 300) {
+          edges {
+            node {
+              slug
+            }
+          }
+        }
+      }
+    `,
+  });
 
   return {
-    paths: [{params: {slug: 'plakatjagd'}}],
+    paths: data.news.edges.map((n) => ({params: {slug: n.node.slug}})),
     fallback: false,
   };
 };

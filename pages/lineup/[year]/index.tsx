@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React from 'react';
 import {gql} from '@apollo/client';
 import {
   LineUpStaticPathsQuery,
@@ -7,11 +7,12 @@ import {
 } from '../../../types/graphql';
 import Page from '../../../components/Page';
 import {useRouter} from 'next/router';
-import {Heading, HStack, Spacer} from '@chakra-ui/react';
+import {Center, Heading, HStack, Spacer, Spinner} from '@chakra-ui/react';
 import {GetStaticPaths, GetStaticProps} from 'next';
 import {initializeApollo} from '../../_app';
 import LineupTable from '../../../components/lineup/LineupTable';
 import YearSelector from '../../../components/lineup/YearSelector';
+import useIsRouting from '../../../components/useIsRouting';
 
 type Props = {
   data: LineupTableQuery;
@@ -39,25 +40,8 @@ gql`
 `;
 
 export default function LineupPage({data, eventId}: Props) {
-  const {events, query} = useRouter();
-
-  useEffect(() => {
-    const a = (url, {shallow}) => {
-      console.log(`routing to ${url}`, `is shallow routing: ${shallow}`);
-    };
-    events.on('routeChangeStart', a);
-
-    const b = (url, {shallow}) => {
-      console.log(`routing complete ${url}`, `is shallow routing: ${shallow}`);
-    };
-
-    events.on('routeChangeComplete', b);
-
-    () => {
-      events.off('routeChangeStart', a);
-      events.off('routeChangeStart', b);
-    };
-  }, [events]);
+  const {query} = useRouter();
+  const isRouting = useIsRouting();
 
   const event = data.event;
   if (event?.__typename !== 'Event') {
@@ -71,7 +55,13 @@ export default function LineupPage({data, eventId}: Props) {
         <Spacer />
         <YearSelector currentEventId={eventId} events={data.events} />
       </HStack>
-      <LineupTable event={event} areas={data.areas} />
+      {isRouting === 'same-page' ? (
+        <Center pt="16">
+          <Spinner />
+        </Center>
+      ) : (
+        <LineupTable event={event} areas={data.areas} />
+      )}
     </Page>
   );
 }

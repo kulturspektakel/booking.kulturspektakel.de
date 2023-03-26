@@ -8,6 +8,7 @@ import DateString from '../../components/DateString';
 import Mark from '../../components/Mark';
 import {GetStaticProps} from 'next';
 import {initializeApollo} from '../_app';
+import Card from '../../components/Card';
 
 gql`
   query NewsArchive {
@@ -30,45 +31,40 @@ type Props = {
 export default function Events({data}: Props) {
   return (
     <Page title="News-Archiv">
-      <SimpleGrid columns={3} spacing={4}>
+      <SimpleGrid columns={4} spacing={4}>
         {data.news.edges.map(({node}, i) => (
           <>
             {(i === 0 ||
               data.news.edges[i - 1].node.createdAt.getFullYear() !==
                 node.createdAt.getFullYear()) && (
-              <Center>
+              <Center key={node.createdAt.getFullYear()}>
                 <Heading textAlign="center">
                   {node.createdAt.getFullYear()}
                 </Heading>
               </Center>
             )}
-            <Link href={`/news/${node.slug}`}>
-              <AspectRatio ratio={1}>
-                <Box
-                  bg="white"
-                  borderRadius="lg"
-                  boxShadow="sm"
-                  p="4"
-                  transition=".15s all"
-                  _hover={{
-                    transform: 'scale(1.03) rotate(1deg)',
-                    boxShadow: 'lg',
+            <Card
+              key={node.slug}
+              p="4"
+              href={`/news/${node.slug}`}
+              aspectRatio="1/1"
+              textAlign="center"
+              justifyContent="center"
+            >
+              <Heading size="md" mb="2" noOfLines={4}>
+                {node.title}
+              </Heading>
+              <Mark alignSelf="center">
+                <DateString
+                  options={{
+                    day: 'numeric',
+                    month: 'short',
+                    year: 'numeric',
                   }}
-                >
-                  <Heading size="md">{node.title}</Heading>
-                  <Mark>
-                    <DateString
-                      options={{
-                        day: 'numeric',
-                        month: 'long',
-                        year: 'numeric',
-                      }}
-                      date={node.createdAt}
-                    />
-                  </Mark>
-                </Box>
-              </AspectRatio>
-            </Link>
+                  date={node.createdAt}
+                />
+              </Mark>
+            </Card>
           </>
         ))}
       </SimpleGrid>

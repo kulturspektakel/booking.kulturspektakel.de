@@ -113,7 +113,7 @@ export default function LineupTable({
                 }}
               />
             </Heading>
-            <SimpleGrid columns={{sm: 3, base: 2}} spacing={2}>
+            <SimpleGrid columns={{sm: 3, base: 2}} spacing={4}>
               {event.bandsPlaying.edges
                 .filter(
                   ({node}) =>

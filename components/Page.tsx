@@ -24,6 +24,7 @@ import NextLink from 'next/link';
 import Image from 'next/image';
 import logo from './logo.svg';
 import halftone from './halftone.svg';
+import logoTextRight from './logo-text-right-black.svg';
 
 gql`
   query Page {
@@ -137,6 +138,12 @@ export default function Page({
       </Container>
       <Box as="footer" bg="gray.200" p="10">
         <Container maxW="container.md">
+          <Image width={150} src={logoTextRight} />
+          <Text>
+            Das Kult ist ein dreitägiges ehrenamtlich von Jugendlichen
+            organisiertes Musikfestival in Gauting.
+          </Text>
+          <Text>gefördert von</Text>
           <List>
             {footerItems.map(({label, href}, i) => (
               <ListItem key={i}>

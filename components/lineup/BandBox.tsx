@@ -1,11 +1,11 @@
-import React from 'react';
+import React, {useEffect, useRef} from 'react';
 import {gql} from '@apollo/client';
 import {BandBoxFragment} from '../../types/graphql';
-import {Box, Heading, Text, Link} from '@chakra-ui/react';
+import {Box, Heading, Text} from '@chakra-ui/react';
 import TimeString from '../TimeString';
 import Image from 'next/image';
-import NextLink from 'next/link';
 import Mark from '../Mark';
+import Card from '../Card';
 
 gql`
   fragment BandBox on BandPlaying {
@@ -27,41 +27,33 @@ gql`
 export default function BandBox({
   band,
   href,
+  onHighlight,
+  isHighlighted = false,
 }: {
+  onHighlight?: () => void;
+  isHighlighted?: boolean;
   href: string;
   band: BandBoxFragment;
 }) {
+  const ref = useRef<any>();
+
+  useEffect(() => {
+    if (isHighlighted && onHighlight) {
+      onHighlight();
+    }
+  }, [isHighlighted, onHighlight]);
+
   return (
-    <Link
-      as={NextLink}
-      display="inline-block"
+    <Card
       borderRadius="xl"
-      overflow="hidden"
-      m="1.5"
-      mb="0"
       href={href}
       color={band.area.id === 'Area:dj' ? 'white' : undefined}
       bg="blackAlpha.800"
-      boxShadow="sm"
       p="4"
       pe="6"
-      w="233px"
-      h="233px"
+      aspectRatio="1/1"
       position="relative"
-      _hover={{
-        transform: 'scale(1.03) rotate(1deg)',
-        boxShadow: 'lg',
-      }}
-      _focusVisible={{
-        transform: 'scale(1.03) rotate(1deg)',
-        outlineColor: 'blue',
-        boxShadow: 'lg',
-      }}
-      _active={{
-        transform: 'scale(1.03) rotate(1deg)',
-        outlineColor: 'blue',
-        boxShadow: 'lg',
-      }}
+      ref={ref}
     >
       <Mark
         zIndex="3"
@@ -122,6 +114,6 @@ export default function BandBox({
           }}
         />
       )}
-    </Link>
+    </Card>
   );
 }

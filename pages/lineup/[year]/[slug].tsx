@@ -16,11 +16,13 @@ import {
   AspectRatio,
   Box,
   Text,
+  Flex,
 } from '@chakra-ui/react';
 import DateString from '../../../components/DateString';
 import NextLink from 'next/link';
 import Image from 'next/image';
 import Mark from '../../../components/Mark';
+import Card from '../../../components/Card';
 
 type Props = {
   data: BandDetailQuery;
@@ -31,6 +33,7 @@ gql`
     bandPlaying(eventId: $eventId, slug: $slug) {
       name
       description
+      shortDescription
       startTime
       genre
       photo {
@@ -56,43 +59,49 @@ export default function BandPage({data}: Props) {
 
   return (
     <Page>
-      <Button
-        as={NextLink}
-        href={`/lineup/${band.startTime.getFullYear()}`}
-        leftIcon={<ArrowBackIcon />}
-      >
-        Lineup {band.startTime.getFullYear()}
-      </Button>
-
-      <Box>
-        <DateString
-          date={band.startTime}
-          options={{
-            hour: '2-digit',
-            minute: '2-digit',
-            weekday: 'short',
-            day: '2-digit',
-            month: '2-digit',
-            year: 'numeric',
-          }}
-        />
-        &nbsp;Uhr
-        <Mark bgColor={band.area.themeColor}>{band.area.displayName}</Mark>
-        <Heading>{band.name}</Heading>
-        {band.genre}
-      </Box>
+      <Flex justifyContent="space-between" alignItems="center" mb="6" mt="4">
+        <Box>
+          <Mark bgColor={band.area.themeColor}>{band.area.displayName}</Mark>
+          &emsp;
+          <Text display="inline" fontWeight="semibold">
+            <DateString
+              date={band.startTime}
+              options={{
+                hour: '2-digit',
+                minute: '2-digit',
+                weekday: 'short',
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+              }}
+            />
+            &nbsp;Uhr
+          </Text>
+          <Heading>{band.name}</Heading>
+          {band.genre}
+        </Box>
+        <Button
+          as={NextLink}
+          href={`/lineup/${band.startTime.getFullYear()}`}
+          leftIcon={<ArrowBackIcon />}
+        >
+          Lineup {band.startTime.getFullYear()}
+        </Button>
+      </Flex>
       <SimpleGrid columns={2} spacing={6}>
         {band.photo && (
-          <AspectRatio
-            ratio={band.photo.width / band.photo.height}
-            borderRadius="xl"
-            overflow="hidden"
-          >
-            <Image src={band.photo?.uri} alt={band.photo.title ?? ''} fill />
-          </AspectRatio>
+          <Card aspectRatio={`${band.photo.width} / ${band.photo.height}`}>
+            <Image
+              src={band.photo?.uri}
+              alt={band.photo.title ?? ''}
+              width={band.photo.width}
+              height={band.photo.height}
+              sizes="500px"
+            />
+          </Card>
         )}
         <Box>
-          <Text>{band.description}</Text>
+          <Text>{band.description ?? band.shortDescription}</Text>
         </Box>
       </SimpleGrid>
     </Page>

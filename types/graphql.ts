@@ -139,6 +139,7 @@ export type BandPlaying = Node & {
   id: Scalars['ID'];
   name: Scalars['String'];
   photo?: Maybe<PixelImage>;
+  shortDescription?: Maybe<Scalars['String']>;
   slug: Scalars['String'];
   startTime: Scalars['DateTime'];
 };
@@ -791,30 +792,6 @@ export type BandBoxFragment = {
   };
 };
 
-export type BandDetailQueryVariables = Exact<{
-  eventId: Scalars['ID'];
-  slug: Scalars['String'];
-}>;
-
-export type BandDetailQuery = {
-  __typename?: 'Query';
-  bandPlaying?: {
-    __typename?: 'BandPlaying';
-    name: string;
-    description?: string | null;
-    startTime: Date;
-    genre?: string | null;
-    photo?: {
-      __typename?: 'PixelImage';
-      uri: string;
-      title?: string | null;
-      width: number;
-      height: number;
-    } | null;
-    area: {__typename?: 'Area'; displayName: string; themeColor: string};
-  } | null;
-};
-
 export type BandSerachQueryVariables = Exact<{
   query: Scalars['String'];
   limit: Scalars['Int'];
@@ -965,6 +942,10 @@ export type EventsQuery = {
       width: number;
       height: number;
     } | null;
+    bandsPlaying: {
+      __typename?: 'EventBandsPlayingConnection';
+      totalCount: number;
+    };
   }>;
 };
 
@@ -985,6 +966,31 @@ export type NewsQuery = {
       };
     }>;
   };
+};
+
+export type BandDetailQueryVariables = Exact<{
+  eventId: Scalars['ID'];
+  slug: Scalars['String'];
+}>;
+
+export type BandDetailQuery = {
+  __typename?: 'Query';
+  bandPlaying?: {
+    __typename?: 'BandPlaying';
+    name: string;
+    description?: string | null;
+    shortDescription?: string | null;
+    startTime: Date;
+    genre?: string | null;
+    photo?: {
+      __typename?: 'PixelImage';
+      uri: string;
+      title?: string | null;
+      width: number;
+      height: number;
+    } | null;
+    area: {__typename?: 'Area'; displayName: string; themeColor: string};
+  } | null;
 };
 
 export type BandDetailStaticPathsQueryVariables = Exact<{[key: string]: never}>;
@@ -1117,6 +1123,19 @@ export type NewsSingleQuery = {
     | {__typename?: 'ProductList'}
     | {__typename?: 'Viewer'}
     | null;
+};
+
+export type NewsStaticPathsQueryVariables = Exact<{[key: string]: never}>;
+
+export type NewsStaticPathsQuery = {
+  __typename?: 'Query';
+  news: {
+    __typename?: 'QueryNewsConnection';
+    edges: Array<{
+      __typename?: 'QueryNewsConnectionEdge';
+      node: {__typename?: 'News'; slug: string};
+    }>;
+  };
 };
 
 export type NewsArchiveQueryVariables = Exact<{[key: string]: never}>;
@@ -1370,76 +1389,6 @@ export type DuplicateApplicationWarningQueryResult = Apollo.QueryResult<
   DuplicateApplicationWarningQuery,
   DuplicateApplicationWarningQueryVariables
 >;
-export const BandDetailDocument = gql`
-  query BandDetail($eventId: ID!, $slug: String!) {
-    bandPlaying(eventId: $eventId, slug: $slug) {
-      name
-      description
-      startTime
-      genre
-      photo {
-        uri
-        title
-        width
-        height
-      }
-      area {
-        displayName
-        themeColor
-      }
-    }
-  }
-`;
-
-/**
- * __useBandDetailQuery__
- *
- * To run a query within a React component, call `useBandDetailQuery` and pass it any options that fit your needs.
- * When your component renders, `useBandDetailQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useBandDetailQuery({
- *   variables: {
- *      eventId: // value for 'eventId'
- *      slug: // value for 'slug'
- *   },
- * });
- */
-export function useBandDetailQuery(
-  baseOptions: Apollo.QueryHookOptions<
-    BandDetailQuery,
-    BandDetailQueryVariables
-  >,
-) {
-  const options = {...defaultOptions, ...baseOptions};
-  return Apollo.useQuery<BandDetailQuery, BandDetailQueryVariables>(
-    BandDetailDocument,
-    options,
-  );
-}
-export function useBandDetailLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    BandDetailQuery,
-    BandDetailQueryVariables
-  >,
-) {
-  const options = {...defaultOptions, ...baseOptions};
-  return Apollo.useLazyQuery<BandDetailQuery, BandDetailQueryVariables>(
-    BandDetailDocument,
-    options,
-  );
-}
-export type BandDetailQueryHookResult = ReturnType<typeof useBandDetailQuery>;
-export type BandDetailLazyQueryHookResult = ReturnType<
-  typeof useBandDetailLazyQuery
->;
-export type BandDetailQueryResult = Apollo.QueryResult<
-  BandDetailQuery,
-  BandDetailQueryVariables
->;
 export const BandSerachDocument = gql`
   query BandSerach($query: String!, $limit: Int!) {
     findBandPlaying(query: $query, limit: $limit) {
@@ -1671,6 +1620,9 @@ export const EventsDocument = gql`
         width
         height
       }
+      bandsPlaying {
+        totalCount
+      }
     }
   }
 `;
@@ -1760,6 +1712,77 @@ export function useNewsLazyQuery(
 export type NewsQueryHookResult = ReturnType<typeof useNewsQuery>;
 export type NewsLazyQueryHookResult = ReturnType<typeof useNewsLazyQuery>;
 export type NewsQueryResult = Apollo.QueryResult<NewsQuery, NewsQueryVariables>;
+export const BandDetailDocument = gql`
+  query BandDetail($eventId: ID!, $slug: String!) {
+    bandPlaying(eventId: $eventId, slug: $slug) {
+      name
+      description
+      shortDescription
+      startTime
+      genre
+      photo {
+        uri
+        title
+        width
+        height
+      }
+      area {
+        displayName
+        themeColor
+      }
+    }
+  }
+`;
+
+/**
+ * __useBandDetailQuery__
+ *
+ * To run a query within a React component, call `useBandDetailQuery` and pass it any options that fit your needs.
+ * When your component renders, `useBandDetailQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useBandDetailQuery({
+ *   variables: {
+ *      eventId: // value for 'eventId'
+ *      slug: // value for 'slug'
+ *   },
+ * });
+ */
+export function useBandDetailQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    BandDetailQuery,
+    BandDetailQueryVariables
+  >,
+) {
+  const options = {...defaultOptions, ...baseOptions};
+  return Apollo.useQuery<BandDetailQuery, BandDetailQueryVariables>(
+    BandDetailDocument,
+    options,
+  );
+}
+export function useBandDetailLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    BandDetailQuery,
+    BandDetailQueryVariables
+  >,
+) {
+  const options = {...defaultOptions, ...baseOptions};
+  return Apollo.useLazyQuery<BandDetailQuery, BandDetailQueryVariables>(
+    BandDetailDocument,
+    options,
+  );
+}
+export type BandDetailQueryHookResult = ReturnType<typeof useBandDetailQuery>;
+export type BandDetailLazyQueryHookResult = ReturnType<
+  typeof useBandDetailLazyQuery
+>;
+export type BandDetailQueryResult = Apollo.QueryResult<
+  BandDetailQuery,
+  BandDetailQueryVariables
+>;
 export const BandDetailStaticPathsDocument = gql`
   query BandDetailStaticPaths {
     events(type: Kulturspektakel) {
@@ -2072,6 +2095,67 @@ export type NewsSingleLazyQueryHookResult = ReturnType<
 export type NewsSingleQueryResult = Apollo.QueryResult<
   NewsSingleQuery,
   NewsSingleQueryVariables
+>;
+export const NewsStaticPathsDocument = gql`
+  query NewsStaticPaths {
+    news(first: 300) {
+      edges {
+        node {
+          slug
+        }
+      }
+    }
+  }
+`;
+
+/**
+ * __useNewsStaticPathsQuery__
+ *
+ * To run a query within a React component, call `useNewsStaticPathsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useNewsStaticPathsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useNewsStaticPathsQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useNewsStaticPathsQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    NewsStaticPathsQuery,
+    NewsStaticPathsQueryVariables
+  >,
+) {
+  const options = {...defaultOptions, ...baseOptions};
+  return Apollo.useQuery<NewsStaticPathsQuery, NewsStaticPathsQueryVariables>(
+    NewsStaticPathsDocument,
+    options,
+  );
+}
+export function useNewsStaticPathsLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    NewsStaticPathsQuery,
+    NewsStaticPathsQueryVariables
+  >,
+) {
+  const options = {...defaultOptions, ...baseOptions};
+  return Apollo.useLazyQuery<
+    NewsStaticPathsQuery,
+    NewsStaticPathsQueryVariables
+  >(NewsStaticPathsDocument, options);
+}
+export type NewsStaticPathsQueryHookResult = ReturnType<
+  typeof useNewsStaticPathsQuery
+>;
+export type NewsStaticPathsLazyQueryHookResult = ReturnType<
+  typeof useNewsStaticPathsLazyQuery
+>;
+export type NewsStaticPathsQueryResult = Apollo.QueryResult<
+  NewsStaticPathsQuery,
+  NewsStaticPathsQueryVariables
 >;
 export const NewsArchiveDocument = gql`
   query NewsArchive {
