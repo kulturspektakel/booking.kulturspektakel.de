@@ -16,10 +16,9 @@ const moduleExports = {
       },
     ],
   },
-
   // Your existing module.exports
   experimental: {
-    // swcPlugins: [['next-superjson-plugin', {}]],
+    swcPlugins: [['next-superjson-plugin', {}]],
   },
   sentry: {
     // Use `hidden-source-map` rather than `source-map` as the Webpack `devtool`
@@ -29,6 +28,10 @@ const moduleExports = {
     // https://docs.sentry.io/platforms/javascript/guides/nextjs/manual-setup/#use-hidden-source-map
     // for more information.
     hideSourceMaps: true,
+  },
+  i18n: {
+    locales: ['de'],
+    defaultLocale: 'de',
   },
 };
 

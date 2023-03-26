@@ -1,29 +1,23 @@
 import React from 'react';
 import {gql} from '@apollo/client';
-import {Text, Heading} from '@chakra-ui/react';
+import {Heading} from '@chakra-ui/react';
 import Link from 'next/link';
 import DateString from '../DateString';
 import Mark from '../Mark';
+import {ArticleHeadFragment} from '../../types/graphql';
 
 gql`
-  fragment Article on News {
+  fragment ArticleHead on News {
     slug
     title
     createdAt
-    content
   }
 `;
 
-export default function ArticleHead(props: {
-  title: string;
-  createdAt: Date;
-  slug?: string;
-}) {
+export default function ArticleHead(props: ArticleHeadFragment) {
   return (
     <>
-      <Heading color="red.500" size="lg">
-        {props.title}
-      </Heading>
+      <Heading size="lg">{props.title}</Heading>
       <Link href={`/news/${props.slug}`}>
         <Mark>
           <DateString

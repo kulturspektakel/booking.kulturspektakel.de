@@ -1,39 +1,77 @@
-import React, {Suspense} from 'react';
+import React, {useEffect} from 'react';
 import {gql} from '@apollo/client';
-import {LineUpStaticPathsQuery} from '../../../types/graphql';
+import {
+  LineUpStaticPathsQuery,
+  LineupTableDocument,
+  LineupTableQuery,
+} from '../../../types/graphql';
 import Page from '../../../components/Page';
 import {useRouter} from 'next/router';
-import {Center, Heading, HStack, Spacer, Spinner} from '@chakra-ui/react';
+import {Heading, HStack, Spacer} from '@chakra-ui/react';
 import {GetStaticPaths, GetStaticProps} from 'next';
 import {initializeApollo} from '../../_app';
 import LineupTable from '../../../components/lineup/LineupTable';
 import YearSelector from '../../../components/lineup/YearSelector';
 
-// eslint-disable-next-line @typescript-eslint/ban-types
-type Props = {};
+type Props = {
+  data: LineupTableQuery;
+  eventId: string;
+};
 
-export default function LineupPage(props: Props) {
-  const {query} = useRouter();
-  const id = `Event:kult${query.year}`;
+gql`
+  query LineupTable($id: ID!) {
+    areas {
+      ...AreaPill
+    }
+    events(type: Kulturspektakel) {
+      ...YearSelector
+    }
+    event: node(id: $id) {
+      ... on Event {
+        id
+        name
+        start
+        end
+        ...LineupTable
+      }
+    }
+  }
+`;
+
+export default function LineupPage({data, eventId}: Props) {
+  const {events, query} = useRouter();
+
+  useEffect(() => {
+    const a = (url, {shallow}) => {
+      console.log(`routing to ${url}`, `is shallow routing: ${shallow}`);
+    };
+    events.on('routeChangeStart', a);
+
+    const b = (url, {shallow}) => {
+      console.log(`routing complete ${url}`, `is shallow routing: ${shallow}`);
+    };
+
+    events.on('routeChangeComplete', b);
+
+    () => {
+      events.off('routeChangeStart', a);
+      events.off('routeChangeStart', b);
+    };
+  }, [events]);
+
+  const event = data.event;
+  if (event?.__typename !== 'Event') {
+    throw new Error();
+  }
 
   return (
     <Page>
       <HStack>
         <Heading as="h1">Lineup&nbsp;{query.year}</Heading>
         <Spacer />
-        <Suspense fallback={null}>
-          <YearSelector eventId={id} />
-        </Suspense>
+        <YearSelector currentEventId={eventId} events={data.events} />
       </HStack>
-      <Suspense
-        fallback={
-          <Center>
-            <Spinner />
-          </Center>
-        }
-      >
-        <LineupTable eventId={id} />
-      </Suspense>
+      <LineupTable event={event} areas={data.areas} />
     </Page>
   );
 }
@@ -59,8 +97,24 @@ export const getStaticPaths: GetStaticPaths = async () => {
   };
 };
 
-export const getStaticProps: GetStaticProps<Props> = async () => {
+type ParsedUrlQuery = {
+  year: string;
+};
+
+export const getStaticProps: GetStaticProps<Props, ParsedUrlQuery> = async (
+  ctx,
+) => {
+  const client = initializeApollo();
+  const eventId = `Event:kult${ctx.params?.year}`;
+
+  const {data} = await client.query<LineupTableQuery>({
+    query: LineupTableDocument,
+    variables: {
+      id: eventId,
+    },
+  });
+
   return {
-    props: {},
+    props: {data, eventId},
   };
 };

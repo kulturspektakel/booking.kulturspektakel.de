@@ -1,10 +1,11 @@
 import React from 'react';
 import Page from '../../components/Page';
 import {gql} from '@apollo/client';
-import {useNewsSingleQuery} from '../../types/graphql';
+import {NewsSingleDocument, NewsSingleQuery} from '../../types/graphql';
 import Article from '../../components/news/Article';
-import {useRouter} from 'next/router';
 import Head from 'next/head';
+import {GetStaticPaths, GetStaticProps} from 'next';
+import {initializeApollo} from '../_app';
 
 gql`
   query NewsSingle($id: ID!) {
@@ -16,15 +17,12 @@ gql`
   }
 `;
 
-export default function NewsSingle() {
-  const {query} = useRouter();
-  const {data} = useNewsSingleQuery({
-    variables: {
-      id: `News:${query.slug}`,
-    },
-  });
+type Props = {
+  data: NewsSingleQuery;
+};
 
-  if (data?.node?.__typename === 'News') {
+export default function NewsSingle({data}: Props) {
+  if (data.node?.__typename === 'News') {
     return (
       <Page>
         {/* <Head></Head> */}
@@ -33,3 +31,32 @@ export default function NewsSingle() {
     );
   }
 }
+
+type ParsedUrlQuery = {
+  slug: string;
+};
+
+export const getStaticPaths: GetStaticPaths<ParsedUrlQuery> = async () => {
+  // TODO
+
+  return {
+    paths: [{params: {slug: 'plakatjagd'}}],
+    fallback: false,
+  };
+};
+
+export const getStaticProps: GetStaticProps<Props, ParsedUrlQuery> = async (
+  ctx,
+) => {
+  const client = initializeApollo();
+  const {data} = await client.query<NewsSingleQuery>({
+    query: NewsSingleDocument,
+    variables: {
+      id: `News:${ctx.params?.slug}`,
+    },
+  });
+
+  return {
+    props: {data},
+  };
+};

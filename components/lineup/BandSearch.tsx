@@ -15,9 +15,10 @@ import {
 import React, {useMemo, useRef} from 'react';
 import {useCombobox} from 'downshift';
 import {BandSerachDocument, BandSerachQuery} from '../../types/graphql';
-import {TomoTypeaheadConfig, useTypeahead} from './TomoTypeahead';
 import {Search2Icon} from '@chakra-ui/icons';
 import {yearFromEventId} from './LineupTable';
+import {TomoTypeaheadConfig} from 'tomo-typeahead';
+import {useTypeahead} from 'tomo-typeahead/react';
 
 gql`
   query BandSerach($query: String!, $limit: Int!) {
@@ -110,6 +111,7 @@ export default function BandSearch(props: {
               <Search2Icon color="gray.300" />
             </InputLeftElement>
             <Input
+              bg="white"
               borderRadius="full"
               placeholder="Bands suchen…"
               {...getInputProps({ref})}

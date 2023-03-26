@@ -1,11 +1,18 @@
 import React, {useCallback, useMemo, useState} from 'react';
-import {gql, useSuspenseQuery_experimental} from '@apollo/client';
+import {gql} from '@apollo/client';
 import {
+  AreaPillFragment,
   BandSerachQuery,
-  LineupTableDocument,
-  LineupTableQuery,
+  LineupTableFragment,
 } from '../../types/graphql';
-import {Heading, HStack, List, ListItem, Spacer} from '@chakra-ui/react';
+import {
+  Heading,
+  HStack,
+  List,
+  ListItem,
+  SimpleGrid,
+  Spacer,
+} from '@chakra-ui/react';
 import BandSearch from './BandSearch';
 import DateString, {isSameDay} from '../DateString';
 import BandBox from './BandBox';
@@ -13,27 +20,17 @@ import AreaPill from './AreaPill';
 import {useRouter} from 'next/router';
 
 gql`
-  query LineupTable($id: ID!) {
-    areas {
-      ...AreaPill
-    }
-    event: node(id: $id) {
-      ... on Event {
-        id
-        name
-        start
-        end
-        bandsPlaying(first: 100) {
-          edges {
-            node {
-              id
-              slug
-              event {
-                id
-              }
-              ...BandBox
-            }
+  fragment LineupTable on Event {
+    id
+    bandsPlaying(first: 100) {
+      edges {
+        node {
+          id
+          slug
+          event {
+            id
           }
+          ...BandBox
         }
       }
     }
@@ -61,31 +58,22 @@ function useBandSearchNavigation(eventId: string): [BS, (value: BS) => void] {
   return [band, selectBand];
 }
 
-export default function LineupTable(props: {eventId: string}) {
-  const {data} = useSuspenseQuery_experimental<LineupTableQuery>(
-    LineupTableDocument,
-    {
-      variables: {
-        id: props.eventId,
-      },
-    },
-  );
-
-  const event = data.event;
-  if (event == null || event.__typename !== 'Event') {
-    throw new Error();
-  }
-
-  const [band, selectBand] = useBandSearchNavigation(props.eventId);
-
+export default function LineupTable({
+  event,
+  areas,
+}: {
+  event: LineupTableFragment;
+  areas: AreaPillFragment[];
+}) {
+  const [band, selectBand] = useBandSearchNavigation(event.id);
   const [stage, selectStage] = useState<string | null>(null);
 
-  const areas = useMemo(() => {
+  const a = useMemo(() => {
     const activeAreas = new Set(
       event.bandsPlaying.edges.map(({node}) => node.area.id),
     );
-    return data?.areas.filter((a) => activeAreas.has(a.id));
-  }, [data?.areas, event.bandsPlaying]);
+    return areas.filter((a) => activeAreas.has(a.id));
+  }, [areas, event.bandsPlaying.edges]);
 
   const days = useMemo(
     () =>
@@ -100,21 +88,21 @@ export default function LineupTable(props: {eventId: string}) {
 
   return (
     <>
+      <HStack mt="4">
+        {a.map((a) => (
+          <AreaPill
+            area={a}
+            isSelected={a.id === stage}
+            onChange={selectStage}
+            key={a.id}
+          />
+        ))}
+        <Spacer />
+        <BandSearch onSelect={selectBand} />
+      </HStack>
       <List>
-        <HStack mt="4">
-          {areas?.map((a) => (
-            <AreaPill
-              area={a}
-              isSelected={a.id === stage}
-              onChange={selectStage}
-              key={a.id}
-            />
-          ))}
-          <Spacer />
-          <BandSearch onSelect={selectBand} />
-        </HStack>
         {days.map((day) => (
-          <ListItem key={day.toDateString()}>
+          <ListItem key={day.getTime()}>
             <Heading textAlign="center" mt="16" mb="12">
               <DateString
                 date={day}
@@ -125,7 +113,7 @@ export default function LineupTable(props: {eventId: string}) {
                 }}
               />
             </Heading>
-            <List>
+            <SimpleGrid columns={{sm: 3, base: 2}} spacing={2}>
               {event.bandsPlaying.edges
                 .filter(
                   ({node}) =>
@@ -134,14 +122,14 @@ export default function LineupTable(props: {eventId: string}) {
                 )
                 .map(({node}) => (
                   <BandBox
-                    href={`${props.eventId.replace(/[^\d]/g, '')}/${node.slug}`}
+                    href={`${event.id.replace(/[^\d]/g, '')}/${node.slug}`}
                     key={node.id}
                     band={node}
                     isHighlighted={node.id === band?.id}
                     onHighlight={selectBand}
                   />
                 ))}
-            </List>
+            </SimpleGrid>
           </ListItem>
         ))}
       </List>

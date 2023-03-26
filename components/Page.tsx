@@ -5,6 +5,7 @@ import {
   Center,
   Container,
   Flex,
+  Heading,
   IconButton,
   Link,
   List,
@@ -48,7 +49,13 @@ const footerItems = [
   {label: 'Impressum', href: '/impressum'},
 ];
 
-export default function Page({children}: {children: React.ReactNode}) {
+export default function Page({
+  children,
+  title,
+}: {
+  children: React.ReactNode;
+  title?: string;
+}) {
   const {pathname} = useRouter();
   const {data} = useSuspenseQuery_experimental<PageQuery>(PageDocument, {});
   const event = data.events.at(0);
@@ -72,6 +79,7 @@ export default function Page({children}: {children: React.ReactNode}) {
               // mixBlendMode: 'lighten',
               opacity: 0.05,
             }}
+            alt=""
           />
         )}
         <Show below="md">
@@ -120,9 +128,14 @@ export default function Page({children}: {children: React.ReactNode}) {
           <meta name="viewport" content="width=device-width, initial-scale=1" />
           <title>Kulturspektakel Gauting</title>
         </Head>
+        {title != null && (
+          <Heading mb="8" textAlign="center">
+            {title}
+          </Heading>
+        )}
         {children}
       </Container>
-      <Box as="footer" bg="gray.100" p="10">
+      <Box as="footer" bg="gray.200" p="10">
         <Container maxW="container.md">
           <List>
             {footerItems.map(({label, href}, i) => (

@@ -769,14 +769,6 @@ export type DuplicateApplicationWarningQuery = {
   } | null;
 };
 
-export type EventDetailsFragment = {
-  __typename?: 'Event';
-  name: string;
-  start: Date;
-  end: Date;
-  description?: string | null;
-};
-
 export type AreaPillFragment = {
   __typename?: 'Area';
   id: string;
@@ -816,8 +808,10 @@ export type BandDetailQuery = {
       __typename?: 'PixelImage';
       uri: string;
       title?: string | null;
+      width: number;
+      height: number;
     } | null;
-    area: {__typename?: 'Area'; displayName: string};
+    area: {__typename?: 'Area'; displayName: string; themeColor: string};
   } | null;
 };
 
@@ -836,75 +830,41 @@ export type BandSerachQuery = {
   }>;
 };
 
-export type LineupTableQueryVariables = Exact<{
-  id: Scalars['ID'];
-}>;
-
-export type LineupTableQuery = {
-  __typename?: 'Query';
-  areas: Array<{
-    __typename?: 'Area';
-    id: string;
-    displayName: string;
-    themeColor: string;
-  }>;
-  event?:
-    | {__typename?: 'Area'}
-    | {__typename?: 'BandApplication'}
-    | {__typename?: 'BandApplicationComment'}
-    | {__typename?: 'BandPlaying'}
-    | {__typename?: 'Card'}
-    | {__typename?: 'Device'}
-    | {
-        __typename?: 'Event';
+export type LineupTableFragment = {
+  __typename?: 'Event';
+  id: string;
+  bandsPlaying: {
+    __typename?: 'EventBandsPlayingConnection';
+    edges: Array<{
+      __typename?: 'EventBandsPlayingConnectionEdge';
+      node: {
+        __typename?: 'BandPlaying';
         id: string;
+        slug: string;
+        genre?: string | null;
         name: string;
-        start: Date;
-        end: Date;
-        bandsPlaying: {
-          __typename?: 'EventBandsPlayingConnection';
-          edges: Array<{
-            __typename?: 'EventBandsPlayingConnectionEdge';
-            node: {
-              __typename?: 'BandPlaying';
-              id: string;
-              slug: string;
-              genre?: string | null;
-              name: string;
-              startTime: Date;
-              event: {__typename?: 'Event'; id: string};
-              photo?: {__typename?: 'PixelImage'; uri: string} | null;
-              area: {
-                __typename?: 'Area';
-                id: string;
-                displayName: string;
-                themeColor: string;
-              };
-            };
-          }>;
+        startTime: Date;
+        event: {__typename?: 'Event'; id: string};
+        photo?: {__typename?: 'PixelImage'; uri: string} | null;
+        area: {
+          __typename?: 'Area';
+          id: string;
+          displayName: string;
+          themeColor: string;
         };
-      }
-    | {__typename?: 'News'}
-    | {__typename?: 'NuclinoPage'}
-    | {__typename?: 'Product'}
-    | {__typename?: 'ProductList'}
-    | {__typename?: 'Viewer'}
-    | null;
+      };
+    }>;
+  };
 };
 
-export type YearSelectorQueryVariables = Exact<{[key: string]: never}>;
-
-export type YearSelectorQuery = {
-  __typename?: 'Query';
-  events: Array<{
-    __typename?: 'Event';
-    id: string;
-    start: Date;
-    bandsPlaying: {
-      __typename?: 'EventBandsPlayingConnection';
-      totalCount: number;
-    };
-  }>;
+export type YearSelectorFragment = {
+  __typename?: 'Event';
+  id: string;
+  start: Date;
+  bandsPlaying: {
+    __typename?: 'EventBandsPlayingConnection';
+    totalCount: number;
+  };
 };
 
 export type ArticleFragment = {
@@ -913,6 +873,13 @@ export type ArticleFragment = {
   title: string;
   createdAt: Date;
   content: string;
+};
+
+export type ArticleHeadFragment = {
+  __typename?: 'News';
+  slug: string;
+  title: string;
+  createdAt: Date;
 };
 
 export type ThanksQueryVariables = Exact<{
@@ -991,6 +958,13 @@ export type EventsQuery = {
     start: Date;
     end: Date;
     description?: string | null;
+    poster?: {
+      __typename?: 'PixelImage';
+      uri: string;
+      copyright?: string | null;
+      width: number;
+      height: number;
+    } | null;
   }>;
 };
 
@@ -1011,6 +985,89 @@ export type NewsQuery = {
       };
     }>;
   };
+};
+
+export type BandDetailStaticPathsQueryVariables = Exact<{[key: string]: never}>;
+
+export type BandDetailStaticPathsQuery = {
+  __typename?: 'Query';
+  events: Array<{
+    __typename?: 'Event';
+    id: string;
+    start: Date;
+    bandsPlaying: {
+      __typename?: 'EventBandsPlayingConnection';
+      edges: Array<{
+        __typename?: 'EventBandsPlayingConnectionEdge';
+        node: {__typename?: 'BandPlaying'; slug: string};
+      }>;
+    };
+  }>;
+};
+
+export type LineupTableQueryVariables = Exact<{
+  id: Scalars['ID'];
+}>;
+
+export type LineupTableQuery = {
+  __typename?: 'Query';
+  areas: Array<{
+    __typename?: 'Area';
+    id: string;
+    displayName: string;
+    themeColor: string;
+  }>;
+  events: Array<{
+    __typename?: 'Event';
+    id: string;
+    start: Date;
+    bandsPlaying: {
+      __typename?: 'EventBandsPlayingConnection';
+      totalCount: number;
+    };
+  }>;
+  event?:
+    | {__typename?: 'Area'}
+    | {__typename?: 'BandApplication'}
+    | {__typename?: 'BandApplicationComment'}
+    | {__typename?: 'BandPlaying'}
+    | {__typename?: 'Card'}
+    | {__typename?: 'Device'}
+    | {
+        __typename?: 'Event';
+        id: string;
+        name: string;
+        start: Date;
+        end: Date;
+        bandsPlaying: {
+          __typename?: 'EventBandsPlayingConnection';
+          edges: Array<{
+            __typename?: 'EventBandsPlayingConnectionEdge';
+            node: {
+              __typename?: 'BandPlaying';
+              id: string;
+              slug: string;
+              genre?: string | null;
+              name: string;
+              startTime: Date;
+              event: {__typename?: 'Event'; id: string};
+              photo?: {__typename?: 'PixelImage'; uri: string} | null;
+              area: {
+                __typename?: 'Area';
+                id: string;
+                displayName: string;
+                themeColor: string;
+              };
+            };
+          }>;
+        };
+      }
+    | {__typename?: 'News'}
+    | {__typename?: 'NuclinoPage'}
+    | {__typename?: 'Product'}
+    | {__typename?: 'ProductList'}
+    | {__typename?: 'Viewer'}
+    | null;
 };
 
 export type LineUpStaticPathsQueryVariables = Exact<{[key: string]: never}>;
@@ -1093,14 +1150,6 @@ export type PostersQuery = {
   }>;
 };
 
-export const EventDetailsFragmentDoc = gql`
-  fragment EventDetails on Event {
-    name
-    start
-    end
-    description
-  }
-`;
 export const AreaPillFragmentDoc = gql`
   fragment AreaPill on Area {
     id
@@ -1124,13 +1173,49 @@ export const BandBoxFragmentDoc = gql`
     }
   }
 `;
+export const LineupTableFragmentDoc = gql`
+  fragment LineupTable on Event {
+    id
+    bandsPlaying(first: 100) {
+      edges {
+        node {
+          id
+          slug
+          event {
+            id
+          }
+          ...BandBox
+        }
+      }
+    }
+  }
+  ${BandBoxFragmentDoc}
+`;
+export const YearSelectorFragmentDoc = gql`
+  fragment YearSelector on Event {
+    id
+    start
+    bandsPlaying {
+      totalCount
+    }
+  }
+`;
+export const ArticleHeadFragmentDoc = gql`
+  fragment ArticleHead on News {
+    slug
+    title
+    createdAt
+  }
+`;
 export const ArticleFragmentDoc = gql`
   fragment Article on News {
     slug
     title
     createdAt
     content
+    ...ArticleHead
   }
+  ${ArticleHeadFragmentDoc}
 `;
 export const PageDocument = gql`
   query Page {
@@ -1295,9 +1380,12 @@ export const BandDetailDocument = gql`
       photo {
         uri
         title
+        width
+        height
       }
       area {
         displayName
+        themeColor
       }
     }
   }
@@ -1412,145 +1500,6 @@ export type BandSerachLazyQueryHookResult = ReturnType<
 export type BandSerachQueryResult = Apollo.QueryResult<
   BandSerachQuery,
   BandSerachQueryVariables
->;
-export const LineupTableDocument = gql`
-  query LineupTable($id: ID!) {
-    areas {
-      ...AreaPill
-    }
-    event: node(id: $id) {
-      ... on Event {
-        id
-        name
-        start
-        end
-        bandsPlaying(first: 100) {
-          edges {
-            node {
-              id
-              slug
-              event {
-                id
-              }
-              ...BandBox
-            }
-          }
-        }
-      }
-    }
-  }
-  ${AreaPillFragmentDoc}
-  ${BandBoxFragmentDoc}
-`;
-
-/**
- * __useLineupTableQuery__
- *
- * To run a query within a React component, call `useLineupTableQuery` and pass it any options that fit your needs.
- * When your component renders, `useLineupTableQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useLineupTableQuery({
- *   variables: {
- *      id: // value for 'id'
- *   },
- * });
- */
-export function useLineupTableQuery(
-  baseOptions: Apollo.QueryHookOptions<
-    LineupTableQuery,
-    LineupTableQueryVariables
-  >,
-) {
-  const options = {...defaultOptions, ...baseOptions};
-  return Apollo.useQuery<LineupTableQuery, LineupTableQueryVariables>(
-    LineupTableDocument,
-    options,
-  );
-}
-export function useLineupTableLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    LineupTableQuery,
-    LineupTableQueryVariables
-  >,
-) {
-  const options = {...defaultOptions, ...baseOptions};
-  return Apollo.useLazyQuery<LineupTableQuery, LineupTableQueryVariables>(
-    LineupTableDocument,
-    options,
-  );
-}
-export type LineupTableQueryHookResult = ReturnType<typeof useLineupTableQuery>;
-export type LineupTableLazyQueryHookResult = ReturnType<
-  typeof useLineupTableLazyQuery
->;
-export type LineupTableQueryResult = Apollo.QueryResult<
-  LineupTableQuery,
-  LineupTableQueryVariables
->;
-export const YearSelectorDocument = gql`
-  query YearSelector {
-    events(type: Kulturspektakel) {
-      id
-      start
-      bandsPlaying {
-        totalCount
-      }
-    }
-  }
-`;
-
-/**
- * __useYearSelectorQuery__
- *
- * To run a query within a React component, call `useYearSelectorQuery` and pass it any options that fit your needs.
- * When your component renders, `useYearSelectorQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useYearSelectorQuery({
- *   variables: {
- *   },
- * });
- */
-export function useYearSelectorQuery(
-  baseOptions?: Apollo.QueryHookOptions<
-    YearSelectorQuery,
-    YearSelectorQueryVariables
-  >,
-) {
-  const options = {...defaultOptions, ...baseOptions};
-  return Apollo.useQuery<YearSelectorQuery, YearSelectorQueryVariables>(
-    YearSelectorDocument,
-    options,
-  );
-}
-export function useYearSelectorLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    YearSelectorQuery,
-    YearSelectorQueryVariables
-  >,
-) {
-  const options = {...defaultOptions, ...baseOptions};
-  return Apollo.useLazyQuery<YearSelectorQuery, YearSelectorQueryVariables>(
-    YearSelectorDocument,
-    options,
-  );
-}
-export type YearSelectorQueryHookResult = ReturnType<
-  typeof useYearSelectorQuery
->;
-export type YearSelectorLazyQueryHookResult = ReturnType<
-  typeof useYearSelectorLazyQuery
->;
-export type YearSelectorQueryResult = Apollo.QueryResult<
-  YearSelectorQuery,
-  YearSelectorQueryVariables
 >;
 export const ThanksDocument = gql`
   query Thanks($id: ID!) {
@@ -1710,12 +1659,20 @@ export type EventQueryResult = Apollo.QueryResult<
 >;
 export const EventsDocument = gql`
   query Events {
-    events(type: Other) {
+    events {
       id
-      ...EventDetails
+      name
+      start
+      end
+      description
+      poster {
+        uri
+        copyright
+        width
+        height
+      }
     }
   }
-  ${EventDetailsFragmentDoc}
 `;
 
 /**
@@ -1803,6 +1760,142 @@ export function useNewsLazyQuery(
 export type NewsQueryHookResult = ReturnType<typeof useNewsQuery>;
 export type NewsLazyQueryHookResult = ReturnType<typeof useNewsLazyQuery>;
 export type NewsQueryResult = Apollo.QueryResult<NewsQuery, NewsQueryVariables>;
+export const BandDetailStaticPathsDocument = gql`
+  query BandDetailStaticPaths {
+    events(type: Kulturspektakel) {
+      id
+      start
+      bandsPlaying {
+        edges {
+          node {
+            slug
+          }
+        }
+      }
+    }
+  }
+`;
+
+/**
+ * __useBandDetailStaticPathsQuery__
+ *
+ * To run a query within a React component, call `useBandDetailStaticPathsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useBandDetailStaticPathsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useBandDetailStaticPathsQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useBandDetailStaticPathsQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    BandDetailStaticPathsQuery,
+    BandDetailStaticPathsQueryVariables
+  >,
+) {
+  const options = {...defaultOptions, ...baseOptions};
+  return Apollo.useQuery<
+    BandDetailStaticPathsQuery,
+    BandDetailStaticPathsQueryVariables
+  >(BandDetailStaticPathsDocument, options);
+}
+export function useBandDetailStaticPathsLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    BandDetailStaticPathsQuery,
+    BandDetailStaticPathsQueryVariables
+  >,
+) {
+  const options = {...defaultOptions, ...baseOptions};
+  return Apollo.useLazyQuery<
+    BandDetailStaticPathsQuery,
+    BandDetailStaticPathsQueryVariables
+  >(BandDetailStaticPathsDocument, options);
+}
+export type BandDetailStaticPathsQueryHookResult = ReturnType<
+  typeof useBandDetailStaticPathsQuery
+>;
+export type BandDetailStaticPathsLazyQueryHookResult = ReturnType<
+  typeof useBandDetailStaticPathsLazyQuery
+>;
+export type BandDetailStaticPathsQueryResult = Apollo.QueryResult<
+  BandDetailStaticPathsQuery,
+  BandDetailStaticPathsQueryVariables
+>;
+export const LineupTableDocument = gql`
+  query LineupTable($id: ID!) {
+    areas {
+      ...AreaPill
+    }
+    events(type: Kulturspektakel) {
+      ...YearSelector
+    }
+    event: node(id: $id) {
+      ... on Event {
+        id
+        name
+        start
+        end
+        ...LineupTable
+      }
+    }
+  }
+  ${AreaPillFragmentDoc}
+  ${YearSelectorFragmentDoc}
+  ${LineupTableFragmentDoc}
+`;
+
+/**
+ * __useLineupTableQuery__
+ *
+ * To run a query within a React component, call `useLineupTableQuery` and pass it any options that fit your needs.
+ * When your component renders, `useLineupTableQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useLineupTableQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useLineupTableQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    LineupTableQuery,
+    LineupTableQueryVariables
+  >,
+) {
+  const options = {...defaultOptions, ...baseOptions};
+  return Apollo.useQuery<LineupTableQuery, LineupTableQueryVariables>(
+    LineupTableDocument,
+    options,
+  );
+}
+export function useLineupTableLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    LineupTableQuery,
+    LineupTableQueryVariables
+  >,
+) {
+  const options = {...defaultOptions, ...baseOptions};
+  return Apollo.useLazyQuery<LineupTableQuery, LineupTableQueryVariables>(
+    LineupTableDocument,
+    options,
+  );
+}
+export type LineupTableQueryHookResult = ReturnType<typeof useLineupTableQuery>;
+export type LineupTableLazyQueryHookResult = ReturnType<
+  typeof useLineupTableLazyQuery
+>;
+export type LineupTableQueryResult = Apollo.QueryResult<
+  LineupTableQuery,
+  LineupTableQueryVariables
+>;
 export const LineUpStaticPathsDocument = gql`
   query LineUpStaticPaths {
     events(type: Kulturspektakel) {

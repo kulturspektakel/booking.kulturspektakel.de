@@ -7,7 +7,13 @@ export default function Mark({
   bgColor,
   ...props
 }: {children: React.ReactNode} & TextProps) {
-  const {red, green, blue} = hexRgb(String(bgColor ?? 'ffff00'));
+  const {red, green, blue} = bgColor
+    ? hexRgb(String(bgColor))
+    : {
+        red: 255,
+        green: 215,
+        blue: 75,
+      };
   return (
     <Text
       as="mark"
@@ -21,9 +27,9 @@ export default function Mark({
       boxDecorationBreak="clone"
       bgImage={`linear-gradient(
         to right,
-        rgba(${red}, ${green}, ${blue}, 0.1),
-        rgba(${red}, ${green}, ${blue}, 0.7) 4%,
-        rgba(${red}, ${green}, ${blue}, 0.3)
+        rgba(${red}, ${green}, ${blue}, 0.5),
+        rgba(${red}, ${green}, ${blue}, 1) 4%,
+        rgba(${red}, ${green}, ${blue}, 0.6)
       )`}
     >
       {children}

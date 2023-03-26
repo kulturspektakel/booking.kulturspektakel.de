@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React from 'react';
 import {gql} from '@apollo/client';
 import {BandBoxFragment} from '../../types/graphql';
 import {Box, Heading, Text, Link} from '@chakra-ui/react';
@@ -31,14 +31,8 @@ export default function BandBox({
   href: string;
   band: BandBoxFragment;
 }) {
-  const [hover, setHover] = useState(false);
-
   return (
     <Link
-      onFocus={() => setHover(true)}
-      onBlur={() => setHover(false)}
-      onMouseEnter={() => setHover(true)}
-      onMouseLeave={() => setHover(false)}
       as={NextLink}
       display="inline-block"
       borderRadius="xl"
@@ -46,30 +40,56 @@ export default function BandBox({
       m="1.5"
       mb="0"
       href={href}
-      color={hover && band.area.id === 'Area:dj' ? 'white' : undefined}
-      bg="gray.100"
+      color={band.area.id === 'Area:dj' ? 'white' : undefined}
+      bg="blackAlpha.800"
+      boxShadow="sm"
       p="4"
       pe="6"
-      h="40"
-      maxW="300"
+      w="233px"
+      h="233px"
       position="relative"
       _hover={{
-        textDecoration: 'none',
-        bgColor: band.area.themeColor,
+        transform: 'scale(1.03) rotate(1deg)',
+        boxShadow: 'lg',
       }}
       _focusVisible={{
-        outlineColor: 'black',
+        transform: 'scale(1.03) rotate(1deg)',
+        outlineColor: 'blue',
+        boxShadow: 'lg',
       }}
       _active={{
-        outlineColor: 'black',
+        transform: 'scale(1.03) rotate(1deg)',
+        outlineColor: 'blue',
+        boxShadow: 'lg',
       }}
     >
-      <Box zIndex="3" position="relative">
-        <Text fontWeight="bold">
-          <TimeString date={band.startTime} />
-          &nbsp;
-          <Mark bgColor={band.area.themeColor}>{band.area.displayName}</Mark>
-        </Text>
+      <Mark
+        zIndex="3"
+        position="absolute"
+        top="3"
+        left="4"
+        color="white"
+        bgColor={band.area.themeColor}
+      >
+        <TimeString date={band.startTime} />
+        &nbsp;
+        {band.area.displayName}
+      </Mark>
+
+      <Box
+        bgGradient={`linear(to-b, transparent, black)`}
+        position="absolute"
+        left="0"
+        right="0"
+        bottom="0"
+        top="0"
+        p="4"
+        pb="3"
+        zIndex="2"
+        display="flex"
+        flexDirection="column"
+        justifyContent="flex-end"
+      >
         <Heading
           size="lg"
           lineHeight="1"
@@ -77,23 +97,16 @@ export default function BandBox({
           pb="0.5"
           noOfLines={3}
           fontWeight="bold"
+          color="white"
+          sx={{hyphens: 'auto'}}
         >
           {band.name}
         </Heading>
-        {band.genre}
+        <Text noOfLines={1} color="white">
+          {band.genre}
+        </Text>
       </Box>
-      {hover && (
-        <Box
-          bgGradient={`linear(to-b, ${band.area.themeColor}, transparent)`}
-          position="absolute"
-          left="0"
-          top="0"
-          right="0"
-          h="60"
-          zIndex="2"
-        />
-      )}
-      {hover && band.photo != null && (
+      {band.photo != null && (
         <Image
           src={band.photo.uri}
           alt=""
@@ -102,10 +115,9 @@ export default function BandBox({
           fill
           style={{
             filter: `grayscale(1)`,
-            opacity: 0.8,
             objectFit: 'cover',
-            objectPosition: '0 30%',
-            mixBlendMode: 'overlay',
+            objectPosition: '50% 30%',
+            // mixBlendMode: 'overlay',
             zIndex: 1,
           }}
         />

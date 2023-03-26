@@ -2,6 +2,7 @@ import React, {useState} from 'react';
 import {gql} from '@apollo/client';
 import {Button, Center, ScaleFade} from '@chakra-ui/react';
 import {CloseIcon} from '@chakra-ui/icons';
+import {AreaPillFragment} from '../../types/graphql';
 
 gql`
   fragment AreaPill on Area {
@@ -18,7 +19,7 @@ export default function AreaPill({
 }: {
   area: AreaPillFragment;
   isSelected: boolean;
-  onChange: (value: string) => void;
+  onChange: (value: string | null) => void;
 }) {
   const [hover, setHover] = useState(false);
 

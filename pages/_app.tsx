@@ -1,7 +1,12 @@
 import '../styles/globals.css';
 import React, {useMemo} from 'react';
 import {AppProps} from 'next/app';
-import {ChakraProvider, extendTheme} from '@chakra-ui/react';
+import {
+  ChakraProvider,
+  defineStyle,
+  defineStyleConfig,
+  extendTheme,
+} from '@chakra-ui/react';
 import {
   ApolloProvider,
   ApolloClient,
@@ -24,15 +29,38 @@ const App = ({Component, pageProps}: AppProps) => {
 
   const theme = extendTheme({
     fonts: {
-      heading: `"Space Grotesk", "Conduit ITC ExtraBold", sans-serif`,
+      heading: `"Space Grotesk", sans-serif`,
       body: `"Space Grotesk", sans-serif`,
     },
     colors: {
       brand: {
         '900': '#073332',
       },
+      gray: {
+        // '50': '#F3F3F1',
+        '100': '#f6f5f0',
+        '200': '#dbd8d3',
+        '300': '#d0cabc',
+        '400': '#b6b39f',
+        '500': '#9c9686',
+        '600': '#5a574e',
+        // '700': '#524F47',
+        // '800': '#37352F',
+        // '900': '#1B1A18',
+      },
     },
     components: {
+      Button: defineStyleConfig({
+        baseStyle: defineStyle({
+          fontWeight: 'semibold',
+        }),
+        variants: {
+          solid: {
+            bgColor: 'white',
+            boxShadow: 'sm',
+          },
+        },
+      }),
       Steps: {
         ...Steps,
         baseStyle: (props: any) => ({
@@ -50,7 +78,7 @@ const App = ({Component, pageProps}: AppProps) => {
     styles: {
       global: {
         body: {
-          backgroundColor: 'gray.50',
+          backgroundColor: 'gray.100',
         },
       },
     },
