@@ -38,6 +38,14 @@ export type AreaOpeningHourArgs = {
   day?: InputMaybe<Scalars['Date']>;
 };
 
+export type Asset = {
+  copyright?: Maybe<Scalars['String']>;
+  id: Scalars['String'];
+  title?: Maybe<Scalars['String']>;
+  type: Scalars['String'];
+  uri: Scalars['String'];
+};
+
 export type BandApplication = Node & {
   __typename?: 'BandApplication';
   bandApplicationRating: Array<BandApplicationRating>;
@@ -131,6 +139,9 @@ export type BandPlaying = Node & {
   genre?: Maybe<Scalars['String']>;
   id: Scalars['ID'];
   name: Scalars['String'];
+  photo?: Maybe<PixelImage>;
+  shortDescription?: Maybe<Scalars['String']>;
+  slug: Scalars['String'];
   startTime: Scalars['DateTime'];
 };
 
@@ -280,12 +291,56 @@ export type Event = Node & {
   bandApplication: Array<BandApplication>;
   bandApplicationEnd?: Maybe<Scalars['DateTime']>;
   bandApplicationStart?: Maybe<Scalars['DateTime']>;
-  bandsPlaying: Array<BandPlaying>;
+  bandsPlaying: EventBandsPlayingConnection;
+  description?: Maybe<Scalars['String']>;
   djApplicationEnd?: Maybe<Scalars['DateTime']>;
   end: Scalars['DateTime'];
   id: Scalars['ID'];
+  media: EventMediaConnection;
   name: Scalars['String'];
+  poster?: Maybe<PixelImage>;
   start: Scalars['DateTime'];
+};
+
+export type EventBandsPlayingArgs = {
+  after?: InputMaybe<Scalars['String']>;
+  before?: InputMaybe<Scalars['String']>;
+  first?: InputMaybe<Scalars['Int']>;
+  last?: InputMaybe<Scalars['Int']>;
+};
+
+export type EventMediaArgs = {
+  after?: InputMaybe<Scalars['String']>;
+  before?: InputMaybe<Scalars['String']>;
+  first?: InputMaybe<Scalars['Int']>;
+  height?: InputMaybe<Scalars['Int']>;
+  last?: InputMaybe<Scalars['Int']>;
+  width?: InputMaybe<Scalars['Int']>;
+};
+
+export type EventBandsPlayingConnection = {
+  __typename?: 'EventBandsPlayingConnection';
+  edges: Array<EventBandsPlayingConnectionEdge>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int'];
+};
+
+export type EventBandsPlayingConnectionEdge = {
+  __typename?: 'EventBandsPlayingConnectionEdge';
+  cursor: Scalars['String'];
+  node: BandPlaying;
+};
+
+export type EventMediaConnection = {
+  __typename?: 'EventMediaConnection';
+  edges: Array<EventMediaConnectionEdge>;
+  pageInfo: PageInfo;
+};
+
+export type EventMediaConnectionEdge = {
+  __typename?: 'EventMediaConnectionEdge';
+  cursor: Scalars['String'];
+  node: Asset;
 };
 
 export enum EventType {
@@ -352,6 +407,7 @@ export type Mutation = {
 
 export type MutationCreateBandApplicationArgs = {
   data: CreateBandApplicationInput;
+  eventId: Scalars['ID'];
 };
 
 export type MutationCreateBandApplicationCommentArgs = {
@@ -395,6 +451,15 @@ export type MutationUpsertProductListArgs = {
   id?: InputMaybe<Scalars['ID']>;
   name?: InputMaybe<Scalars['String']>;
   products?: InputMaybe<Array<ProductInput>>;
+};
+
+export type News = Node & {
+  __typename?: 'News';
+  content: Scalars['String'];
+  createdAt: Scalars['Date'];
+  id: Scalars['ID'];
+  slug: Scalars['String'];
+  title: Scalars['String'];
 };
 
 export type Node = {
@@ -483,6 +548,23 @@ export type PageInfo = {
   startCursor?: Maybe<Scalars['String']>;
 };
 
+export type PixelImage = Asset & {
+  __typename?: 'PixelImage';
+  copyright?: Maybe<Scalars['String']>;
+  height: Scalars['Int'];
+  id: Scalars['String'];
+  scaledUri: Scalars['String'];
+  title?: Maybe<Scalars['String']>;
+  type: Scalars['String'];
+  uri: Scalars['String'];
+  width: Scalars['Int'];
+};
+
+export type PixelImageScaledUriArgs = {
+  height?: InputMaybe<Scalars['Int']>;
+  width?: InputMaybe<Scalars['Int']>;
+};
+
 export enum PreviouslyPlayed {
   No = 'No',
   OtherFormation = 'OtherFormation',
@@ -492,6 +574,7 @@ export enum PreviouslyPlayed {
 export type Product = Billable &
   Node & {
     __typename?: 'Product';
+    additives: Array<ProductAdditives>;
     id: Scalars['ID'];
     name: Scalars['String'];
     price: Scalars['Int'];
@@ -505,16 +588,24 @@ export type ProductSalesNumbersArgs = {
   before: Scalars['DateTime'];
 };
 
+export type ProductAdditives = {
+  __typename?: 'ProductAdditives';
+  displayName: Scalars['String'];
+  id: Scalars['ID'];
+};
+
 export type ProductInput = {
+  additives: Array<Scalars['ID']>;
   name: Scalars['String'];
   price: Scalars['Int'];
-  requiresDeposit?: InputMaybe<Scalars['Boolean']>;
+  requiresDeposit: Scalars['Boolean'];
 };
 
 export type ProductList = Billable &
   Node & {
     __typename?: 'ProductList';
     active: Scalars['Boolean'];
+    description?: Maybe<Scalars['String']>;
     emoji?: Maybe<Scalars['String']>;
     historicalProducts: Array<HistoricalProduct>;
     id: Scalars['ID'];
@@ -531,19 +622,27 @@ export type ProductListSalesNumbersArgs = {
 export type Query = {
   __typename?: 'Query';
   areas: Array<Area>;
+  bandPlaying?: Maybe<BandPlaying>;
   cardStatus: CardStatus;
   checkDuplicateApplication?: Maybe<ObfuscatedBandApplication>;
   config: Config;
   devices: Array<Device>;
   distanceToKult?: Maybe<Scalars['Float']>;
   events: Array<Event>;
-  findBandPlaying?: Maybe<Array<BandPlaying>>;
+  findBandPlaying: Array<BandPlaying>;
+  news: QueryNewsConnection;
   node?: Maybe<Node>;
   nodes: Array<Maybe<Node>>;
   nuclinoPages: Array<NuclinoSearchResult>;
+  productAdditives: Array<ProductAdditives>;
   productLists: Array<ProductList>;
   transactions: Transactions;
   viewer?: Maybe<Viewer>;
+};
+
+export type QueryBandPlayingArgs = {
+  eventId: Scalars['ID'];
+  slug: Scalars['String'];
 };
 
 export type QueryCardStatusArgs = {
@@ -564,11 +663,20 @@ export type QueryDistanceToKultArgs = {
 };
 
 export type QueryEventsArgs = {
+  limit?: InputMaybe<Scalars['Int']>;
   type?: InputMaybe<EventType>;
 };
 
 export type QueryFindBandPlayingArgs = {
+  limit?: InputMaybe<Scalars['Int']>;
   query: Scalars['String'];
+};
+
+export type QueryNewsArgs = {
+  after?: InputMaybe<Scalars['String']>;
+  before?: InputMaybe<Scalars['String']>;
+  first?: InputMaybe<Scalars['Int']>;
+  last?: InputMaybe<Scalars['Int']>;
 };
 
 export type QueryNodeArgs = {
@@ -581,6 +689,27 @@ export type QueryNodesArgs = {
 
 export type QueryNuclinoPagesArgs = {
   query: Scalars['String'];
+};
+
+export type QueryProductAdditivesArgs = {
+  type?: InputMaybe<DeviceType>;
+};
+
+export type QueryProductListsArgs = {
+  activeOnly?: InputMaybe<Scalars['Boolean']>;
+};
+
+export type QueryNewsConnection = {
+  __typename?: 'QueryNewsConnection';
+  edges: Array<QueryNewsConnectionEdge>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int'];
+};
+
+export type QueryNewsConnectionEdge = {
+  __typename?: 'QueryNewsConnectionEdge';
+  cursor: Scalars['String'];
+  node: News;
 };
 
 export type SalesNumber = {
@@ -667,40 +796,6 @@ export type DuplicateApplicationWarningQuery = {
   } | null;
 };
 
-export type ThanksQueryVariables = Exact<{
-  id: Scalars['ID'];
-}>;
-
-export type ThanksQuery = {
-  __typename?: 'Query';
-  node?:
-    | {__typename?: 'Area'}
-    | {__typename?: 'BandApplication'}
-    | {__typename?: 'BandApplicationComment'}
-    | {__typename?: 'BandPlaying'}
-    | {__typename?: 'Card'}
-    | {__typename?: 'Device'}
-    | {
-        __typename?: 'Event';
-        bandApplicationEnd?: Date | null;
-        djApplicationEnd?: Date | null;
-      }
-    | {__typename?: 'NuclinoPage'}
-    | {__typename?: 'Product'}
-    | {__typename?: 'ProductList'}
-    | {__typename?: 'Viewer'}
-    | null;
-};
-
-export type CreateBandApplicationMutationVariables = Exact<{
-  data: CreateBandApplicationInput;
-}>;
-
-export type CreateBandApplicationMutation = {
-  __typename?: 'Mutation';
-  createBandApplication: {__typename?: 'BandApplication'; id: string};
-};
-
 export type EventQueryVariables = Exact<{
   id: Scalars['ID'];
 }>;
@@ -723,6 +818,7 @@ export type EventQuery = {
         bandApplicationEnd?: Date | null;
         djApplicationEnd?: Date | null;
       }
+    | {__typename?: 'News'}
     | {__typename?: 'NuclinoPage'}
     | {__typename?: 'Product'}
     | {__typename?: 'ProductList'}
@@ -840,107 +936,6 @@ export type DuplicateApplicationWarningLazyQueryHookResult = ReturnType<
 export type DuplicateApplicationWarningQueryResult = Apollo.QueryResult<
   DuplicateApplicationWarningQuery,
   DuplicateApplicationWarningQueryVariables
->;
-export const ThanksDocument = gql`
-  query Thanks($id: ID!) {
-    node(id: $id) {
-      ... on Event {
-        bandApplicationEnd
-        djApplicationEnd
-      }
-    }
-  }
-`;
-
-/**
- * __useThanksQuery__
- *
- * To run a query within a React component, call `useThanksQuery` and pass it any options that fit your needs.
- * When your component renders, `useThanksQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useThanksQuery({
- *   variables: {
- *      id: // value for 'id'
- *   },
- * });
- */
-export function useThanksQuery(
-  baseOptions: Apollo.QueryHookOptions<ThanksQuery, ThanksQueryVariables>,
-) {
-  const options = {...defaultOptions, ...baseOptions};
-  return Apollo.useQuery<ThanksQuery, ThanksQueryVariables>(
-    ThanksDocument,
-    options,
-  );
-}
-export function useThanksLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<ThanksQuery, ThanksQueryVariables>,
-) {
-  const options = {...defaultOptions, ...baseOptions};
-  return Apollo.useLazyQuery<ThanksQuery, ThanksQueryVariables>(
-    ThanksDocument,
-    options,
-  );
-}
-export type ThanksQueryHookResult = ReturnType<typeof useThanksQuery>;
-export type ThanksLazyQueryHookResult = ReturnType<typeof useThanksLazyQuery>;
-export type ThanksQueryResult = Apollo.QueryResult<
-  ThanksQuery,
-  ThanksQueryVariables
->;
-export const CreateBandApplicationDocument = gql`
-  mutation CreateBandApplication($data: CreateBandApplicationInput!) {
-    createBandApplication(data: $data) {
-      id
-    }
-  }
-`;
-export type CreateBandApplicationMutationFn = Apollo.MutationFunction<
-  CreateBandApplicationMutation,
-  CreateBandApplicationMutationVariables
->;
-
-/**
- * __useCreateBandApplicationMutation__
- *
- * To run a mutation, you first call `useCreateBandApplicationMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useCreateBandApplicationMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [createBandApplicationMutation, { data, loading, error }] = useCreateBandApplicationMutation({
- *   variables: {
- *      data: // value for 'data'
- *   },
- * });
- */
-export function useCreateBandApplicationMutation(
-  baseOptions?: Apollo.MutationHookOptions<
-    CreateBandApplicationMutation,
-    CreateBandApplicationMutationVariables
-  >,
-) {
-  const options = {...defaultOptions, ...baseOptions};
-  return Apollo.useMutation<
-    CreateBandApplicationMutation,
-    CreateBandApplicationMutationVariables
-  >(CreateBandApplicationDocument, options);
-}
-export type CreateBandApplicationMutationHookResult = ReturnType<
-  typeof useCreateBandApplicationMutation
->;
-export type CreateBandApplicationMutationResult =
-  Apollo.MutationResult<CreateBandApplicationMutation>;
-export type CreateBandApplicationMutationOptions = Apollo.BaseMutationOptions<
-  CreateBandApplicationMutation,
-  CreateBandApplicationMutationVariables
 >;
 export const EventDocument = gql`
   query Event($id: ID!) {

@@ -11,6 +11,13 @@ const moduleExports = {
   experimental: {
     swcPlugins: [['next-superjson-plugin', {}]],
   },
+  redirects: () => [
+    {
+      source: '/',
+      destination: 'https://www2.kulturspektakel.de/booking', // Matched parameters can be used in the destination
+      permanent: false,
+    },
+  ],
   sentry: {
     // Use `hidden-source-map` rather than `source-map` as the Webpack `devtool`
     // for client-side builds. (This will be the default starting in
