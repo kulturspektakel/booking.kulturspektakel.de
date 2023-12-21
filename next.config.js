@@ -14,7 +14,7 @@ const moduleExports = {
   redirects: () => [
     {
       source: '/',
-      destination: 'https://www2.kulturspektakel.de/booking', // Matched parameters can be used in the destination
+      destination: 'https://www.kulturspektakel.de/booking', // Matched parameters can be used in the destination
       permanent: false,
     },
   ],
